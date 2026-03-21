@@ -8,8 +8,10 @@ export default function CustomCursor() {
 
   useEffect(() => {
     if (reduced) return;
-    const dot = ref.current;
-    if (!dot) return;
+    const el = ref.current;
+    if (!el) return;
+    // Capture as non-null const for use in closures
+    const dot: HTMLDivElement = el;
 
     let mouseX = 0, mouseY = 0;
     let cursorX = 0, cursorY = 0;
