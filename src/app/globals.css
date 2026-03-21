@@ -2884,7 +2884,7 @@ select:focus-visible,
 /* Blog Grid */
 .blog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
   padding: 0 var(--gutter) var(--section-pad);
   max-width: 1200px;
