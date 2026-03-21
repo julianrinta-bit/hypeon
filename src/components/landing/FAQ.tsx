@@ -64,12 +64,13 @@ export default function FAQ() {
             return (
               <RevealOnScroll key={i}>
                 <div className={`faq-item${isActive ? ' active' : ''}`} data-faq={i}>
-                  <div className="faq-question" onClick={() => toggle(i)} role="button" tabIndex={0} aria-expanded={isActive} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(i); } }}>
+                  <button type="button" className="faq-question" onClick={() => toggle(i)} aria-expanded={isActive} aria-controls={`faq-answer-${i}`}>
                     <span className="faq-question-text">{faq.q}</span>
                     <span className="faq-arrow">{isActive ? '\u2212' : '+'}</span>
-                  </div>
+                  </button>
                   <div
                     className="faq-answer"
+                    id={`faq-answer-${i}`}
                     ref={(el) => { answerRefs.current[i] = el; }}
                     style={{ maxHeight: isActive ? (answerRefs.current[i]?.scrollHeight ?? 300) + 'px' : '0' }}
                   >

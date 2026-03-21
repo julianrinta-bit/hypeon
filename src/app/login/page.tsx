@@ -8,6 +8,7 @@ export default function LoginPage() {
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setError('');
 
@@ -25,6 +26,7 @@ export default function LoginPage() {
           <span className="nav-logo-slash">//</span>
           <span className="nav-logo-text">HYPE ON</span>
         </a>
+        <a href="/" className="blog-back">&larr; Back to home</a>
         <h1 className="login-title">Client Portal</h1>
 
         <form onSubmit={handleSubmit} className="login-form">

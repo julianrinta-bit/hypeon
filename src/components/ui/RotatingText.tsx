@@ -8,7 +8,13 @@ const INTERVAL_MS = 3000;
 export default function RotatingText() {
   const ref = useRef<HTMLSpanElement>(null);
   const [index, setIndex] = useState(0);
+  const indexRef = useRef(index);
   const reduced = useReducedMotion();
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    indexRef.current = index;
+  }, [index]);
 
   useEffect(() => {
     if (reduced) return;
@@ -16,7 +22,7 @@ export default function RotatingText() {
     if (!el) return;
 
     const interval = setInterval(() => {
-      const nextIndex = (index + 1) % PHRASES.length;
+      const nextIndex = (indexRef.current + 1) % PHRASES.length;
 
       el.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s';
       el.style.transform = 'translateY(-110%)';
@@ -39,7 +45,7 @@ export default function RotatingText() {
     }, INTERVAL_MS);
 
     return () => clearInterval(interval);
-  }, [index, reduced]);
+  }, [reduced]);
 
   return (
     <span className="rotating-wrapper">

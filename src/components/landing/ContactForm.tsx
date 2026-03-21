@@ -43,6 +43,14 @@ export default function ContactForm() {
   const sectionRef = useRef<HTMLElement>(null);
   const goldPulsed = useRef(false);
   const formRef = useRef<HTMLFormElement>(null);
+  const resetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear reset timer on unmount
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    };
+  }, []);
 
   // Prefill email from exit modal URL parameter
   useEffect(() => {
@@ -97,13 +105,14 @@ export default function ContactForm() {
       const result = await submitLead(formData);
       if (result.success) {
         setSubmitted(true);
-        setTimeout(() => {
+        resetTimerRef.current = setTimeout(() => {
           setSubmitted(false);
           setService('youtube');
           setChannelUrl('');
           setName('');
           setEmail('');
           setMessage('');
+          resetTimerRef.current = null;
         }, 3000);
       } else {
         setError(result.error || 'Something went wrong.');
@@ -164,7 +173,10 @@ export default function ContactForm() {
                       type="button"
                       className={`service-pill${service === key ? ' active' : ''}`}
                       data-value={key}
-                      onClick={() => setService(key)}
+                      onClick={() => {
+                        setService(key);
+                        if (key !== 'youtube') setChannelUrl('');
+                      }}
                     >
                       {key === 'youtube'
                         ? 'YouTube Performance'

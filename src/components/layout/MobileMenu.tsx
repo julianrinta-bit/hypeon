@@ -1,8 +1,11 @@
 'use client';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   const open = useCallback(() => {
     setIsOpen(true);
@@ -12,16 +15,54 @@ export default function MobileMenu() {
   const close = useCallback(() => {
     setIsOpen(false);
     document.body.style.overflow = '';
+    hamburgerRef.current?.focus();
   }, []);
 
-  // Close on Escape key
+  // Focus close button when menu opens
+  useEffect(() => {
+    if (isOpen) {
+      closeRef.current?.focus();
+    }
+  }, [isOpen]);
+
+  // Close on Escape key + focus trap
   useEffect(() => {
     if (!isOpen) return;
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        close();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const overlay = overlayRef.current;
+        if (!overlay) return;
+
+        const focusable = overlay.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
     };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, close]);
 
   // Clean up overflow hidden on unmount
@@ -34,6 +75,7 @@ export default function MobileMenu() {
         onClick={open}
         aria-label="Open menu"
         aria-expanded={isOpen}
+        ref={hamburgerRef}
       >
         <span /><span /><span />
       </button>
@@ -41,8 +83,9 @@ export default function MobileMenu() {
         className={`mobile-menu-overlay${isOpen ? ' active' : ''}`}
         aria-hidden={!isOpen}
         inert={!isOpen ? true : undefined}
+        ref={overlayRef}
       >
-        <button className="mobile-menu-close" onClick={close} aria-label="Close menu">
+        <button className="mobile-menu-close" onClick={close} aria-label="Close menu" ref={closeRef}>
           &times;
         </button>
         <a href="/#proof" className="mobile-menu-link" onClick={close}>Proof</a>

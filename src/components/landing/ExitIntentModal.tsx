@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 export default function ExitIntentModal() {
   const [active, setActive] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Desktop only, show once per session
@@ -22,17 +23,54 @@ export default function ExitIntentModal() {
     return () => document.removeEventListener('mouseout', handleMouseOut);
   }, []);
 
-  // Escape key to close
+  const close = useCallback(() => setActive(false), []);
+
+  // Focus email input when modal opens
   useEffect(() => {
-    if (!active) return;
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') close();
-    };
-    document.addEventListener('keydown', handleEscape);
-    return () => document.removeEventListener('keydown', handleEscape);
+    if (active) {
+      emailRef.current?.focus();
+    }
   }, [active]);
 
-  const close = () => setActive(false);
+  // Escape key to close + focus trap
+  useEffect(() => {
+    if (!active) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        close();
+        return;
+      }
+
+      if (e.key === 'Tab') {
+        const modal = modalRef.current;
+        if (!modal) return;
+
+        const focusable = modal.querySelectorAll<HTMLElement>(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [active, close]);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) close();
@@ -60,7 +98,7 @@ export default function ExitIntentModal() {
       aria-label="Free audit offer"
       onClick={handleOverlayClick}
     >
-      <div className="exit-modal">
+      <div className="exit-modal" ref={modalRef}>
         <button className="exit-modal-close" onClick={close} aria-label="Close">
           &times;
         </button>
