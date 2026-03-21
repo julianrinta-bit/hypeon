@@ -1,9 +1,20 @@
+'use client';
+import { useState, useEffect } from 'react';
 import MobileMenu from './MobileMenu';
 
 export default function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll(); // check initial position
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
   return (
     <>
-      <nav className="nav" aria-label="Main navigation">
+      <nav className={`nav${scrolled ? ' nav--scrolled' : ''}`} aria-label="Main navigation">
         <a href="/" className="nav-logo" aria-label="Hype On Media home">
           <span className="nav-logo-slash">//</span>
           <span className="nav-logo-text">HYPE ON</span>
