@@ -2769,3 +2769,338 @@ select:focus-visible,
   outline-color: var(--bg);
 }
 
+/* ═══════════════════════════════════════════════════════
+   BLOG
+   ═══════════════════════════════════════════════════════ */
+
+/* Blog Hero */
+.blog-hero {
+  padding: var(--section-pad) var(--gutter) calc(var(--section-pad) * 0.5);
+  text-align: center;
+}
+
+.blog-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.02em;
+}
+
+.blog-hero p {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  color: var(--white-60);
+  margin-top: 0.75rem;
+}
+
+/* Blog Grid */
+.blog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 2rem;
+  padding: 0 var(--gutter) var(--section-pad);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Blog Card */
+.blog-card {
+  background: var(--surface);
+  border: 1px solid var(--white-06);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 300ms ease, transform 300ms ease;
+}
+
+.blog-card:hover {
+  border-color: var(--accent-line);
+  transform: translateY(-2px);
+}
+
+.blog-card a {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.blog-card__cover {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.blog-card__body {
+  padding: 1.5rem;
+}
+
+.blog-card__meta {
+  display: flex;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--white-60);
+  margin-bottom: 0.75rem;
+}
+
+.blog-card__body h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.3;
+  margin-bottom: 0.5rem;
+}
+
+.blog-card__body p {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--white-60);
+  line-height: 1.6;
+}
+
+/* Blog Article */
+.blog-article {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--section-pad) var(--gutter);
+}
+
+.blog-article__header {
+  margin-bottom: 2rem;
+}
+
+.blog-article__meta {
+  display: flex;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.blog-article__header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+}
+
+.blog-article__description {
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  color: var(--white-60);
+  line-height: 1.6;
+}
+
+.blog-article__cover {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius);
+  margin-bottom: 3rem;
+}
+
+/* Prose — article body typography */
+.prose {
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  color: var(--white);
+  line-height: 1.8;
+}
+
+.prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.prose h3 {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-top: 2.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose h4 {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose p {
+  margin-bottom: 1.5rem;
+}
+
+.prose a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 200ms ease;
+}
+
+.prose a:hover {
+  color: var(--white);
+}
+
+.prose strong {
+  font-weight: 700;
+  color: var(--white);
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose ul,
+.prose ol {
+  margin-bottom: 1.5rem;
+  padding-left: 1.5rem;
+}
+
+.prose li {
+  margin-bottom: 0.5rem;
+}
+
+.prose li::marker {
+  color: var(--accent);
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--accent);
+  padding: 1rem 1.5rem;
+  margin: 2rem 0;
+  background: var(--accent-muted);
+  color: var(--white-60);
+  font-style: italic;
+}
+
+.prose blockquote p {
+  margin-bottom: 0;
+}
+
+.prose img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  margin: 2rem 0;
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--white-12);
+  margin: 3rem 0;
+}
+
+/* Prose — code blocks (rehype-pretty-code) */
+.prose pre {
+  background: var(--surface);
+  border: 1px solid var(--white-06);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  overflow-x: auto;
+  margin: 2rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+.prose :not(pre) > code {
+  background: var(--surface);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  border: 1px solid var(--white-06);
+  color: var(--accent);
+}
+
+/* Prose — heading anchor links */
+.prose h2 a,
+.prose h3 a,
+.prose h4 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.prose h2 a:hover,
+.prose h3 a:hover,
+.prose h4 a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 4px;
+}
+
+/* Inline CTA */
+.blog-cta {
+  background: var(--surface);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin: 3rem 0;
+  text-align: center;
+}
+
+.blog-cta h3 {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+
+.blog-cta p {
+  font-family: var(--font-body);
+  color: var(--white-60);
+  margin-bottom: 1.25rem;
+}
+
+.blog-cta__button {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--bg);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  padding: 0.75rem 2rem;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: opacity 200ms ease;
+}
+
+.blog-cta__button:hover {
+  opacity: 0.88;
+}
+
+/* Blog responsive */
+@media (max-width: 768px) {
+  .blog-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .blog-article {
+    padding: calc(var(--section-pad) * 0.6) var(--gutter);
+  }
+
+  .prose h2 {
+    font-size: 1.5rem;
+  }
+}
+
