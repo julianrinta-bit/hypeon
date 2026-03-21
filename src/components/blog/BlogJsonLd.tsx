@@ -1,3 +1,8 @@
+interface FAQItem {
+  question: string
+  answer: string
+}
+
 interface Post {
   title: string
   description: string
@@ -7,7 +12,7 @@ interface Post {
   cover: { src: string; width: number; height: number }
 }
 
-export default function BlogJsonLd({ post }: { post: Post }) {
+export default function BlogJsonLd({ post, faq }: { post: Post; faq?: FAQItem[] }) {
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -41,10 +46,33 @@ export default function BlogJsonLd({ post }: { post: Post }) {
     },
   }
 
+  const faqLd = faq?.length
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faq.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })),
+      }
+    : null
+
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      )}
+    </>
   )
 }
