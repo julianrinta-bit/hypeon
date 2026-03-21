@@ -174,6 +174,70 @@ Conventions not yet established. Will populate as patterns emerge during develop
 Architecture not yet mapped. Follow existing patterns found in the codebase.
 <!-- GSD:architecture-end -->
 
+## Conventions — Learned the Hard Way
+
+### CSS Specificity
+
+**`.prose a` overrides EVERYTHING inside articles.** Any `<a>` element inside `.prose` inherits `color: var(--accent)` (gold text). This makes buttons with gold background + dark text INVISIBLE. Always add `.prose .your-button-class` with `color: var(--bg) !important` and `text-decoration: none !important` when placing clickable elements inside prose.
+
+**`mix-blend-mode: difference` is dangerous on navbars.** It inverts colors against whatever is below — works on solid dark hero, becomes invisible over lighter sections. Use glassmorphism instead: `backdrop-filter: blur(14px) saturate(160%)` + `rgba(9, 9, 11, 0.82)` background on scroll.
+
+### Next.js + Velite Pipeline
+
+**Velite `clean: true` deletes images before Next.js serves them.** Always use `clean: false` in velite.config.ts. The build script is `"build": "velite build && next build"` — velite runs FIRST and completes before Next.js starts. Never rely on the async `import('velite').then(...)` in next.config.ts for production builds.
+
+**`aspect-ratio` conflicts with Next.js Image component.** Next.js `<Image>` sets explicit `width` and `height` attributes. Adding CSS `aspect-ratio` with a different ratio causes cropping/distortion. Either match the ratio exactly or use `height: auto` and let the image size naturally.
+
+### Navigation
+
+**Anchor links must be absolute from subpages.** Use `/#section` not `#section`. Links like `#proof` only work on the landing page — from `/blog` or `/login` they resolve to nothing.
+
+**Every page needs a way back.** Blog → "← Back to home". Article → "← All articles". Login → "← Back to home" + clickable logo. No dead ends.
+
+**Mobile menu must mirror desktop nav.** If desktop has "Log in", mobile must too. Audit both when adding any nav link.
+
+### Accessibility
+
+**Modals and overlays need focus traps.** When open: Tab/Shift+Tab cycles within the modal. On close: restore focus to the trigger element. Use `inert` attribute on closed overlays to prevent tab-through.
+
+**`document.body.style.overflow = 'hidden'` must be cleaned up on unmount.** If a component sets overflow hidden (for modals, menus), add `useEffect(() => () => { document.body.style.overflow = ''; }, [])`.
+
+**`role="navigation"` on `<nav>` and `role="contentinfo"` on `<footer>` are redundant.** HTML5 semantic elements already have implicit ARIA roles.
+
+### Blog Design
+
+**Counter animations (0 → 5B+) feel cheap in 2026.** Show values instantly. Keep data visualizations (sparklines, bar charts) — those add value.
+
+**Cover images must be visible on dark backgrounds.** Black-on-black placeholders are invisible. Use gradient + typography covers with brand colors.
+
+**Text inside articles should be 18px (`1.125rem`) on a 720px column.** This gives ~70 characters per line — optimal reading measure.
+
+**Articles need a two-column layout on desktop (≥1100px).** 720px body + 240px sticky TOC sidebar = ~1000px total. The outer container must be 1000px, not 720px, or the sidebar squeezes the body.
+
+### Blog Content (AEO/GEO/SEO)
+
+**Every H2 must be followed by a 40-60 word answer block.** This is what AI chatbots and Google AI Overviews extract.
+
+**Every article must end with an FAQ section.** 3-5 Q&A items with specific, data-backed answers.
+
+**Never say "AI will let you do it yourself."** Always say "Hype On already does this." See `.claude/skills/hypeon-blog-writer/SKILL.md` for the full brand voice guide.
+
+### Deployment
+
+**Server port 3400** for Hype On website (Orbit uses 3000, 3100 was taken by PM2 daemon, 3200/3202/3300 by other Orbit processes).
+
+**Deploy sequence:** `git push` → SSH to alpha → `git pull && npm run build && pm2 restart hypeon-website`.
+
+**PM2 ecosystem file must be `.cjs`** because package.json has `"type": "module"`. `module.exports` syntax doesn't work in `.js` files.
+
+### GSD Plan Files
+
+**Frontmatter must be the VERY FIRST thing in the file** (line 1 = `---`). Heading goes AFTER the closing `---`. The GSD tool takes the LAST `---` block in the file, so code examples with `---` break parsing.
+
+**No parenthetical comments in `files_modified`** values. `- src/app/layout.tsx (add X)` breaks YAML. Use `- src/app/layout.tsx` only.
+
+**`depends_on` uses plan IDs, not filenames.** Use `[01-01]` not `[01-PLAN-01]`.
+
 <!-- GSD:workflow-start source:GSD defaults -->
 ## GSD Workflow Enforcement
 
