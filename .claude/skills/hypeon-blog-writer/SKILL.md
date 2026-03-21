@@ -1,5 +1,5 @@
 ---
-name: blog-writer
+name: hypeon-blog-writer
 description: >
   Research, write, and publish blog articles for the Hype On Media website.
   Use when: "write an article", "blog post about", "create content", "publish article",
