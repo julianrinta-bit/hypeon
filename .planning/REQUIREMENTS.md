@@ -90,18 +90,47 @@
 
 ## Traceability
 
-| Requirement | Phase | Status |
-|-------------|-------|--------|
-| LAND-01 through LAND-11 | Phase 1 | Pending |
-| INFRA-01 through INFRA-06 | Phase 1 | Pending |
-| BLOG-01 through BLOG-09 | Phase 2 | Pending |
-| PORT-01 through PORT-06 | Phase 3 | Pending |
+| Requirement | Phase | Plan | Status |
+|-------------|-------|------|--------|
+| LAND-01 | Phase 1 | 1.2 — Sections + Animations | Pending |
+| LAND-02 | Phase 1 | 1.2 — Sections + Animations | Pending |
+| LAND-03 | Phase 1 | 1.3 — Form + Polish + Ship | Pending |
+| LAND-04 | Phase 1 | 1.3 — Form + Polish + Ship | Pending |
+| LAND-05 | Phase 1 | 1.3 — Form + Polish + Ship | Pending |
+| LAND-06 | Phase 1 | 1.2 — Sections + Animations | Pending |
+| LAND-07 | Phase 1 | 1.2 — Sections + Animations | Pending |
+| LAND-08 | Phase 1 | 1.3 — Form + Polish + Ship | Pending |
+| LAND-09 | Phase 1 | 1.3 — Form + Polish + Ship | Pending |
+| LAND-10 | Phase 1 | 1.2 — Sections + Animations | Pending |
+| LAND-11 | Phase 1 | 1.3 — Form + Polish + Ship | Pending |
+| INFRA-01 | Phase 1 | 1.1 — Scaffold + Infra | Pending |
+| INFRA-02 | Phase 1 | 1.1 — Scaffold + Infra | Pending |
+| INFRA-03 | Phase 1 | 1.1 — Scaffold + Infra | Pending |
+| INFRA-04 | Phase 1 | 1.1 — Scaffold + Infra | Pending |
+| INFRA-05 | Phase 1 | 1.1 — Scaffold + Infra | Pending |
+| INFRA-06 | Phase 1 | 1.1 — Scaffold + Infra | Pending |
+| BLOG-01 | Phase 2 | 2.1 — MDX Pipeline + Pages | Pending |
+| BLOG-02 | Phase 2 | 2.1 — MDX Pipeline + Pages | Pending |
+| BLOG-03 | Phase 2 | 2.1 — MDX Pipeline + Pages | Pending |
+| BLOG-04 | Phase 2 | 2.2 — SEO + Content | Pending |
+| BLOG-05 | Phase 2 | 2.2 — SEO + Content | Pending |
+| BLOG-06 | Phase 2 | 2.2 — SEO + Content | Pending |
+| BLOG-07 | Phase 2 | 2.1 — MDX Pipeline + Pages | Pending |
+| BLOG-08 | Phase 2 | 2.2 — SEO + Content | Pending |
+| BLOG-09 | Phase 2 | 2.2 — SEO + Content | Pending |
+| PORT-01 | Phase 3 | 3.1 — Auth + Schema | Pending |
+| PORT-02 | Phase 3 | 3.1 — Auth + Schema | Pending |
+| PORT-03 | Phase 3 | 3.2 — Dashboard | Pending |
+| PORT-04 | Phase 3 | 3.2 — Dashboard | Pending |
+| PORT-05 | Phase 3 | 3.2 — Dashboard | Pending |
+| PORT-06 | Phase 3 | 3.2 — Dashboard | Pending |
 
 **Coverage:**
 - v1 requirements: 32 total
 - Mapped to phases: 32
-- Unmapped: 0 ✓
+- Mapped to plans: 32
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-21*
-*Last updated: 2026-03-21 after initial definition*
+*Last updated: 2026-03-21 — traceability updated with plan-level mapping*
