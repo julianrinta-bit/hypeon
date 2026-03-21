@@ -4,7 +4,6 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 import { MDXContent } from '@/components/blog/MDXContent'
 import BlogJsonLd from '@/components/blog/BlogJsonLd'
-import InlineCTA from '@/components/blog/InlineCTA'
 
 // SSG: pre-render all slugs at build time
 export function generateStaticParams() {
@@ -76,7 +75,7 @@ export default async function BlogPostPage({
         />
 
         <div className="blog-article__body prose">
-          <MDXContent code={post.code} components={{ InlineCTA }} />
+          <MDXContent code={post.code} />
         </div>
       </article>
     </main>

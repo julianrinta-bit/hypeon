@@ -1,19 +1,22 @@
 'use client'
 
 import * as runtime from 'react/jsx-runtime'
-import type { ComponentType } from 'react'
+import InlineCTA from '@/components/blog/InlineCTA'
 
 const useMDXComponent = (code: string) => {
   const fn = new Function(code)
   return fn({ ...runtime }).default
 }
 
-interface MDXProps {
-  code: string
-  components?: Record<string, ComponentType>
+const mdxComponents = {
+  InlineCTA,
 }
 
-export const MDXContent = ({ code, components }: MDXProps) => {
+interface MDXProps {
+  code: string
+}
+
+export const MDXContent = ({ code }: MDXProps) => {
   const Component = useMDXComponent(code)
-  return <Component components={components} />
+  return <Component components={mdxComponents} />
 }
