@@ -23,30 +23,12 @@ export default function AnalyticsDashboard() {
   const costAfterRef = useRef<HTMLDivElement>(null);
   const costBadgeRef = useRef<HTMLSpanElement>(null);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
-  const rafsRef = useRef<number[]>([]);
   const hasAnimatedRef = useRef(false);
   const reduced = useReducedMotion();
 
   const addTimeout = useCallback((fn: () => void, delay: number) => {
     const id = setTimeout(fn, delay);
     timeoutsRef.current.push(id);
-  }, []);
-
-  const countUp = useCallback((el: Element, target: number, duration: number) => {
-    const start = performance.now();
-    function tick(now: number) {
-      const t = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - t, 3);
-      el.textContent = String(Math.round(eased * target));
-      if (t < 1) {
-        const id = requestAnimationFrame(tick);
-        rafsRef.current.push(id);
-      } else {
-        el.textContent = String(target);
-      }
-    }
-    const id = requestAnimationFrame(tick);
-    rafsRef.current.push(id);
   }, []);
 
   useEffect(() => {
@@ -85,18 +67,6 @@ export default function AnalyticsDashboard() {
         seg.dataset.color = GOLD_SHADES[i];
         segmentsBar.appendChild(seg);
       }
-    }
-
-    function animateCounters() {
-      const counters = grid!.querySelectorAll('[data-count]');
-      counters.forEach((el) => {
-        const target = parseInt(el.getAttribute('data-count') || '0', 10);
-        if (reduced) {
-          el.textContent = String(target);
-        } else {
-          countUp(el, target, 1500);
-        }
-      });
     }
 
     function animateViews() {
@@ -176,7 +146,6 @@ export default function AnalyticsDashboard() {
         if (entry.isIntersecting && !hasAnimatedRef.current) {
           hasAnimatedRef.current = true;
           grid!.classList.add('visible');
-          animateCounters();
           animateViews();
           animateRevenue();
           animateDots();
@@ -195,10 +164,8 @@ export default function AnalyticsDashboard() {
       obs.disconnect();
       timeoutsRef.current.forEach(clearTimeout);
       timeoutsRef.current = [];
-      rafsRef.current.forEach(cancelAnimationFrame);
-      rafsRef.current = [];
     };
-  }, [reduced, countUp, addTimeout]);
+  }, [reduced, addTimeout]);
 
   return (
     <section className="proof section" id="proof">
@@ -217,7 +184,7 @@ export default function AnalyticsDashboard() {
                 <span className="analytics-card__label">Organic Views</span>
                 <span className="analytics-card__badge">Lifetime</span>
               </div>
-              <div className="analytics-card__number"><span data-count="5">0</span>B+</div>
+              <div className="analytics-card__number"><span>5</span>B+</div>
             </div>
             <div className="analytics-card__viz" aria-hidden="true">
               <div className="sparkline-wrap">
@@ -246,7 +213,7 @@ export default function AnalyticsDashboard() {
                 <span className="analytics-card__label">Monthly Revenue</span>
                 <span className="analytics-card__badge">Current</span>
               </div>
-              <div className="analytics-card__number">$<span data-count="4">0</span>M+</div>
+              <div className="analytics-card__number">$<span>4</span>M+</div>
             </div>
             <div className="analytics-card__viz" aria-hidden="true">
               <div className="bars-wrap" id="revenueChart" ref={revenueChartRef}>
@@ -266,7 +233,7 @@ export default function AnalyticsDashboard() {
                 <span className="analytics-card__label">Channels Scaled</span>
                 <span className="analytics-card__badge">Active</span>
               </div>
-              <div className="analytics-card__number"><span data-count="50">0</span>+</div>
+              <div className="analytics-card__number"><span>50</span>+</div>
             </div>
             <div className="analytics-card__viz" aria-hidden="true">
               <div className="dots-wrap" id="dotsGrid" ref={dotsGridRef}></div>
@@ -280,7 +247,7 @@ export default function AnalyticsDashboard() {
                 <span className="analytics-card__label">Play Buttons Earned</span>
                 <span className="analytics-card__badge">Awards</span>
               </div>
-              <div className="analytics-card__number"><span data-count="20">0</span>+</div>
+              <div className="analytics-card__number"><span>20</span>+</div>
             </div>
             <div className="analytics-card__viz" aria-hidden="true">
               <div className="playbtns-wrap" id="playBtns" ref={playBtnsRef}></div>
@@ -294,7 +261,7 @@ export default function AnalyticsDashboard() {
                 <span className="analytics-card__label">Languages</span>
                 <span className="analytics-card__badge">Global</span>
               </div>
-              <div className="analytics-card__number"><span data-count="15">0</span></div>
+              <div className="analytics-card__number"><span>15</span></div>
             </div>
             <div className="analytics-card__viz" aria-hidden="true">
               <div className="segments-wrap">
@@ -318,7 +285,7 @@ export default function AnalyticsDashboard() {
                 <span className="analytics-card__label">Cost Reduction</span>
                 <span className="analytics-card__badge">Efficiency</span>
               </div>
-              <div className="analytics-card__number"><span data-count="60">0</span>%+</div>
+              <div className="analytics-card__number"><span>60</span>%+</div>
             </div>
             <div className="analytics-card__viz" aria-hidden="true">
               <div className="cost-wrap">
