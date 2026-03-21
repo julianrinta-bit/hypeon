@@ -2,6 +2,7 @@
 
 import * as runtime from 'react/jsx-runtime'
 import InlineCTA from '@/components/blog/InlineCTA'
+import ReadAlso from '@/components/blog/ReadAlso'
 
 const useMDXComponent = (code: string) => {
   const fn = new Function(code)
@@ -10,6 +11,7 @@ const useMDXComponent = (code: string) => {
 
 const mdxComponents = {
   InlineCTA,
+  ReadAlso,
 }
 
 interface MDXProps {
