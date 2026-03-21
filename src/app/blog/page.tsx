@@ -31,8 +31,8 @@ export default function BlogPage() {
 
       {/* Featured post */}
       {featured && (
-        <section className="blog-grid" style={{ paddingBottom: 0 }}>
-          <Link href={featured.permalink} className="blog-featured" style={{ gridColumn: '1 / -1' }}>
+        <section className="blog-featured-wrap">
+          <Link href={featured.permalink} className="blog-featured">
             <Image
               src={featured.cover.src}
               alt={featured.coverAlt}

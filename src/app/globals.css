@@ -3193,16 +3193,17 @@ select:focus-visible,
   margin-bottom: 1.25rem;
 }
 
-.blog-cta__button {
+.blog-cta__button,
+.prose .blog-cta__button {
   display: inline-block;
   background: var(--accent);
-  color: var(--bg);
+  color: var(--bg) !important;
   font-family: var(--font-body);
   font-weight: 600;
   font-size: 0.9375rem;
   padding: 0.75rem 2rem;
   border-radius: var(--radius);
-  text-decoration: none;
+  text-decoration: none !important;
   transition: background 200ms ease, box-shadow 200ms ease, transform 200ms ease;
 }
 
@@ -3210,6 +3211,13 @@ select:focus-visible,
   background: #e6be00;
   box-shadow: 0 0 20px var(--accent-glow);
   transform: translateY(-1px);
+}
+
+/* Featured post wrapper */
+.blog-featured-wrap {
+  padding: 0 var(--gutter);
+  max-width: 1200px;
+  margin: 0 auto 2rem;
 }
 
 /* Featured post */
