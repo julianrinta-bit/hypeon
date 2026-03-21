@@ -24,6 +24,9 @@ export default function MobileMenu() {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, close]);
 
+  // Clean up overflow hidden on unmount
+  useEffect(() => () => { document.body.style.overflow = ''; }, []);
+
   return (
     <>
       <button
@@ -37,6 +40,7 @@ export default function MobileMenu() {
       <div
         className={`mobile-menu-overlay${isOpen ? ' active' : ''}`}
         aria-hidden={!isOpen}
+        inert={!isOpen ? true : undefined}
       >
         <button className="mobile-menu-close" onClick={close} aria-label="Close menu">
           &times;
@@ -46,6 +50,7 @@ export default function MobileMenu() {
         <a href="/#work" className="mobile-menu-link" onClick={close}>Work</a>
         <a href="/#about" className="mobile-menu-link" onClick={close}>About</a>
         <a href="/blog" className="mobile-menu-link" onClick={close}>Blog</a>
+        <a href="/login" className="mobile-menu-link" onClick={close}>Log in</a>
         <a href="/#contact" className="mobile-menu-cta" onClick={close}>Get a free audit &rarr;</a>
       </div>
     </>

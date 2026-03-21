@@ -4,7 +4,7 @@ export default function Footer() {
       <div className="container">
         <div className="footer-inner">
           <div className="footer-left">
-            <div className="footer-wordmark">HYPE ON MEDIA</div>
+            <a href="/" style={{ textDecoration: 'none', color: 'inherit' }}><div className="footer-wordmark">HYPE ON MEDIA</div></a>
             <div className="footer-tagline">YouTube. Engineered.</div>
           </div>
           <div className="footer-right">

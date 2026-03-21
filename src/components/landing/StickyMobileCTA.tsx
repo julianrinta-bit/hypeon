@@ -49,7 +49,7 @@ export default function StickyMobileCTA() {
         &times;
       </button>
       <span className="sticky-mobile-cta-text">Free Audit</span>
-      <a href="#contact" className="sticky-mobile-cta-btn" onClick={handleCTAClick}>
+      <a href="/#contact" className="sticky-mobile-cta-btn" onClick={handleCTAClick}>
         Get Started &rarr;
       </a>
     </div>

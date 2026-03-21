@@ -48,7 +48,7 @@ export default function ExitIntentModal() {
     // Navigate to contact section with email as URL parameter.
     // ContactForm reads `prefill_email` from the URL on mount via useEffect
     // and populates the email field. This avoids direct DOM writes that bypass React state.
-    window.location.hash = `contact?prefill_email=${encodeURIComponent(email)}`;
+    window.location.href = `/#contact?prefill_email=${encodeURIComponent(email)}`;
   };
 
   return (
