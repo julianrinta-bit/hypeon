@@ -41,12 +41,12 @@ export default function MobileMenu() {
         <button className="mobile-menu-close" onClick={close} aria-label="Close menu">
           &times;
         </button>
-        <a href="#proof" className="mobile-menu-link" onClick={close}>Proof</a>
-        <a href="#services" className="mobile-menu-link" onClick={close}>Services</a>
-        <a href="#work" className="mobile-menu-link" onClick={close}>Work</a>
-        <a href="#about" className="mobile-menu-link" onClick={close}>About</a>
+        <a href="/#proof" className="mobile-menu-link" onClick={close}>Proof</a>
+        <a href="/#services" className="mobile-menu-link" onClick={close}>Services</a>
+        <a href="/#work" className="mobile-menu-link" onClick={close}>Work</a>
+        <a href="/#about" className="mobile-menu-link" onClick={close}>About</a>
         <a href="/blog" className="mobile-menu-link" onClick={close}>Blog</a>
-        <a href="#contact" className="mobile-menu-cta" onClick={close}>Get a free audit &rarr;</a>
+        <a href="/#contact" className="mobile-menu-cta" onClick={close}>Get a free audit &rarr;</a>
       </div>
     </>
   );

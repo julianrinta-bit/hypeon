@@ -16,6 +16,7 @@ export default function BlogPage() {
   return (
     <main id="main-content">
       <section className="blog-hero">
+        <Link href="/" className="blog-back">&larr; Back to home</Link>
         <h1>Blog</h1>
         <p>YouTube growth strategies and insights</p>
       </section>

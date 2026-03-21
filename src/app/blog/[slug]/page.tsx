@@ -1,6 +1,7 @@
 import { posts } from '#velite'
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
+import Link from 'next/link'
 import type { Metadata } from 'next'
 import { MDXContent } from '@/components/blog/MDXContent'
 import BlogJsonLd from '@/components/blog/BlogJsonLd'
@@ -50,6 +51,7 @@ export default async function BlogPostPage({
 
   return (
     <main id="main-content">
+      <Link href="/blog" className="blog-back">&larr; All articles</Link>
       <article className="blog-article">
         <BlogJsonLd post={post} />
         <header className="blog-article__header">
