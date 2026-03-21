@@ -1,5 +1,5 @@
 'use client';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +13,16 @@ export default function MobileMenu() {
     setIsOpen(false);
     document.body.style.overflow = '';
   }, []);
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') close();
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, close]);
 
   return (
     <>
