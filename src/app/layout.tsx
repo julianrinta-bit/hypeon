@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
 import { Plus_Jakarta_Sans, IBM_Plex_Mono } from 'next/font/google';
 import './globals.css';
+import ScrollProgress from '@/components/layout/ScrollProgress';
+import CustomCursor from '@/components/layout/CustomCursor';
+import Nav from '@/components/layout/Nav';
+import Footer from '@/components/layout/Footer';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -60,8 +64,12 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
+        <ScrollProgress />
         <div className="noise" aria-hidden="true" />
+        <CustomCursor />
+        <Nav />
         {children}
+        <Footer />
       </body>
     </html>
   );
