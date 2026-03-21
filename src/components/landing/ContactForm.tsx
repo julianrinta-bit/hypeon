@@ -132,7 +132,7 @@ export default function ContactForm() {
               </a>
             </div>
           </RevealOnScroll>
-          <RevealOnScroll delay={1}>
+          <RevealOnScroll className="reveal reveal-delay-1">
             <form
               className="contact-form"
               id="contact-form"
