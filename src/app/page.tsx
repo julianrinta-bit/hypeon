@@ -12,6 +12,7 @@ import Testimonials from '@/components/landing/Testimonials';
 import Different from '@/components/landing/Different';
 import About from '@/components/landing/About';
 import FAQ from '@/components/landing/FAQ';
+import ContactForm from '@/components/landing/ContactForm';
 
 export default function LandingPage() {
   return (
@@ -37,12 +38,7 @@ export default function LandingPage() {
       <div className="container"><div className="divider" /></div>
       <FAQ />
       <div className="container"><div className="divider" /></div>
-      {/* ContactForm placeholder — Plan 1.3 */}
-      <section className="contact section" id="contact">
-        <div className="container">
-          <p>Contact form coming in Plan 1.3</p>
-        </div>
-      </section>
+      <ContactForm />
     </main>
   );
 }
