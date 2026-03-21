@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Image from 'next/image'
 import type { Metadata } from 'next'
 import { MDXContent } from '@/components/blog/MDXContent'
+import BlogJsonLd from '@/components/blog/BlogJsonLd'
 import InlineCTA from '@/components/blog/InlineCTA'
 
 // SSG: pre-render all slugs at build time
@@ -51,6 +52,7 @@ export default async function BlogPostPage({
   return (
     <main id="main-content">
       <article className="blog-article">
+        <BlogJsonLd post={post} />
         <header className="blog-article__header">
           <div className="blog-article__meta">
             <time dateTime={post.date}>
