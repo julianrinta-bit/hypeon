@@ -3234,8 +3234,7 @@ select:focus-visible,
 
 .blog-featured__cover {
   width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
+  height: auto;
   border-radius: var(--radius);
   transition: transform 400ms ease;
 }
