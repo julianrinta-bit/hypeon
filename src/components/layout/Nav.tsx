@@ -13,6 +13,7 @@ export default function Nav() {
           <li><a href="#services">Services</a></li>
           <li><a href="#work">Work</a></li>
           <li><a href="#about">About</a></li>
+          <li><a href="/blog">Blog</a></li>
         </ul>
         <a href="#contact" className="nav-cta magnetic">Get a free audit</a>
         <MobileMenu />

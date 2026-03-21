@@ -8,6 +8,7 @@ export default function Footer() {
             <div className="footer-tagline">YouTube. Engineered.</div>
           </div>
           <div className="footer-right">
+            <a href="/blog" className="footer-domain" style={{ textDecoration: 'none', color: 'inherit' }}>Blog</a>
             <span className="footer-domain">hypeon.media</span>
             <span className="footer-copy">&copy; 2024–2026 Hype On Media FZCO</span>
             <div className="footer-social">
