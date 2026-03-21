@@ -371,22 +371,26 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   position: relative;
 }
 
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 30%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(255, 211, 0, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
 .hero .section-bg-number {
   top: 8%;
   right: -3%;
 }
 
-.hero-layout {
-  display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: clamp(3rem, 6vw, 8rem);
-  align-items: end;
-  position: relative;
-  z-index: 2;
-}
-
 .hero-content {
   position: relative;
+  z-index: 2;
 }
 
 .hero-tag {
@@ -404,9 +408,10 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 .hero-headline {
   font-family: var(--font-display);
   font-weight: 800;
-  font-size: clamp(2.8rem, 7vw, 6.5rem);
+  font-size: clamp(3.5rem, 9vw, 8rem);
   line-height: 0.95;
   letter-spacing: -0.03em;
+  text-wrap: balance;
   margin-bottom: 2.5rem;
   opacity: 0;
   transform: translateY(40px);
@@ -450,7 +455,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   font-size: 1.05rem;
   line-height: 1.7;
   margin-bottom: 0.5rem;
-  max-width: 520px;
+  max-width: 600px;
 }
 
 .hero-stats-line {
@@ -517,15 +522,9 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   box-shadow: 0 0 20px var(--accent-muted);
 }
 
-/* Hero right stat stack */
+/* Hero right stat stack — removed from layout, data lives in AnalyticsDashboard */
 .hero-stat-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 1.8rem;
-  align-self: end;
-  opacity: 0;
-  transform: translateY(30px);
-  animation: fadeUp 0.8s var(--ease-out-expo) 1s forwards;
+  display: none;
 }
 
 .hero-stat-item {
@@ -597,19 +596,6 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 }
 
 @media (max-width: 768px) {
-  .hero-layout {
-    grid-template-columns: 1fr;
-    gap: 3rem;
-  }
-  .hero-stat-stack {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-  }
-  .hero-stat-item {
-    flex-direction: column;
-    gap: 0.25rem;
-  }
   .hero-scroll-hint { display: none; }
 }
 
@@ -705,6 +691,11 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   min-height: 220px;
   position: relative;
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.analytics-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .analytics-card--hero {
@@ -987,6 +978,9 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 .analytics-grid.visible .analytics-card:nth-child(4)::after { transition-delay: 0.2s; }
 .analytics-grid.visible .analytics-card:nth-child(5)::after { transition-delay: 0.25s; }
 .analytics-grid.visible .analytics-card:nth-child(6)::after { transition-delay: 0.3s; }
+.analytics-card:hover::after {
+  box-shadow: 0 0 8px rgba(255, 211, 0, 0.15);
+}
 
 /* Analytics grid responsive */
 @media (max-width: 768px) {
@@ -1813,7 +1807,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   html { scroll-behavior: auto; }
   .reveal { opacity: 1; transform: none; }
   .stagger-reveal > * { opacity: 1; transform: none; }
-  .hero-tag, .hero-headline, .hero-sub, .hero-stat-stack, .hero-scroll-hint {
+  .hero-tag, .hero-headline, .hero-sub, .hero-scroll-hint {
     opacity: 1;
     transform: none;
   }
