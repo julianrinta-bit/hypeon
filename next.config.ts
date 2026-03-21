@@ -1,4 +1,13 @@
-import type { NextConfig } from 'next';
+import type { NextConfig } from 'next'
+
+// Velite build integration (Turbopack-compatible)
+// Must use top-level import pattern — webpack plugin does NOT work with --turbo
+const isDev = process.argv.indexOf('dev') !== -1
+const isBuild = process.argv.indexOf('build') !== -1
+if (!process.env.VELITE_STARTED && (isDev || isBuild)) {
+  process.env.VELITE_STARTED = '1'
+  import('velite').then(m => m.build({ watch: isDev, clean: !isDev }))
+}
 
 const nextConfig: NextConfig = {
   images: {
@@ -7,6 +16,6 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'i.ytimg.com' },
     ],
   },
-};
+}
 
-export default nextConfig;
+export default nextConfig
