@@ -17,7 +17,7 @@ export default function BlogJsonLd({ post }: { post: Post }) {
     dateModified: post.updated ?? post.date,
     image: {
       '@type': 'ImageObject',
-      url: `https://hypeon.media${post.cover.src}`,
+      url: post.cover.src.startsWith('http') ? post.cover.src : `https://hypeon.media${post.cover.src}`,
       width: post.cover.width,
       height: post.cover.height,
     },

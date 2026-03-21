@@ -1,6 +1,6 @@
 export default function Footer() {
   return (
-    <footer className="footer" role="contentinfo">
+    <footer className="footer">
       <div className="container">
         <div className="footer-inner">
           <div className="footer-left">

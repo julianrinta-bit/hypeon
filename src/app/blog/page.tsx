@@ -7,6 +7,12 @@ export const metadata: Metadata = {
   title: 'Blog — Hype On Media',
   description: 'YouTube growth strategies, case studies, and industry insights from Hype On Media.',
   alternates: { canonical: '/blog' },
+  openGraph: {
+    title: 'Blog — Hype On Media',
+    description: 'YouTube growth strategies, case studies, and industry insights.',
+    type: 'website',
+    url: 'https://hypeon.media/blog',
+  },
 }
 
 export default function BlogPage() {

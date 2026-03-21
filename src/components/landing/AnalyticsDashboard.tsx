@@ -219,7 +219,7 @@ export default function AnalyticsDashboard() {
               </div>
               <div className="analytics-card__number"><span data-count="5">0</span>B+</div>
             </div>
-            <div className="analytics-card__viz">
+            <div className="analytics-card__viz" aria-hidden="true">
               <div className="sparkline-wrap">
                 <svg viewBox="0 0 400 80" preserveAspectRatio="none">
                   <defs>
@@ -248,7 +248,7 @@ export default function AnalyticsDashboard() {
               </div>
               <div className="analytics-card__number">$<span data-count="4">0</span>M+</div>
             </div>
-            <div className="analytics-card__viz">
+            <div className="analytics-card__viz" aria-hidden="true">
               <div className="bars-wrap" id="revenueChart" ref={revenueChartRef}>
                 {BAR_HEIGHTS.map((h, i) => (
                   <div className="bar-col" key={i}>
@@ -268,7 +268,7 @@ export default function AnalyticsDashboard() {
               </div>
               <div className="analytics-card__number"><span data-count="50">0</span>+</div>
             </div>
-            <div className="analytics-card__viz">
+            <div className="analytics-card__viz" aria-hidden="true">
               <div className="dots-wrap" id="dotsGrid" ref={dotsGridRef}></div>
             </div>
           </div>
@@ -282,7 +282,7 @@ export default function AnalyticsDashboard() {
               </div>
               <div className="analytics-card__number"><span data-count="20">0</span>+</div>
             </div>
-            <div className="analytics-card__viz">
+            <div className="analytics-card__viz" aria-hidden="true">
               <div className="playbtns-wrap" id="playBtns" ref={playBtnsRef}></div>
             </div>
           </div>
@@ -296,7 +296,7 @@ export default function AnalyticsDashboard() {
               </div>
               <div className="analytics-card__number"><span data-count="15">0</span></div>
             </div>
-            <div className="analytics-card__viz">
+            <div className="analytics-card__viz" aria-hidden="true">
               <div className="segments-wrap">
                 <div className="segments-bar" id="segmentsBar" ref={segmentsBarRef}></div>
                 <div className="segments-labels">
@@ -320,7 +320,7 @@ export default function AnalyticsDashboard() {
               </div>
               <div className="analytics-card__number"><span data-count="60">0</span>%+</div>
             </div>
-            <div className="analytics-card__viz">
+            <div className="analytics-card__viz" aria-hidden="true">
               <div className="cost-wrap">
                 <div className="cost-row">
                   <span className="cost-label">Before</span>

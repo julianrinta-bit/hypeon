@@ -17,6 +17,7 @@ export default function Showreel() {
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
                 loading="lazy"
+                sandbox="allow-scripts allow-same-origin allow-presentation"
               ></iframe>
             </div>
             <p className="showreel-caption">Meet Chris from our strategy team — 4 min</p>

@@ -3,7 +3,7 @@ import MobileMenu from './MobileMenu';
 export default function Nav() {
   return (
     <>
-      <nav className="nav" role="navigation" aria-label="Main navigation">
+      <nav className="nav" aria-label="Main navigation">
         <a href="/" className="nav-logo" aria-label="Hype On Media home">
           <span className="nav-logo-slash">//</span>
           <span className="nav-logo-text">HYPE ON</span>
