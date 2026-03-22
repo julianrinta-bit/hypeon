@@ -11,6 +11,10 @@ export default function Footer() {
             <a href="/blog" className="footer-domain" style={{ textDecoration: 'none', color: 'inherit' }}>Blog</a>
             <span className="footer-domain">hypeon.media</span>
             <span className="footer-copy">&copy; 2024–2026 Hype On Media FZCO</span>
+            <span className="footer-legal">
+              <a href="/privacy">Privacy</a>
+              <a href="/terms">Terms</a>
+            </span>
             <div className="footer-social">
               <a href="https://linkedin.com/company/hypeonmedia" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                 <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M4.94 2.5A1.94 1.94 0 013 4.44C3 5.5 3.87 6.38 4.94 6.38s1.94-.88 1.94-1.94A1.94 1.94 0 004.94 2.5zM3.25 7.88h3.38V17.5H3.25V7.88zm5.63 0h3.24v1.31h.05a3.55 3.55 0 013.2-1.75c3.42 0 4.05 2.25 4.05 5.18V17.5h-3.38v-3.44c0-1.56-.03-3.56-2.17-3.56-2.17 0-2.5 1.7-2.5 3.44V17.5H8.88V7.88z"/></svg>
