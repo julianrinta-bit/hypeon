@@ -212,7 +212,13 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 
 **Cover images must be visible on dark backgrounds.** Black-on-black placeholders are invisible. Use gradient + typography covers with brand colors.
 
-**Cover images must be unique per article.** Copying the same file to 50 folders makes the grid look broken. Use `node scripts/generate-covers.js` with rotating gradient accent colors.
+**Cover images must be unique per article.** Copying the same file to 50 folders makes the grid look broken.
+
+**Thumbnails use "HYPE ON MEDIA" as a subtle watermark** — NOT a bottom bar, NOT a logo stamp. The watermark should be barely visible (8-12% opacity white text), positioned bottom-right or bottom-left. It says "this came from Hype On" without being a design element.
+
+**Thumbnail typography should hint at the website's brand** — use the same font family as the hero (Plus Jakarta Sans for display, or a condensed bold variant). Brand color hints: #FFD300 (gold) as accent, #0A0A0A (near-black) as base. But thumbnails are NOT forced into the website palette — they use whatever works best for CTR, with subtle brand cues.
+
+**Obsidian linking rule:** Every new framework, skill, or engagement doc must have a `## Related` section with `[[wiki-links]]` to connected documents. See vault CLAUDE.md for full linking rules.
 
 **Text inside articles should be 18px (`1.125rem`) on a 720px column.** This gives ~70 characters per line — optimal reading measure.
 

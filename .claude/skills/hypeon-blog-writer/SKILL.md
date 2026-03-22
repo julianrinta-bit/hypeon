@@ -166,6 +166,28 @@ Before writing, create a brief:
 5. **Prediction** — "what's coming next" (position as ahead of the curve)
 6. **CTA** — InlineCTA component linking to free audit
 
+#### Bold Keywords (every article)
+
+**Bold important words and stats** throughout the article — specific numbers, key terms, framework names, and surprising claims. This helps scanners catch the value without reading every word.
+
+- Bold: stats (`**$2.4M**`, `**73%**`, `**14 days shorter**`), key terms (`**dark funnel**`, `**pipeline attribution**`), and strong claims (`**YouTube is infrastructure, not a campaign**`)
+- Don't bold: generic words, transition phrases, or entire sentences
+- Aim for 2-4 bolded elements per section (H2 block)
+
+#### CTA Placement (Programmatic — 1/4 and 3/4)
+
+**InlineCTA and NewsletterCTA are placed at 1/4 and 3/4 of the article.** Not at the end. Not stacked. Calculated by H2 count.
+
+**Formula:** Count the H2 headings (excluding FAQ). Place CTAs after:
+- **InlineCTA** → after H2 #`ceil(total/4)` (the 1/4 mark)
+- **NewsletterCTA** → after H2 #`ceil(total*3/4)` (the 3/4 mark)
+
+**Example:** Article with 6 H2 sections:
+- InlineCTA after H2 #2 (ceil(6/4) = 2)
+- NewsletterCTA after H2 #5 (ceil(6*3/4) = 5)
+
+**NEVER at the very end.** NEVER stacked. NEVER adjacent. This is a formula, not a judgment call.
+
 #### AEO/GEO Optimization (every article)
 
 - **Answer blocks:** After each H2, include a 40-60 word paragraph that directly answers the heading as a question. This is what AI extracts.
