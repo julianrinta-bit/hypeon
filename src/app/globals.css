@@ -4037,3 +4037,60 @@ select:focus-visible,
   margin: 0 auto;
 }
 
+/* ============================================================
+   SWIPE NAVIGATION — hint + directional feedback
+   ============================================================ */
+
+/* Swipe hint */
+.swipe-hint {
+  position: fixed;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: rgba(245, 245, 245, 0.4);
+  padding: 0.5rem 1rem;
+  background: rgba(9, 9, 11, 0.8);
+  border: 1px solid var(--white-12);
+  border-radius: 20px;
+  opacity: 0;
+  animation: swipeHintFade 4s ease forwards;
+  z-index: 50;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@keyframes swipeHintFade {
+  0%   { opacity: 0; }
+  15%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* Swipe feedback arrow */
+.swipe-arrow {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 2rem;
+  color: rgba(245, 245, 245, 0.5);
+  z-index: 50;
+  pointer-events: none;
+  animation: swipeArrowFade 0.3s ease forwards;
+}
+
+.swipe-arrow--left  { left: 1rem; }
+.swipe-arrow--right { right: 1rem; }
+
+@keyframes swipeArrowFade {
+  0%   { opacity: 0; transform: translateY(-50%) scale(0.8); }
+  50%  { opacity: 1; transform: translateY(-50%) scale(1); }
+  100% { opacity: 0; transform: translateY(-50%) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swipe-hint,
+  .swipe-arrow { animation: none; opacity: 0; }
+}
+
