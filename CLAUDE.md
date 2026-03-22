@@ -184,7 +184,9 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 
 ### Next.js + Velite Pipeline
 
-**Velite `clean: true` deletes images before Next.js serves them.** Always use `clean: false` in velite.config.ts. The build script is `"build": "velite build && next build"` — velite runs FIRST and completes before Next.js starts. Never rely on the async `import('velite').then(...)` in next.config.ts for production builds.
+**Velite `clean: true` deletes images before Next.js serves them.** Always use `clean: false` in velite.config.ts. The build script is `"build": "velite build && next build"` — velite runs FIRST and completes before Next.js starts. Never rely on the async `import('velite').then(...)` in next.config.ts for production builds — this causes race conditions where images aren't ready.
+
+**Velite requires `slug:` in frontmatter.** Without it, articles are silently skipped — no error, no warning. Always include `slug: {directory-name}` matching the folder name. After any batch content generation, verify with: `grep -rL "^slug:" content/blog/*/index.mdx`
 
 **`aspect-ratio` conflicts with Next.js Image component.** Next.js `<Image>` sets explicit `width` and `height` attributes. Adding CSS `aspect-ratio` with a different ratio causes cropping/distortion. Either match the ratio exactly or use `height: auto` and let the image size naturally.
 
@@ -210,9 +212,17 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 
 **Cover images must be visible on dark backgrounds.** Black-on-black placeholders are invisible. Use gradient + typography covers with brand colors.
 
+**Cover images must be unique per article.** Copying the same file to 50 folders makes the grid look broken. Use `node scripts/generate-covers.js` with rotating gradient accent colors.
+
 **Text inside articles should be 18px (`1.125rem`) on a 720px column.** This gives ~70 characters per line — optimal reading measure.
 
 **Articles need a two-column layout on desktop (≥1100px).** 720px body + 240px sticky TOC sidebar = ~1000px total. The outer container must be 1000px, not 720px, or the sidebar squeezes the body.
+
+**55+ articles require pagination.** Show 12 at a time with a "Load more" button and a search bar. Never render all posts in one grid — it's slow and overwhelming.
+
+**Search bar must be visible on dark themes.** `rgba(255,255,255,0.05)` is invisible on `#0A0A0A`. Use at minimum `rgba(255,255,255,0.18)` border + search icon + focus glow (`box-shadow: 0 0 0 3px rgba(255,255,255,0.06)`).
+
+**Scroll-to-top button is needed on long pages (8+ sections).** 44×44px circle, bottom-right, glassmorphism at rest, accent fill on hover, appears after 1vh scroll. On mobile, position `bottom: 88px` to sit above any sticky CTA.
 
 ### Blog Content (AEO/GEO/SEO)
 
