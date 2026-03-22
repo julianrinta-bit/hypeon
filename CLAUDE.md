@@ -1,3 +1,15 @@
+## ⚠ READ BEFORE DOING ANYTHING
+
+**This project has skills that give you capabilities you don't have by default:**
+
+- **`hypeon-imagery`** — Generates photos/thumbnails/infographics via NanoBanana (Gemini 3.1 Flash Image API). API key in `~/.env`. YOU CAN GENERATE IMAGES. Read `.claude/skills/hypeon-imagery/SKILL.md`.
+- **`hypeon-blog-writer`** — Writes articles in Julian's voice. Read `.claude/skills/hypeon-blog-writer/SKILL.md`.
+- **`hypeon-weekly-article`** — Full pipeline: research → write → thumbnail → deploy. Read `.claude/skills/hypeon-weekly-article/SKILL.md`.
+
+**Before ANY task, read the relevant skill.** The vault at `~/Library/Mobile Documents/com~apple~CloudDocs/Julian's Documents/CREATIVE AGENCY OS/01_FRAMEWORKS/` has frameworks with deep know-how. The skills reference them.
+
+---
+
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
