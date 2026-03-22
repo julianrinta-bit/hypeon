@@ -333,6 +333,10 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   gap: 2rem;
   transform: translateX(100%);
   transition: transform 0.4s var(--ease-out-expo);
+  touch-action: none;
+  overscroll-behavior: contain;
+  overflow: hidden;
+  -webkit-overflow-scrolling: auto;
 }
 
 .mobile-menu-overlay.active {
