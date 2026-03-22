@@ -8,6 +8,7 @@ import BlogJsonLd from '@/components/blog/BlogJsonLd'
 import TableOfContents from '@/components/blog/TableOfContents'
 import ReadingProgress from '@/components/blog/ReadingProgress'
 import ShareButtons from '@/components/blog/ShareButtons'
+import SwipeNavigation from '@/components/blog/SwipeNavigation'
 
 // SSG: pre-render all slugs at build time
 export function generateStaticParams() {
@@ -51,6 +52,11 @@ export default async function BlogPostPage({
   const { slug } = await params
   const post = posts.find(p => p.slug === slug)
   if (!post) notFound()
+
+  const sortedPosts = posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+  const currentIndex = sortedPosts.findIndex(p => p.slug === post.slug)
+  const prevSlug = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1].slug : undefined
+  const nextSlug = currentIndex > 0 ? sortedPosts[currentIndex - 1].slug : undefined
 
   const related = posts
     .filter(p => p.slug !== post.slug)
@@ -129,6 +135,7 @@ export default async function BlogPostPage({
             </div>
           </section>
         )}
+        <SwipeNavigation prevSlug={prevSlug} nextSlug={nextSlug} />
       </main>
     </>
   )

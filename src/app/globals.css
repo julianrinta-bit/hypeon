@@ -3026,6 +3026,9 @@ select:focus-visible,
   font-size: 0.9375rem;
   color: var(--white-60);
   line-height: 1.6;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 
 /* Blog Article */
@@ -3081,6 +3084,9 @@ select:focus-visible,
   font-size: 1.125rem;
   color: var(--white);
   line-height: 1.8;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 
 .prose h2 {
@@ -3202,6 +3208,10 @@ select:focus-visible,
 }
 
 /* Scroll margin for heading anchors */
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  text-align: left;
+}
+
 .prose h2, .prose h3, .prose h4 {
   scroll-margin-top: 5rem;
 }
@@ -3460,6 +3470,9 @@ select:focus-visible,
   font-size: 1rem;
   line-height: 1.7;
   margin-bottom: 1.5rem;
+  text-align: justify;
+  hyphens: auto;
+  -webkit-hyphens: auto;
 }
 
 /* Tags */
@@ -3619,7 +3632,7 @@ select:focus-visible,
 .blog-related {
   max-width: 1000px;
   margin: 4rem auto 0;
-  padding-top: 3rem;
+  padding: 3rem var(--gutter) 0;
   border-top: 1px solid var(--white-06);
 }
 
@@ -3700,6 +3713,15 @@ select:focus-visible,
 
   .prose h2 {
     font-size: 1.5rem;
+  }
+
+  .blog-back {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+  }
+
+  .blog-hero {
+    padding-top: 1rem;
   }
 }
 
