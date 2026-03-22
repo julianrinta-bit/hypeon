@@ -1,21 +1,57 @@
 ---
-name: hypeon-infographic-cover
+name: hypeon-imagery
 description: >
-  Generate photorealistic documentary-style cover images for Hype On Media blog articles.
-  Each cover features a recurring avatar character in a real workspace environment,
-  designed to stop B2B executive scrolling and drive clicks through identification.
-  Use when: "generate covers", "create thumbnails", "make blog images",
-  "blog cover images", "OG images", "thumbnail for article".
+  Generate ALL images for Hype On Media — blog thumbnails, social media visuals,
+  photos, infographics, portraits, and any visual asset. The "ferretería" for imagery.
+  Use when: "generate image", "create thumbnail", "make photo", "generate cover",
+  "blog image", "OG image", "social media image", "portrait", "infographic",
+  "hazme una foto", "genera una imagen", or ANY request involving visual generation.
 metadata:
-  version: 3.0.0
+  version: 4.0.0
   author: Hype On Media
-  domain: photorealistic-ai-generation + b2b-marketing-psychology
-  style: documentary-candid (validated March 2026)
+  domain: ai-image-generation
+  style: adaptive (documentary, infographic, statement, hybrid — board decides per piece)
 ---
 
-# Hype On Blog Thumbnail Generator
+# Hype On Imagery — The Visual Ferretería
 
-Every thumbnail is a **strategic piece**. The board deliberates what FORMAT best serves each article — it could be a documentary photo, an infographic, a data visualization, or a hybrid. There is no single default.
+Generate ANY image for Hype On Media. Thumbnails, portraits, infographics, social posts, photos.
+
+## Step 0: READ FRAMEWORKS FIRST (MANDATORY — before ANY generation)
+
+**Before generating a single pixel, read these vault frameworks:**
+
+```
+~/Library/Mobile Documents/com~apple~CloudDocs/Julian's Documents/CREATIVE AGENCY OS/01_FRAMEWORKS/Production/
+├── Photorealistic_Portrait_Prompts.md    — documentary style, 6 principles, anti-stock
+├── Photo_Realism_Micro_Details.md        — master prompt block (skin, hair, clothing, camera)
+├── Lighting_And_Background_Realism.md    — mixed light, background people, blown windows
+├── Visual_Realism_Masterclass.md         — typography on photos, wardrobe by region, anti-AI
+├── NanoBanana_Prompt_Guide.md            — SCHEMA framework, style keywords, templates
+├── Eye_Catching_Infographics.md          — layouts, colors, data viz patterns
+└── Content_Pipeline_Automated.md         — where imagery fits in the pipeline
+```
+
+And the CTR/design frameworks:
+```
+~/Library/Mobile Documents/.../01_FRAMEWORKS/Web_Design/
+├── Thumbnail_CTR_Design.md               — dimensions, safe zones, color psychology
+└── Visual_Composition_Rules.md           — margins, grid, typography scale
+```
+
+**Read the relevant ones for your task type. Follow their rules. This is NOT optional.**
+
+Key rules from the frameworks (summary — still read the full docs):
+- Material specificity > object specificity ("silver metal teeth zipper with circular ring pull" not "zipper")
+- Sociogeographic context: season, local brands, skin tone by sun exposure
+- Background text must be REAL READABLE text (book titles, screen content)
+- Mixed lighting with color temperature split (cool face + warm background = real)
+- Background people need specific clothing colors, mid-motion poses, partial occlusion
+- API key from `~/.env` via `process.env.GOOGLE_AI_API_KEY` — NEVER hardcode
+
+---
+
+Every image is a **strategic piece**. The board deliberates what FORMAT best serves each piece — documentary photo, infographic, portrait, hybrid, statement. There is no single default.
 
 ## Format Decision (Board Deliberation — FIRST STEP)
 

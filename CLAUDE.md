@@ -212,6 +212,8 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 
 **Cover images must be visible on dark backgrounds.** Black-on-black placeholders are invisible. Use gradient + typography covers with brand colors.
 
+**All body text is justified.** `.prose`, `.blog-card__body p`, and `.blog-featured__body p` use `text-align: justify; hyphens: auto`. Headings stay left-aligned. This is systemic — every new article inherits it.
+
 **Cover images must be unique per article.** Copying the same file to 50 folders makes the grid look broken.
 
 **Thumbnails use "HYPE ON MEDIA" as a subtle watermark** — NOT a bottom bar, NOT a logo stamp. The watermark should be barely visible (8-12% opacity white text), positioned bottom-right or bottom-left. It says "this came from Hype On" without being a design element.
