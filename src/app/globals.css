@@ -3752,29 +3752,94 @@ select:focus-visible,
 /* Blog search */
 .blog-search-wrap {
   max-width: 1200px;
-  margin: 0 auto 2rem;
+  margin: 0 auto 2.5rem;
   padding: 0 var(--gutter);
+  display: flex;
+  justify-content: center;
+}
+
+.blog-search-field {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+}
+
+.blog-search-icon {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(245, 245, 245, 0.35);
+  pointer-events: none;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.blog-search-field:focus-within .blog-search-icon {
+  color: rgba(245, 245, 245, 0.6);
 }
 
 .blog-search {
   width: 100%;
-  max-width: 400px;
-  padding: 0.75rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--white-12);
+  padding: 0.8125rem 3.5rem 0.8125rem 2.75rem;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(240, 240, 236, 0.18);
   color: #f5f5f5;
   font-family: var(--font-body);
   font-size: 0.875rem;
-  transition: border-color 0.2s;
+  border-radius: var(--radius);
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.blog-search::-webkit-search-cancel-button {
+  display: none;
+}
+
+.blog-search:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(240, 240, 236, 0.26);
 }
 
 .blog-search:focus {
   outline: none;
-  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 211, 0, 0.55);
+  box-shadow: 0 0 0 3px rgba(255, 211, 0, 0.08), 0 1px 12px rgba(0, 0, 0, 0.4);
 }
 
 .blog-search::placeholder {
-  color: rgba(245, 245, 245, 0.25);
+  color: rgba(245, 245, 245, 0.28);
+}
+
+.blog-search-clear {
+  position: absolute;
+  right: 0.875rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: 1px solid rgba(240, 240, 236, 0.14);
+  color: rgba(245, 245, 245, 0.35);
+  font-family: var(--font-body);
+  font-size: 0.625rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: color 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+
+.blog-search-clear:hover {
+  color: rgba(245, 245, 245, 0.7);
+  border-color: rgba(240, 240, 236, 0.28);
+}
+
+.blog-search-clear:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* Load more */

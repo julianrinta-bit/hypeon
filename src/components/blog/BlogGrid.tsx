@@ -37,14 +37,37 @@ export default function BlogGrid({ posts }: { posts: Post[] }) {
   return (
     <>
       <div className="blog-search-wrap">
-        <input
-          type="search"
-          placeholder="Search articles..."
-          value={search}
-          onChange={e => { setSearch(e.target.value); setVisible(POSTS_PER_PAGE); }}
-          className="blog-search"
-          aria-label="Search blog articles"
-        />
+        <div className="blog-search-field">
+          <svg
+            className="blog-search-icon"
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            aria-hidden="true"
+          >
+            <circle cx="6.5" cy="6.5" r="5" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M10.5 10.5L14 14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+          </svg>
+          <input
+            type="search"
+            placeholder="Search articles..."
+            value={search}
+            onChange={e => { setSearch(e.target.value); setVisible(POSTS_PER_PAGE); }}
+            className="blog-search"
+            aria-label="Search blog articles"
+          />
+          {search && (
+            <button
+              className="blog-search-clear"
+              onClick={() => { setSearch(''); setVisible(POSTS_PER_PAGE); }}
+              aria-label="Clear search"
+              type="button"
+            >
+              ESC
+            </button>
+          )}
+        </div>
       </div>
 
       <section className="blog-grid">
