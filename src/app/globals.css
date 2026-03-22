@@ -48,6 +48,33 @@
 
   --gutter: clamp(1.5rem, 4vw, 4rem);
   --section-pad: clamp(6rem, 12vh, 14rem);
+
+  /* Motion tokens (Notion-inspired) */
+  --duration-micro: 150ms;
+  --duration-fast: 200ms;
+  --duration-medium: 300ms;
+  --ease-in-out-cubic: cubic-bezier(0.645, 0.045, 0.355, 1);
+
+  /* Spacing tokens */
+  --space-4: 0.25rem;
+  --space-8: 0.5rem;
+  --space-12: 0.75rem;
+  --space-16: 1rem;
+  --space-24: 1.5rem;
+  --space-32: 2rem;
+  --space-48: 3rem;
+  --space-64: 4rem;
+  --space-96: 6rem;
+
+  /* Shadow tokens */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.4);
+  --shadow-glow: 0 0 30px var(--accent-glow);
+
+  /* Border tokens */
+  --border-subtle: 1px solid var(--white-06);
+  --border-default: 1px solid var(--white-12);
+  --border-strong: 1px solid var(--white-30);
 }
 
 html {
@@ -207,7 +234,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--white-60);
-  transition: color 0.25s;
+  transition: color 0.2s ease;
   position: relative;
 }
 
@@ -218,12 +245,12 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   left: 0;
   width: 0;
   height: 1px;
-  background: var(--accent);
-  transition: width 0.3s var(--ease-out-expo);
+  background: var(--white-30);
+  transition: width 0.2s var(--ease-out-expo);
 }
 
 .nav-links a:hover { color: var(--white); }
-.nav-links a:hover::after { width: 100%; }
+.nav-links a:hover::after { width: 60%; }
 
 .nav-login {
   font-family: var(--font-body);
@@ -247,7 +274,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   text-transform: uppercase;
   padding: 0.6rem 1.4rem;
   border: 1px solid var(--white-30);
-  transition: all 0.3s var(--ease-out-expo);
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.3s ease;
 }
 
 .nav-cta:hover {
@@ -292,7 +319,9 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 .mobile-menu-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(9, 9, 11, 0.98);
+  background: rgba(9, 9, 11, 0.92);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
   z-index: 999;
   display: flex;
   flex-direction: column;
@@ -313,15 +342,28 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   font-size: 1.5rem;
   color: var(--white);
   text-decoration: none;
-  transition: color 0.25s;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.3s ease, transform 0.3s var(--ease-out-expo), color 0.25s;
 }
+
+.mobile-menu-overlay.active a {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.mobile-menu-overlay.active a:nth-child(2) { transition-delay: 0.05s; }
+.mobile-menu-overlay.active a:nth-child(3) { transition-delay: 0.1s; }
+.mobile-menu-overlay.active a:nth-child(4) { transition-delay: 0.15s; }
+.mobile-menu-overlay.active a:nth-child(5) { transition-delay: 0.2s; }
+.mobile-menu-overlay.active a:nth-child(6) { transition-delay: 0.25s; }
+.mobile-menu-overlay.active a:nth-child(7) { transition-delay: 0.3s; }
 
 .mobile-menu-overlay a:hover {
   color: var(--accent);
 }
 
 .mobile-menu-overlay .mobile-menu-cta {
-  margin-top: 1rem;
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
@@ -331,26 +373,52 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   background: var(--accent);
   color: var(--bg);
   padding: 1rem 2.2rem;
+  padding-top: 2rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--white-12);
   border-radius: var(--radius);
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.3s ease, transform 0.3s var(--ease-out-expo), color 0.25s;
+}
+
+.mobile-menu-overlay.active .mobile-menu-cta {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: 0.35s;
 }
 
 .mobile-menu-close {
   position: absolute;
   top: 1.5rem;
   right: var(--gutter);
-  font-size: 1.8rem;
+  font-size: 0;
   color: var(--white);
   background: none;
   border: none;
   cursor: pointer;
   z-index: 1000;
-  padding: 0.5rem;
-  transition: color 0.25s;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.mobile-menu-close:hover {
-  color: var(--accent);
+.mobile-menu-close::before,
+.mobile-menu-close::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 1.5px;
+  background: var(--white-60);
+  transition: background 0.2s ease;
 }
+
+.mobile-menu-close::before { transform: rotate(45deg); }
+.mobile-menu-close::after { transform: rotate(-45deg); }
+.mobile-menu-close:hover::before,
+.mobile-menu-close:hover::after { background: var(--accent); }
 
 @media (prefers-reduced-motion: reduce) {
   .mobile-menu-overlay {
@@ -4092,5 +4160,174 @@ select:focus-visible,
 @media (prefers-reduced-motion: reduce) {
   .swipe-hint,
   .swipe-arrow { animation: none; opacity: 0; }
+}
+
+/* ============================================================
+   LEGAL PAGES (Privacy, Terms)
+   ============================================================ */
+
+.legal-page {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: calc(74px + var(--section-pad)) var(--gutter) var(--section-pad);
+}
+
+.legal-page h1 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.03em;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+
+.legal-page .legal-updated {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--white-30);
+  letter-spacing: 0.05em;
+  margin-bottom: 3rem;
+}
+
+.legal-page h2 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--white);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.legal-page p,
+.legal-page li {
+  font-family: var(--font-body);
+  color: var(--white-60);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.legal-page ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.legal-page a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--accent-line);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.legal-page a:hover {
+  text-decoration-color: var(--accent);
+}
+
+/* ============================================================
+   COOKIE CONSENT BANNER
+   ============================================================ */
+
+.cookie-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  padding: 1rem var(--gutter);
+  background: var(--surface);
+  border-top: 1px solid var(--white-12);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  transform: translateY(100%);
+  transition: transform 0.4s var(--ease-out-expo);
+}
+
+.cookie-banner.visible {
+  transform: translateY(0);
+}
+
+.cookie-banner p {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--white-60);
+  letter-spacing: 0.03em;
+}
+
+.cookie-banner a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.cookie-banner button {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.5rem 1.2rem;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s ease;
+}
+
+.cookie-banner button:hover {
+  opacity: 0.85;
+}
+
+@media (max-width: 768px) {
+  .cookie-banner {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.2rem var(--gutter);
+    gap: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cookie-banner {
+    transition: none;
+  }
+}
+
+/* ============================================================
+   FOOTER LEGAL LINKS
+   ============================================================ */
+
+.footer-legal {
+  display: inline-flex;
+  gap: 1rem;
+  margin-left: 1rem;
+}
+
+.footer-legal a {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--white-30);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  transition: color 0.2s ease;
+}
+
+.footer-legal a:hover {
+  color: var(--white-60);
+}
+
+/* ═══════════════════════════════════════════════════════
+   GLOBAL REDUCED MOTION
+   ═══════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 

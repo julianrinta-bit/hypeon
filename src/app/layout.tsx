@@ -7,6 +7,7 @@ import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import StickyMobileCTA from '@/components/landing/StickyMobileCTA';
 import ExitIntentModal from '@/components/landing/ExitIntentModal';
+import CookieConsent from '@/components/layout/CookieConsent';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -76,6 +77,7 @@ export default function RootLayout({
         <StickyMobileCTA />
         <ScrollToTop />
         <ExitIntentModal />
+        <CookieConsent />
       </body>
     </html>
   );

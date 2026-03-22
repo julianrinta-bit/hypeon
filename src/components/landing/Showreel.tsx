@@ -18,6 +18,7 @@ export default function Showreel() {
                 allowFullScreen
                 loading="lazy"
                 sandbox="allow-scripts allow-same-origin allow-presentation"
+                tabIndex={-1}
               ></iframe>
             </div>
             <p className="showreel-caption">Meet Chris from our strategy team — 4 min</p>
