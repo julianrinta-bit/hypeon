@@ -7,14 +7,26 @@ export default function MobileMenu() {
   const closeRef = useRef<HTMLButtonElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
 
+  const scrollY = useRef(0);
+
   const open = useCallback(() => {
-    setIsOpen(true);
+    scrollY.current = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY.current}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
     document.body.style.overflow = 'hidden';
+    setIsOpen(true);
   }, []);
 
   const close = useCallback(() => {
     setIsOpen(false);
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
     document.body.style.overflow = '';
+    window.scrollTo(0, scrollY.current);
     hamburgerRef.current?.focus();
   }, []);
 
@@ -65,8 +77,14 @@ export default function MobileMenu() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, close]);
 
-  // Clean up overflow hidden on unmount
-  useEffect(() => () => { document.body.style.overflow = ''; }, []);
+  // Clean up on unmount
+  useEffect(() => () => {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.overflow = '';
+  }, []);
 
   return (
     <>
