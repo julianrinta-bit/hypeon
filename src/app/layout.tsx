@@ -7,6 +7,7 @@ import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import StickyMobileCTA from '@/components/landing/StickyMobileCTA';
 import ExitIntentModal from '@/components/landing/ExitIntentModal';
+import ScrollToTop from '@/components/ui/ScrollToTop';
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -73,6 +74,7 @@ export default function RootLayout({
         {children}
         <Footer />
         <StickyMobileCTA />
+        <ScrollToTop />
         <ExitIntentModal />
       </body>
     </html>

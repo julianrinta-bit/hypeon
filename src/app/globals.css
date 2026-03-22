@@ -2053,6 +2053,87 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 }
 
 /* ═══════════════════════════════════════════════════════
+   SCROLL TO TOP
+   Appears after 1 viewport height of scroll.
+   Desktop: bottom-right. Mobile: above StickyMobileCTA.
+   ═══════════════════════════════════════════════════════ */
+.scroll-to-top {
+  /* Layout */
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 98; /* below StickyMobileCTA (99) and exit modal (10002) */
+
+  /* Size — 44×44px minimum touch target */
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Appearance — neutral at rest, brand accent on hover */
+  background: rgba(9, 9, 11, 0.82);
+  border: 1px solid var(--white-12);
+  border-radius: 50%;
+  color: var(--white-60);
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  /* Hidden by default: scale down + fade out */
+  opacity: 0;
+  transform: scale(0.8) translateY(4px);
+  pointer-events: none;
+
+  /* Enter: ease-out (250ms). Exit: ease-in (200ms) */
+  transition:
+    opacity 250ms ease-out,
+    transform 250ms ease-out,
+    background-color 200ms ease,
+    border-color 200ms ease,
+    color 200ms ease;
+}
+
+.scroll-to-top--visible {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
+}
+
+/* Hover — brand accent */
+.scroll-to-top:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+}
+
+/* Active — subtle press feedback */
+.scroll-to-top:active {
+  transform: scale(0.93) translateY(0);
+}
+
+/* Focus — keyboard nav visible ring */
+.scroll-to-top:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* Mobile: sit above the sticky 60px CTA bar (60px + 12px gap = 72px) */
+@media (max-width: 768px) {
+  .scroll-to-top {
+    bottom: 80px;
+    right: 1rem;
+  }
+}
+
+/* Reduced motion: collapse all animation to instant */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-to-top {
+    transition: opacity 0ms, transform 0ms;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
    CRO — EXIT INTENT MODAL
    ═══════════════════════════════════════════════════════ */
 .exit-overlay {
