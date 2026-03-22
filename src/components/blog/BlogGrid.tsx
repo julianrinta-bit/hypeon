@@ -19,7 +19,7 @@ interface Post {
 const POSTS_PER_PAGE = 12;
 
 export default function BlogGrid({ posts }: { posts: Post[] }) {
-  const [visible, setVisible] = useState(POSTS_PER_PAGE);
+  const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
 
   const filtered = useMemo(() => {
@@ -31,8 +31,33 @@ export default function BlogGrid({ posts }: { posts: Post[] }) {
     );
   }, [posts, search]);
 
-  const shown = filtered.slice(0, visible);
-  const hasMore = visible < filtered.length;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / POSTS_PER_PAGE));
+  const currentPage = Math.min(page, totalPages);
+  const shown = filtered.slice(
+    (currentPage - 1) * POSTS_PER_PAGE,
+    currentPage * POSTS_PER_PAGE
+  );
+
+  const goToPage = (p: number) => {
+    setPage(p);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  /* Build page number buttons: 1 2 3 ... last */
+  const pageNumbers: (number | 'ellipsis')[] = [];
+  for (let i = 1; i <= totalPages; i++) {
+    if (
+      i === 1 ||
+      i === totalPages ||
+      (i >= currentPage - 1 && i <= currentPage + 1)
+    ) {
+      pageNumbers.push(i);
+    } else if (
+      pageNumbers[pageNumbers.length - 1] !== 'ellipsis'
+    ) {
+      pageNumbers.push('ellipsis');
+    }
+  }
 
   return (
     <>
@@ -53,14 +78,14 @@ export default function BlogGrid({ posts }: { posts: Post[] }) {
             type="search"
             placeholder="Search articles..."
             value={search}
-            onChange={e => { setSearch(e.target.value); setVisible(POSTS_PER_PAGE); }}
+            onChange={e => { setSearch(e.target.value); setPage(1); }}
             className="blog-search"
             aria-label="Search blog articles"
           />
           {search && (
             <button
               className="blog-search-clear"
-              onClick={() => { setSearch(''); setVisible(POSTS_PER_PAGE); }}
+              onClick={() => { setSearch(''); setPage(1); }}
               aria-label="Clear search"
               type="button"
             >
@@ -106,15 +131,48 @@ export default function BlogGrid({ posts }: { posts: Post[] }) {
         ))}
       </section>
 
-      {hasMore && (
-        <div className="blog-load-more-wrap">
+      {totalPages > 1 && (
+        <nav className="blog-pagination" aria-label="Blog pagination">
           <button
-            onClick={() => setVisible(v => v + POSTS_PER_PAGE)}
-            className="blog-load-more"
+            className="blog-pagination__btn"
+            onClick={() => goToPage(currentPage - 1)}
+            disabled={currentPage === 1}
+            aria-label="Previous page"
           >
-            Load more articles ({filtered.length - visible} remaining)
+            &larr; Prev
           </button>
-        </div>
+
+          {pageNumbers.map((p, i) =>
+            p === 'ellipsis' ? (
+              <span key={`ellipsis-${i}`} className="blog-pagination__btn" style={{ border: 'none', cursor: 'default' }}>
+                &hellip;
+              </span>
+            ) : (
+              <button
+                key={p}
+                className={`blog-pagination__btn${p === currentPage ? ' blog-pagination__btn--active' : ''}`}
+                onClick={() => goToPage(p)}
+                aria-label={`Page ${p}`}
+                aria-current={p === currentPage ? 'page' : undefined}
+              >
+                {p}
+              </button>
+            )
+          )}
+
+          <button
+            className="blog-pagination__btn"
+            onClick={() => goToPage(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            aria-label="Next page"
+          >
+            Next &rarr;
+          </button>
+
+          <span className="blog-pagination__info">
+            Page {currentPage} of {totalPages}
+          </span>
+        </nav>
       )}
 
       {filtered.length === 0 && search && (
