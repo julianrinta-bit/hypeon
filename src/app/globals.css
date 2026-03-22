@@ -316,6 +316,11 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   .hamburger-btn { display: flex; }
 }
 
+.hamburger-btn.hamburger-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
 .mobile-menu-overlay {
   position: fixed;
   inset: 0;
@@ -4136,6 +4141,23 @@ select:focus-visible,
   max-width: 780px;
   margin: 0 auto;
   padding: calc(74px + var(--section-pad)) var(--gutter) var(--section-pad);
+}
+
+.legal-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--white-30);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+  margin-bottom: 2rem;
+  transition: color 0.2s ease;
+}
+
+.legal-back:hover {
+  color: var(--accent);
 }
 
 .legal-page h1 {

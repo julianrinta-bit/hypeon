@@ -71,7 +71,7 @@ export default function MobileMenu() {
   return (
     <>
       <button
-        className="hamburger-btn"
+        className={`hamburger-btn${isOpen ? ' hamburger-hidden' : ''}`}
         onClick={open}
         aria-label="Open menu"
         aria-expanded={isOpen}
