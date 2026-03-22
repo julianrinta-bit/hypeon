@@ -11,20 +11,27 @@ export default function MobileMenu() {
 
   const open = useCallback(() => {
     scrollY.current = window.scrollY;
+    // Lock scroll on both html and body (required for iOS Safari)
+    const html = document.documentElement;
+    html.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollY.current}px`;
     document.body.style.left = '0';
     document.body.style.right = '0';
+    document.body.style.width = '100%';
     document.body.style.overflow = 'hidden';
     setIsOpen(true);
   }, []);
 
   const close = useCallback(() => {
     setIsOpen(false);
+    const html = document.documentElement;
+    html.style.overflow = '';
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.left = '';
     document.body.style.right = '';
+    document.body.style.width = '';
     document.body.style.overflow = '';
     window.scrollTo(0, scrollY.current);
     hamburgerRef.current?.focus();
@@ -35,6 +42,20 @@ export default function MobileMenu() {
     if (isOpen) {
       closeRef.current?.focus();
     }
+  }, [isOpen]);
+
+  // Prevent touchmove on overlay (iOS Safari scroll-through fix)
+  useEffect(() => {
+    if (!isOpen) return;
+    const overlay = overlayRef.current;
+    if (!overlay) return;
+
+    const preventTouch = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+
+    overlay.addEventListener('touchmove', preventTouch, { passive: false });
+    return () => overlay.removeEventListener('touchmove', preventTouch);
   }, [isOpen]);
 
   // Close on Escape key + focus trap
@@ -79,10 +100,12 @@ export default function MobileMenu() {
 
   // Clean up on unmount
   useEffect(() => () => {
+    document.documentElement.style.overflow = '';
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.left = '';
     document.body.style.right = '';
+    document.body.style.width = '';
     document.body.style.overflow = '';
   }, []);
 
