@@ -104,11 +104,11 @@ Save to: `content/blog/{slug}/index.mdx`
 
 Follow `.claude/skills/hypeon-infographic-cover/SKILL.md`:
 
-1. **Strategy** — extract hook from finished article, pick avatar, environment, text overlay decision
-2. **Congruence check** — title says X, thumb says Y, together they tell the complete story
-3. **Generate with NanoBanana** — documentary style, API call to gemini-3.1-flash-image-preview
-4. **Post-process** — canvas overlay (text if needed + 85px category band)
-5. **Devil's advocate** — scroll test, share test, FOFU test, documentary test
+1. **Board deliberation** — decide FORMAT first: documentary photo, infographic, data viz, hybrid, or statement. No default — the board decides per article.
+2. **Strategy** — extract hook, pick avatar (if photo), decide text on image, congruence check with title
+3. **Generate with NanoBanana** — ONE prompt generates EVERYTHING (photo + text + composition). NanoBanana renders text natively — do NOT use canvas for text overlay.
+4. **Post-process** — ONLY the 85px category band at bottom (canvas/sharp). Nothing else.
+5. **Devil's advocate** — scroll test, share test, FOFU test, documentary test (if photo format)
 6. **Save** to vault campaign folder first, then to `content/blog/{slug}/cover.jpg`
 
 API key: from `~/.env` → `GOOGLE_AI_API_KEY`
