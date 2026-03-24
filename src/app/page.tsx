@@ -12,6 +12,7 @@ import Testimonials from '@/components/landing/Testimonials';
 import Different from '@/components/landing/Different';
 import About from '@/components/landing/About';
 import FAQ from '@/components/landing/FAQ';
+import LatestInsight from '@/components/landing/LatestInsight';
 import ContactForm from '@/components/landing/ContactForm';
 
 export default function LandingPage() {
@@ -35,6 +36,8 @@ export default function LandingPage() {
       <Different />
       <div className="container"><div className="divider" /></div>
       <About />
+      <div className="container"><div className="divider" /></div>
+      <LatestInsight />
       <div className="container"><div className="divider" /></div>
       <FAQ />
       <div className="container"><div className="divider" /></div>

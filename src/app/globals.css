@@ -1465,6 +1465,121 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 }
 
 /* ═══════════════════════════════════════════════════════
+   LATEST INSIGHT (landing page blog feature)
+   ═══════════════════════════════════════════════════════ */
+.latest-insight__card {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2.5rem;
+  text-decoration: none;
+  color: inherit;
+  background: var(--surface);
+  border: 1px solid var(--white-06);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color 400ms ease, box-shadow 400ms ease;
+}
+
+.latest-insight__card:hover {
+  border-color: var(--accent-line);
+  box-shadow: 0 4px 40px rgba(255, 211, 0, 0.04);
+}
+
+.latest-insight__cover-wrap {
+  overflow: hidden;
+}
+
+.latest-insight__cover {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 500ms var(--ease-out-expo);
+}
+
+.latest-insight__card:hover .latest-insight__cover {
+  transform: scale(1.03);
+}
+
+.latest-insight__body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem 2.5rem 2.5rem 0;
+}
+
+.latest-insight__meta {
+  display: flex;
+  gap: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--white-30);
+  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+}
+
+.latest-insight__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.5vw, 1.85rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--white);
+  margin-bottom: 0.875rem;
+  letter-spacing: -0.02em;
+}
+
+.latest-insight__desc {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  color: var(--white-60);
+  line-height: 1.7;
+  margin-bottom: 1.25rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.latest-insight__tags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.latest-insight__link {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: letter-spacing 300ms ease;
+}
+
+.latest-insight__card:hover .latest-insight__link {
+  letter-spacing: 0.12em;
+}
+
+@media (max-width: 768px) {
+  .latest-insight__card {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .latest-insight__cover {
+    aspect-ratio: 16 / 9;
+  }
+
+  .latest-insight__body {
+    padding: 1.5rem;
+  }
+
+  .latest-insight__title {
+    font-size: 1.25rem;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════
    07 — CONTACT
    ═══════════════════════════════════════════════════════ */
 .contact {
