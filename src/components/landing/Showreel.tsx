@@ -34,8 +34,19 @@ export default function Showreel() {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mq.matches);
     const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
-    mq.addEventListener('change', handler);
-    return () => mq.removeEventListener('change', handler);
+    // Safari 13 fallback: addListener/removeListener
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handler);
+    } else {
+      (mq as any).addListener(handler);
+    }
+    return () => {
+      if (mq.removeEventListener) {
+        mq.removeEventListener('change', handler);
+      } else {
+        (mq as any).removeListener(handler);
+      }
+    };
   }, []);
 
   // Auto-hide controls after 3 seconds of inactivity
