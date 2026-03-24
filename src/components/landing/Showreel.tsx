@@ -243,6 +243,27 @@ export default function Showreel() {
     return () => window.removeEventListener('mouseup', handler);
   }, []);
 
+  // Pause video when scrolled out of view
+  useEffect(() => {
+    const container = containerRef.current;
+    const video = videoRef.current;
+    if (!container || !video) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting && !video.paused) {
+            video.pause();
+            setIsPlaying(false);
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, []);
+
   const progressPct = duration > 0 ? (currentTime / duration) * 100 : 0;
   const bufferedPct = duration > 0 ? (buffered / duration) * 100 : 0;
 
@@ -270,7 +291,7 @@ export default function Showreel() {
                 className="showreel-video"
                 src="/video/hypeon-vsl.mp4"
                 poster="/video/hypeon-vsl-poster.jpg"
-                preload="metadata"
+                preload="none"
                 playsInline
                 onClick={togglePlay}
                 aria-label="Hype On Media — strategy breakdown with Chris"
