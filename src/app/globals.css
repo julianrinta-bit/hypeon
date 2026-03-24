@@ -2554,6 +2554,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   background: #000;
   border: 1px solid var(--white-06);
   overflow: hidden;
+  -webkit-user-select: none;
   user-select: none;
   outline: none;
   transition: box-shadow 0.4s var(--ease-out-expo);
@@ -2583,7 +2584,10 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 /* ── Big Play Button Overlay ── */
 .showreel-play-overlay {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2766,9 +2770,47 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   background: rgba(255, 255, 255, 0.1);
 }
 
+.showreel-btn:focus {
+  outline: 2px solid var(--accent); /* fallback for Safari 14-15.3 */
+}
+
+.showreel-btn:focus:not(:focus-visible) {
+  outline: none; /* remove for mouse users on modern browsers */
+}
+
 .showreel-btn:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/* ── Focus fallbacks for sliders (Safari 14-15.3) ── */
+.showreel-progress:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.showreel-progress:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.showreel-progress:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Play overlay focus fallbacks (Safari 14-15.3) ── */
+.showreel-play-overlay:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.showreel-play-overlay:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.showreel-play-overlay:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 /* ── Volume ── */
@@ -2829,6 +2871,21 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   top: 50%;
   transform: translate(-50%, -50%);
   pointer-events: none;
+}
+
+/* ── Volume track focus fallbacks (Safari 14-15.3) ── */
+.showreel-volume-track:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.showreel-volume-track:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.showreel-volume-track:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 /* ── Time Display ── */
@@ -2904,6 +2961,15 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   .showreel-progress__thumb,
   .showreel-player {
     transition: none;
+  }
+}
+
+/* ── aspect-ratio fallback for Safari 14 ── */
+@supports not (aspect-ratio: 16 / 9) {
+  .showreel-player {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
   }
 }
 
