@@ -2,6 +2,7 @@ import { posts } from '#velite'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Metadata } from 'next'
+import { Suspense } from 'react'
 import BlogGrid from '@/components/blog/BlogGrid'
 
 export const metadata: Metadata = {
@@ -25,7 +26,7 @@ export default function BlogPage() {
   return (
     <main id="main-content">
       <section className="blog-hero">
-        <Link href="/" className="blog-back">&larr; Back to home</Link>
+        <p className="blog-hero__label">Blog</p>
         <h1>Insights &amp; Playbooks</h1>
         <p>Strategies, frameworks, and deep dives on YouTube growth</p>
       </section>
@@ -42,6 +43,7 @@ export default function BlogPage() {
               className="blog-featured__cover"
             />
             <div className="blog-featured__body">
+              <span className="blog-featured__badge">Latest</span>
               <div className="blog-card__meta">
                 <time dateTime={featured.date}>
                   {new Date(featured.date).toLocaleDateString('en-US', {
@@ -49,7 +51,6 @@ export default function BlogPage() {
                   })}
                 </time>
                 <span>{featured.metadata.readingTime} min read</span>
-                <span>{featured.views.toLocaleString()} views</span>
               </div>
               <h2>{featured.title}</h2>
               <p>{featured.description}</p>
@@ -60,13 +61,16 @@ export default function BlogPage() {
                   ))}
                 </div>
               )}
+              <span className="blog-featured__readmore">Read article &rarr;</span>
             </div>
           </Link>
         </section>
       )}
 
-      {/* Remaining posts — paginated + searchable */}
-      <BlogGrid posts={rest} />
+      {/* Remaining posts — paginated + searchable + filterable */}
+      <Suspense fallback={<div className="blog-grid-loading">Loading articles...</div>}>
+        <BlogGrid posts={rest} />
+      </Suspense>
     </main>
   )
 }

@@ -43,6 +43,23 @@ export async function generateMetadata({
   }
 }
 
+// Find related articles by tag overlap (not random)
+function getRelatedPosts(currentPost: typeof posts[0], allPosts: typeof posts, count = 3) {
+  const scored = allPosts
+    .filter(p => p.slug !== currentPost.slug)
+    .map(p => {
+      const tagOverlap = p.tags.filter(t => currentPost.tags.includes(t)).length;
+      return { post: p, score: tagOverlap };
+    })
+    .sort((a, b) => {
+      // Sort by tag overlap first, then by date (newer first)
+      if (b.score !== a.score) return b.score - a.score;
+      return new Date(b.post.date).getTime() - new Date(a.post.date).getTime();
+    });
+
+  return scored.slice(0, count).map(s => s.post);
+}
+
 // Next.js 16: params is a Promise — must await
 export default async function BlogPostPage({
   params,
@@ -57,10 +74,10 @@ export default async function BlogPostPage({
   const currentIndex = sortedPosts.findIndex(p => p.slug === post.slug)
   const prevSlug = currentIndex < sortedPosts.length - 1 ? sortedPosts[currentIndex + 1].slug : undefined
   const nextSlug = currentIndex > 0 ? sortedPosts[currentIndex - 1].slug : undefined
+  const prevTitle = prevSlug ? sortedPosts[currentIndex + 1].title : undefined
+  const nextTitle = nextSlug ? sortedPosts[currentIndex - 1].title : undefined
 
-  const related = posts
-    .filter(p => p.slug !== post.slug)
-    .slice(0, 2)
+  const related = getRelatedPosts(post, posts, 3)
 
   return (
     <>
@@ -113,6 +130,24 @@ export default async function BlogPostPage({
           </div>
         </article>
 
+        {/* Prev/Next article navigation */}
+        {(prevSlug || nextSlug) && (
+          <nav className="blog-prevnext" aria-label="Article navigation">
+            {prevSlug ? (
+              <Link href={`/blog/${prevSlug}`} className="blog-prevnext__link blog-prevnext__link--prev">
+                <span className="blog-prevnext__label">&larr; Previous</span>
+                <span className="blog-prevnext__title">{prevTitle}</span>
+              </Link>
+            ) : <div />}
+            {nextSlug ? (
+              <Link href={`/blog/${nextSlug}`} className="blog-prevnext__link blog-prevnext__link--next">
+                <span className="blog-prevnext__label">Next &rarr;</span>
+                <span className="blog-prevnext__title">{nextTitle}</span>
+              </Link>
+            ) : <div />}
+          </nav>
+        )}
+
         {related.length > 0 && (
           <section className="blog-related">
             <p className="blog-related__title">You might also like</p>
@@ -135,6 +170,14 @@ export default async function BlogPostPage({
             </div>
           </section>
         )}
+
+        {/* Bottom CTA */}
+        <section className="blog-article-cta">
+          <p className="blog-article-cta__headline">Want results like these for your channel?</p>
+          <p className="blog-article-cta__body">Our team has generated 5B+ organic views. Let us show you what&apos;s possible.</p>
+          <a href="/#contact" className="blog-listing-cta__button">Get your free audit</a>
+        </section>
+
         <SwipeNavigation prevSlug={prevSlug} nextSlug={nextSlug} />
       </main>
     </>
