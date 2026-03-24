@@ -148,11 +148,26 @@ export default function Showreel() {
 
   const toggleFullscreen = useCallback(() => {
     const el = containerRef.current;
-    if (!el) return;
+    const video = videoRef.current;
+    if (!el || !video) return;
+
+    // Check if already fullscreen
     if (document.fullscreenElement) {
       document.exitFullscreen();
-    } else {
+      return;
+    }
+
+    // Standard Fullscreen API (desktop browsers)
+    if (el.requestFullscreen) {
       el.requestFullscreen();
+    }
+    // iOS Safari: only supports fullscreen on the video element itself
+    else if ((video as any).webkitEnterFullscreen) {
+      (video as any).webkitEnterFullscreen();
+    }
+    // Older webkit (iPad Safari, some mobile browsers)
+    else if ((el as any).webkitRequestFullscreen) {
+      (el as any).webkitRequestFullscreen();
     }
   }, []);
 
@@ -421,12 +436,18 @@ export default function Showreel() {
                   {/* Fullscreen */}
                   <button className="showreel-btn" onClick={toggleFullscreen} aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}>
                     {isFullscreen ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <path d="M8 3v3a2 2 0 01-2 2H3m18 0h-3a2 2 0 01-2-2V3m0 18v-3a2 2 0 012-2h3M3 16h3a2 2 0 012 2v3" />
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="4 14 10 14 10 20" />
+                        <polyline points="20 10 14 10 14 4" />
+                        <line x1="14" y1="10" x2="21" y2="3" />
+                        <line x1="3" y1="21" x2="10" y2="14" />
                       </svg>
                     ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <path d="M8 3H5a2 2 0 00-2 2v3m18-5h-3a2 2 0 00-2 2v3m0 8v3a2 2 0 002 2h3M3 16v3a2 2 0 002 2h3" />
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                        <polyline points="15 3 21 3 21 9" />
+                        <polyline points="9 21 3 21 3 15" />
+                        <line x1="21" y1="3" x2="14" y2="10" />
+                        <line x1="3" y1="21" x2="10" y2="14" />
                       </svg>
                     )}
                   </button>
