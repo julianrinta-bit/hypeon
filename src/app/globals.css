@@ -2546,26 +2546,306 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   margin: 0 auto;
 }
 
-.showreel-embed {
+/* ── Video Player ── */
+.showreel-player {
   position: relative;
-  padding-bottom: 56.25%;
-  overflow: hidden;
-  background: var(--surface);
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
   border: 1px solid var(--white-06);
+  overflow: hidden;
+  user-select: none;
+  outline: none;
   transition: box-shadow 0.4s var(--ease-out-expo);
 }
 
-.showreel-embed:hover {
+.showreel-player:hover,
+.showreel-player:focus-within {
   box-shadow: 0 0 40px var(--accent-glow);
 }
 
-.showreel-embed iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+.showreel-player--hide-cursor {
+  cursor: none;
 }
 
+.showreel-player--fullscreen {
+  border: none;
+}
+
+.showreel-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+}
+
+/* ── Big Play Button Overlay ── */
+.showreel-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.3);
+  border: none;
+  cursor: pointer;
+  z-index: 2;
+  transition: background var(--duration-fast) ease;
+}
+
+.showreel-play-overlay:hover {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.showreel-play-overlay--paused {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.showreel-play-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: rgba(9, 9, 11, 0.65);
+  backdrop-filter: blur(14px) saturate(160%);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--white);
+  transition:
+    transform var(--duration-fast) var(--ease-out-expo),
+    background var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease;
+}
+
+.showreel-play-overlay:hover .showreel-play-icon {
+  transform: scale(1.08);
+  background: rgba(9, 9, 11, 0.75);
+  border-color: var(--accent-line);
+  box-shadow: 0 0 24px var(--accent-glow);
+}
+
+.showreel-play-icon svg {
+  margin-left: 3px; /* optical center for play triangle */
+}
+
+.showreel-play-icon--small {
+  width: 60px;
+  height: 60px;
+}
+
+/* ── Controls Bar ── */
+.showreel-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  padding: 0 12px 10px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, transparent 100%);
+  opacity: 0;
+  transform: translateY(4px);
+  transition:
+    opacity var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
+  pointer-events: none;
+}
+
+.showreel-controls--visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* ── Progress Bar ── */
+.showreel-progress {
+  position: relative;
+  width: 100%;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 0;
+}
+
+.showreel-progress::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: height var(--duration-micro) ease;
+}
+
+.showreel-progress:hover::before {
+  height: 5px;
+}
+
+.showreel-progress__buffered {
+  position: absolute;
+  left: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: height var(--duration-micro) ease;
+  pointer-events: none;
+}
+
+.showreel-progress:hover .showreel-progress__buffered {
+  height: 5px;
+}
+
+.showreel-progress__filled {
+  position: absolute;
+  left: 0;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition: height var(--duration-micro) ease;
+  pointer-events: none;
+}
+
+.showreel-progress:hover .showreel-progress__filled {
+  height: 5px;
+}
+
+.showreel-progress__thumb {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--accent);
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform var(--duration-micro) ease;
+  pointer-events: none;
+  box-shadow: 0 0 6px rgba(255, 211, 0, 0.4);
+}
+
+.showreel-progress:hover .showreel-progress__thumb {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* ── Controls Row ── */
+.showreel-controls__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.showreel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  transition:
+    background var(--duration-micro) ease,
+    color var(--duration-micro) ease;
+  flex-shrink: 0;
+}
+
+.showreel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.showreel-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Volume ── */
+.showreel-volume-group {
+  display: flex;
+  align-items: center;
+}
+
+.showreel-volume-slider {
+  width: 0;
+  overflow: hidden;
+  transition: width var(--duration-fast) var(--ease-out-expo);
+}
+
+.showreel-volume-slider--visible {
+  width: 70px;
+}
+
+.showreel-volume-track {
+  position: relative;
+  width: 60px;
+  height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-left: 2px;
+}
+
+.showreel-volume-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.showreel-volume-track__filled {
+  position: absolute;
+  left: 0;
+  height: 3px;
+  background: var(--white);
+  border-radius: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.showreel-volume-track__thumb {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--white);
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* ── Time Display ── */
+.showreel-time {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  color: rgba(240, 240, 236, 0.7);
+  white-space: nowrap;
+  padding: 0 4px;
+}
+
+.showreel-spacer {
+  flex: 1;
+}
+
+/* ── Caption ── */
 .showreel-caption {
   font-family: var(--font-mono);
   font-size: 0.75rem;
@@ -2573,6 +2853,58 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   color: var(--white-30);
   text-align: center;
   margin-top: 1rem;
+}
+
+/* ── Mobile adjustments ── */
+@media (max-width: 640px) {
+  .showreel-play-icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .showreel-play-icon svg {
+    width: 20px;
+    height: 24px;
+  }
+
+  .showreel-play-icon--small {
+    width: 48px;
+    height: 48px;
+  }
+
+  .showreel-play-icon--small svg {
+    width: 16px;
+    height: 20px;
+  }
+
+  .showreel-controls {
+    padding: 0 8px 6px;
+  }
+
+  .showreel-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .showreel-time {
+    font-size: 0.6rem;
+  }
+
+  /* Volume slider always hidden on mobile — use mute toggle */
+  .showreel-volume-slider {
+    display: none;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .showreel-play-icon,
+  .showreel-play-overlay,
+  .showreel-controls,
+  .showreel-progress__thumb,
+  .showreel-player {
+    transition: none;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════
