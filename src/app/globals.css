@@ -1487,6 +1487,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 
 .latest-insight__cover-wrap {
   overflow: hidden;
+  aspect-ratio: 1.91 / 1;
 }
 
 .latest-insight__cover {
