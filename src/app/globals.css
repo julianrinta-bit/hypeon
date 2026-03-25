@@ -1567,7 +1567,7 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
   }
 
   .latest-insight__cover {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 1.91 / 1;
   }
 
   .latest-insight__body {
@@ -3549,7 +3549,7 @@ select:focus-visible,
 .blog-card__cover {
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1.91 / 1;
   object-fit: cover;
 }
 
@@ -3626,7 +3626,7 @@ select:focus-visible,
 .blog-article__cover {
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1.91 / 1;
   object-fit: cover;
   border-radius: var(--radius);
   margin-bottom: 3rem;
@@ -4225,7 +4225,7 @@ select:focus-visible,
 .blog-related__image {
   width: 100%;
   height: auto;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 1.91 / 1;
   object-fit: cover;
   border-radius: var(--radius);
   margin-bottom: 0.75rem;
