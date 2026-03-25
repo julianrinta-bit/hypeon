@@ -2165,6 +2165,11 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
     transform: translateY(0);
   }
 
+  /* Shift up when cookie banner is visible to avoid overlap */
+  body[data-cookie-banner="visible"] .sticky-mobile-cta.visible {
+    bottom: 72px;
+  }
+
   .sticky-mobile-cta.dismissed {
     display: none;
   }
