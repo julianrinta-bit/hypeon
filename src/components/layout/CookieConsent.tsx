@@ -17,6 +17,15 @@ export default function CookieConsent() {
     }
   }, [])
 
+  // Toggle body attribute so other fixed-bottom elements can react
+  useEffect(() => {
+    if (visible) {
+      document.body.setAttribute('data-cookie-banner', 'visible')
+    } else {
+      document.body.removeAttribute('data-cookie-banner')
+    }
+  }, [visible])
+
   function handleAccept() {
     localStorage.setItem(STORAGE_KEY, 'accepted')
     setVisible(false)
