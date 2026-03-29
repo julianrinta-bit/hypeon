@@ -1,13 +1,8 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { fetchJobStatus } from '@/lib/actions/status';
 import styles from './status.module.css';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 // ── Pipeline stages (order matters) ────────────────────────────────────────
 
@@ -61,38 +56,29 @@ export default function StatusClient({ publicId }: { publicId: string }) {
     let mounted = true;
 
     const fetchStatus = async () => {
-      const { data, error: fetchError } = await supabase
-        .from('analysis_jobs')
-        .select('status, error_message')
-        .eq('public_id', publicId)
-        .maybeSingle();
+      const result = await fetchJobStatus(publicId);
 
       if (!mounted) return;
 
-      if (fetchError) {
-        console.error('Status fetch error:', fetchError);
-        return;
-      }
-
-      if (!data) {
+      if (!result.found) {
         setNotFound(true);
         return;
       }
 
-      setStatus(data.status);
+      setStatus(result.data.status);
 
-      if (data.status === 'failed') {
-        setError(data.error_message || 'Analysis failed. Our team has been notified.');
+      if (result.data.status === 'failed') {
+        setError(result.data.errorMessage || 'Analysis failed. Our team has been notified.');
       }
 
       // Stop polling on terminal states
-      if (data.status === 'complete' || data.status === 'failed') {
+      if (result.data.status === 'complete' || result.data.status === 'failed') {
         if (pollRef.current) clearInterval(pollRef.current);
         if (timerRef.current) clearInterval(timerRef.current);
       }
 
       // Redirect to results on complete
-      if (data.status === 'complete') {
+      if (result.data.status === 'complete') {
         setTimeout(() => {
           window.location.href = `/analyze/${publicId}`;
         }, 2000);
