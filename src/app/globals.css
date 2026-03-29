@@ -221,19 +221,30 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 }
 
 .nav-logo-slash {
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: 0.85rem;
-  color: var(--accent);
-  margin-right: 0.4rem;
-  letter-spacing: -0.05em;
+  display: none;
+}
+
+.nav-logo-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  color: #0A0A0C;
+  flex-shrink: 0;
+  margin-right: 10px;
 }
 
 .nav-logo-text {
   font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  font-size: 1.05rem;
+  letter-spacing: -0.01em;
   color: var(--white);
 }
 
@@ -284,21 +295,24 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 
 .nav-cta {
   font-family: var(--font-body);
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.8rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   padding: 0.6rem 1.4rem;
-  border: 1px solid var(--white-30);
+  background: var(--accent);
+  color: #0A0A0C;
+  border: 1px solid var(--accent);
   border-radius: var(--radius-button);
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.3s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.3s ease, transform 0.3s var(--ease-out-expo);
 }
 
 .nav-cta:hover {
-  background: var(--accent);
-  color: var(--bg);
-  border-color: var(--accent);
-  box-shadow: 0 0 20px var(--accent-glow);
+  background: var(--accent-hover, #b8ee20);
+  color: #0A0A0C;
+  border-color: var(--accent-hover, #b8ee20);
+  box-shadow: 0 0 24px var(--accent-glow);
+  transform: translateY(-1px);
 }
 
 @media (max-width: 768px) {

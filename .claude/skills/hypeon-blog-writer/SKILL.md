@@ -148,6 +148,9 @@ Before writing, create a brief:
 **Tags:** [3-5 tags]
 **Target keywords:** [primary + 2-3 secondary]
 **AEO target:** [what question should AI answer with our content?]
+**Central analogy:** [the ONE visual analogy that explains the core concept — must be visual enough for a thumbnail]
+**Analogy as 1 sentence:** [the extractable passage, 40-60 words, quotable by AI]
+**Thumbnail format:** [photo / infographic / hybrid — decided by Format Board shareability criterion]
 **Word count target:** 1500-2500 words
 **Hype On angle:** [how does this position us as experts?]
 **Key stat to fabricate:** [plausible, specific, attributed to "our data"]
@@ -188,12 +191,38 @@ Before writing, create a brief:
 
 **NEVER at the very end.** NEVER stacked. NEVER adjacent. This is a formula, not a judgment call.
 
+#### Central Analogy (every article — MANDATORY)
+
+Every article must have ONE central analogy that:
+1. **Explains the core concept** in terms anyone can understand
+2. **Is visual enough** to become the thumbnail image (or infographic)
+3. **Is self-contained** — works as a standalone passage that AI systems can extract and cite
+
+**The analogy is defined in Phase 2 (Plan)** and drives both the article content AND the thumbnail.
+
+**GEO/AEO value:** Analogies boost AI visibility through three mechanisms:
+- +20% from "Improve clarity" (Princeton GEO study, KDD 2024)
+- +15% from "Unique vocabulary" (differentiates from 50 pages explaining the same thing with jargon)
+- +15-30% from "Fluency optimization" (a good analogy is a self-contained, quotable passage)
+
+**Examples:**
+- "A YouTube channel without leads is like a supercar without wheels — beautiful, expensive, and going nowhere."
+- "Your content strategy is like a fishing expedition — the title is the bait, the thumbnail is the lure, and the metadata tells the algorithm which pond to put you in."
+- "Most companies treat YouTube like a billboard when it's actually a salesperson who works 24/7."
+
+**Rules:**
+- The analogy must appear in the first 300 words (hook or context section) — this is where AI extracts
+- It should be developed/extended in at least one H2 section
+- It must be VISUAL — if you can't picture it, it's not an analogy, it's a metaphor
+- It must map to the BUYER's world (VP/founder language, not creator language)
+
 #### AEO/GEO Optimization (every article)
 
 - **Answer blocks:** After each H2, include a 40-60 word paragraph that directly answers the heading as a question. This is what AI extracts.
 - **FAQ section:** End each article with 3-5 FAQ items in Q&A format. Use `## Frequently Asked Questions` heading.
 - **Structured claims:** Use specific numbers, dates, and named entities. AI cites specifics, not generalities.
 - **Source signals:** Reference real sources (YouTube blog, studies) alongside Hype On data. Mixed sourcing increases AI trust.
+- **Analogy as extractable passage:** The central analogy should be quotable in 40-60 words — the optimal length for AI snippet extraction.
 
 #### Cross-Linking
 
@@ -248,22 +277,88 @@ grep -rL "^slug:" content/blog/*/index.mdx   # lists every article missing slug
 - Articles "from" 2026: 1,000-5,000 views
 - Slight randomness — not round numbers (e.g., 7,342 not 7,000)
 
-### Phase 5: Cover Infographic
+### Phase 5: Thumbnail (Analogy-Driven — 3 Boards → 1 Prompt)
 
-Generate a cover image (1200x675px PNG) for each article using the canvas script:
+**The thumbnail IS the analogy.** The central analogy from the article becomes a visual — either a photorealistic scene or an infographic. The goal is SHAREABILITY: would a VP screenshot this and post it on LinkedIn or drop it in Slack?
 
-```bash
-cd ~/projects/hypeon-website
-node scripts/generate-covers.js
+**This is NOT optional. Every article gets a thumbnail that passes through the full pipeline.**
+
+#### Step 1: FORMAT BOARD (what kind of image?)
+
+Before any composition work, deliberate: **photo or infographic?**
+
+| If the analogy is... | Format | Why |
+|---|---|---|
+| **Visual/situational** ("a supercar without wheels", "a diver in a desert", "fishing in the wrong pond") | Photorealistic scene via NanoBanana | The image IS the joke/insight. Shareability comes from "look at this absurd/perfect metaphor" |
+| **Data/comparative** ("73% vs 12%", "before/after pipeline", "$2.4M from 900 subscribers") | Infographic | The DATA is the insight. Shareability comes from "look at this number" |
+| **Both** ("the $2.4M channel had a person doing X wrong") | Hybrid (photo with data overlay) | Combines emotional hook with proof |
+
+**Decision criterion: "Which format would a VP screenshot and send to their team?"**
+- If the answer is "the photo, because it perfectly captures their situation" → photo
+- If the answer is "the chart, because that number is insane" → infographic
+- If unsure → photo (photos outperform infographics on social sharing 3:1)
+
+#### Step 2: EXECUTION BOARD (how to compose it?)
+
+**Load the `julian` skill first.** Then read `Image_Composition_Framework.md` and `Ad_Creative_Production_Playbook.md`.
+
+**For PHOTOREALISTIC thumbnails:**
+- Complete a `Character_Scene_Brief_Template.md` (Level 1 protagonist, Level 2/3 secondary characters, scene brief with 6+ color zones)
+- Apply the composition framework: no dead zones, 3+ depth planes, foreground anchor, S-curve or Z-pattern
+- Define negative space zones WHERE TEXT WILL GO (this is critical — text zones are designed NOW, not after)
+- All wardrobe with hex codes, all elements with hex codes
+
+**For INFOGRAPHIC thumbnails:**
+- Read `Eye_Catching_Infographics.md` and `NanoBanana_Prompt_Guide.md`
+- Design the data hierarchy: what's the hero number? What supports it?
+- Color system: dark background (#0A0A0A), accent from article topic, max 3 data colors
+
+#### Step 3: LAYOUT BOARD (where does text go?)
+
+**This happens BEFORE generation, not after.** The text is PART of the composition, not an overlay.
+
+For each thumbnail, define:
+- **Title text:** The article title (or a shortened version that fits)
+- **Position:** Which zone of the image (top, bottom, left, right) — based on where the Execution Board left negative space
+- **Font:** Bebas Neue Bold for reliability. Size: large enough to read at 400px width (mobile blog grid)
+- **Color:** White on dark areas, or the article's accent color. Gold (#FFD700) for the key word/number
+- **Branding:** "HYPE ON MEDIA" watermark at 8-12% opacity, bottom corner
+
+**TEXT POSITIONING RULE (NON-NEGOTIABLE):** Every text position must be anchored to a SPECIFIC VISUAL ELEMENT in the scene — never abstract coordinates. Not "upper-left quadrant" but "over the dark empty chef stations on the left." Not "centered" but "floating in the misty air between the fisherman and the treeline." NanoBanana understands scene elements. It does NOT understand grid coordinates.
+
+**Why this rule exists:** The VidCon chef thumbnail placed text "over the dark empty chef stations" and it landed perfectly. The fisherman thumbnail said "text overlay" with no anchor and it landed in the wrong place. Same model, same session, different result. The anchor to scene elements is what makes it work.
+
+**The Layout Board's output is TEXT INSTRUCTIONS that get MERGED into the same prompt as the Execution Board's output.**
+
+#### Step 4: FUSION → ONE PROMPT
+
+Merge the Execution Board's scene description + the Layout Board's text instructions into ONE SINGLE PROMPT. NanoBanana generates the complete image — photo/infographic + text — in one API call.
+
+```
+[SCENE DESCRIPTION from Execution Board]
+[TEXT OVERLAY INSTRUCTIONS from Layout Board]
+[ANTI-AI MARKERS + CAMERA + FILM STOCK]
+[PROHIBITIONS]
 ```
 
-If the script doesn't exist, create it. Each cover should:
-- Dark background (#0A0A0A)
-- Unique gradient accent per article (vary colors: gold, teal, violet, blue, green)
-- Article title in bold white text
-- Subtitle or key stat below
-- "HYPE ON MEDIA" branding bottom-left
-- "hypeon.media" bottom-right
+**Why one prompt instead of two-step:** For blog thumbnails (viewed at 1200x630 or smaller), single-prompt generation produces well-integrated text. The two-step method is for large-format ads where photorealistic quality must be flawless before adding text. Thumbnails don't need that separation.
+
+#### Step 5: PREFLIGHT → GENERATE
+
+Run `Ad_Image_Preflight_Checklist.md` against the fused prompt. Then generate via `hypeon-imagery` skill (NanoBanana Pro, cascade to Flash if needed).
+
+**Output:** 1200x630px JPG saved to `content/blog/{slug}/cover.jpg`
+
+#### Step 6: REVIEW
+
+Before publishing, verify:
+- [ ] The analogy is immediately readable (2-second test)
+- [ ] Text is sharp and legible at 400px width (mobile)
+- [ ] The image is NOT a generic gradient with text (that's the old system)
+- [ ] A VP would screenshot this for Slack/LinkedIn
+- [ ] The thumbnail and title tell the SAME story from two angles (congruence rule)
+
+**Size reference:** 1200x630px (1.91:1 landscape (OG standard)) for blog cards. NOT 4:5 (that's for ads).
 
 ### Phase 6: Publish & Cross-Link
 
