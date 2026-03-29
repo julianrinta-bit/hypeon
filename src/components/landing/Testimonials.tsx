@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 
 const testimonials = [
   {
-    text: "We\u2019d been posting on YouTube for two years with no strategy. Hype On restructured our entire approach \u2014 thumbnails, titles, content architecture. Six months later, YouTube is our top lead source.",
+    text: "We\u2019d been posting on YouTube for two years with no strategy. Hype On Media restructured our entire approach \u2014 thumbnails, titles, content architecture. Six months later, YouTube is our top lead source.",
     name: "Rachel M.",
     role: "VP Marketing, Enterprise SaaS",
     metric: "YouTube \u2192 #1 lead source"

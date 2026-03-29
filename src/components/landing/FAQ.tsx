@@ -21,7 +21,7 @@ const FAQS = [
     a: 'Most clients start with our channel audit, then move into a Strategy Sprint \u2014 two weeks. From there, ongoing retainers cover content production, optimization, and scaling. We adapt to your needs \u2014 no rigid packages.',
   },
   {
-    q: 'How is Hype On different from other YouTube agencies?',
+    q: 'How is Hype On Media different from other YouTube agencies?',
     a: 'We built our systems inside operations managing 50+ channels across 15 languages. That experience, combined with AI-powered production tools we built ourselves, means you get enterprise-grade strategy with the speed of a lean team.',
   },
   {

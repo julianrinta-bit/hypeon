@@ -17,7 +17,7 @@ export default function Nav() {
       <nav className={`nav${scrolled ? ' nav--scrolled' : ''}`} aria-label="Main navigation">
         <a href="/" className="nav-logo" aria-label="Hype On Media home">
           <span className="nav-logo-slash">//</span>
-          <span className="nav-logo-text">HYPE ON</span>
+          <span className="nav-logo-text">HYPE ON MEDIA</span>
         </a>
         <ul className="nav-links">
           <li><a href="/#proof">Proof</a></li>

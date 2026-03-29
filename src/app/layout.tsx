@@ -61,7 +61,7 @@ export default function RootLayout({
           href="https://api.fontshare.com/v2/css?f[]=outfit@300,400,500,600&display=swap"
           rel="stylesheet"
         />
-        <meta name="theme-color" content="#09090b" />
+        <meta name="theme-color" content="#0A0A0C" />
       </head>
       <body>
         <a href="#main-content" className="skip-link">
