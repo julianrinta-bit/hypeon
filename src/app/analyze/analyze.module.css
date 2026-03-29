@@ -1190,9 +1190,9 @@
     text-align-last: left;
   }
 
-  .zoneA  { padding: 100px 24px 72px; }
-  .zoneB  { padding: 72px 24px 60px; }
-  .zoneC  { padding: 60px 24px 80px; }
+  .zoneA  { padding: 100px 28px 72px; }
+  .zoneB  { padding: 72px 28px 60px; }
+  .zoneC  { padding: 60px 28px 80px; }
 
   .inputRow {
     flex-direction: column;
