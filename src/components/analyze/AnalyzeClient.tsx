@@ -1,7 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import RadarChart from './RadarChart';
+import { submitAnalysis } from '@/lib/actions/analyze';
 import styles from '@/app/analyze/analyze.module.css';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -221,6 +223,9 @@ export default function AnalyzeClient() {
 
   // Submit state
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
   // FAQ
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
@@ -269,12 +274,34 @@ export default function AnalyzeClient() {
       setEmailMatch('noMatch');
       return;
     }
+    if (!selectedGoal) return;
 
     setSubmitState('loading');
-    setTimeout(() => {
-      setSubmitState('success');
-    }, 2000);
-  }, [name, email, emailConfirm]);
+    setSubmitError(null);
+
+    startTransition(async () => {
+      const result = await submitAnalysis({
+        channel_url: urlValue.trim(),
+        goal: selectedGoal,
+        publishing_frequency: selectedFreq || undefined,
+        production_level: selectedProd || undefined,
+        region: selectedRegion || undefined,
+        name: name.trim(),
+        email: email.trim(),
+      });
+
+      if (result.success && result.publicId) {
+        setSubmitState('success');
+        // Redirect to waiting room after brief success animation
+        setTimeout(() => {
+          router.push(`/analyze/status/${result.publicId}`);
+        }, 1500);
+      } else {
+        setSubmitState('idle');
+        setSubmitError(result.error || 'Something went wrong. Please try again.');
+      }
+    });
+  }, [name, email, emailConfirm, urlValue, selectedGoal, selectedFreq, selectedProd, selectedRegion, router, startTransition]);
 
   // ── FAQ toggle ──────────────────────────────────────────────────────────
   const handleFaqToggle = useCallback((id: string) => {
@@ -529,8 +556,8 @@ export default function AnalyzeClient() {
               className={`${styles.ctaBtn} ${styles.qualifySubmit}`}
               onClick={handleSubmit}
               type="button"
-              disabled={submitState !== 'idle'}
-              style={submitState !== 'idle' ? { opacity: 0.7, pointerEvents: 'none' } : undefined}
+              disabled={submitState !== 'idle' || isPending}
+              style={submitState !== 'idle' || isPending ? { opacity: 0.7, pointerEvents: 'none' } : undefined}
             >
               {submitState === 'idle' && 'Get My Analysis — Free'}
               {submitState === 'loading' && (
@@ -552,6 +579,11 @@ export default function AnalyzeClient() {
                 </span>
               )}
             </button>
+            {submitError && (
+              <p style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
+                {submitError}
+              </p>
+            )}
             <p className={styles.qualifyFine}>No spam. No selling your data. Just your channel audit.</p>
           </div>
 

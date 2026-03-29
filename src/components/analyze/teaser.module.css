@@ -1,0 +1,847 @@
+/*
+  teaser.module.css
+  Teaser results page — /analyze/[id]
+  Tokens inherited from analyze.module.css via the .page wrapper.
+  No scrollbars visible anywhere. All animations respect prefers-reduced-motion.
+*/
+
+/* ─────────────────────────────────────────────────
+   SCROLLBAR SUPPRESSION (global via :root injection
+   is handled in globals.css — here we cover the page)
+───────────────────────────────────────────────── */
+.page {
+  --az-accent:        #c8ff2e;
+  --az-accent-hover:  #b8ee20;
+  --az-accent-subtle: rgba(200, 255, 46, 0.10);
+  --az-text:          #D1D5DB;
+  --az-text-bright:   #E5E7EB;
+  --az-text-muted:    #9CA3AF;
+  --az-text-dim:      #6B7280;
+  --az-glass-bg:      rgba(10, 10, 14, 0.82);
+  --az-glass-border:  rgba(255, 255, 255, 0.08);
+  --az-glass-border-top: rgba(255, 255, 255, 0.18);
+  --az-glass-blur:    16px;
+  --az-bg:            #0A0A0C;
+  --az-bg-subtle:     #111114;
+  --az-bg-elevated:   #161619;
+  --az-ease:          cubic-bezier(0.16, 1, 0.3, 1);
+  --az-score-s:       #c8ff2e;
+  --az-score-a:       #34D399;
+  --az-score-b:       #FBBF24;
+  --az-score-c:       #FB923C;
+  --az-score-d:       #F87171;
+
+  background: var(--az-bg);
+  color: var(--az-text);
+  font-family: var(--font-body, system-ui, sans-serif);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+.page::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-A: GRADE HERO
+───────────────────────────────────────────────── */
+.gradeHero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px 60px;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+
+/* Ambient glow behind the grade */
+.gradeHeroBg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(200, 255, 46, 0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 20% 80%, rgba(200, 255, 46, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Fade-out at the bottom for smooth scroll into next section */
+.gradeHero::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(to bottom, transparent, var(--az-bg));
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gradeHeroInner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+/* Channel avatar */
+.channelAvatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 2.5px solid var(--grade-color, var(--az-accent));
+  box-shadow: 0 0 20px color-mix(in srgb, var(--grade-color, var(--az-accent)) 30%, transparent);
+  animation: fadeScaleIn 0.6s var(--az-ease) both;
+}
+
+.channelAvatarFallback {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--az-bg-elevated);
+  border: 2.5px solid var(--grade-color, var(--az-accent));
+  box-shadow: 0 0 20px color-mix(in srgb, var(--grade-color, var(--az-accent)) 30%, transparent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  animation: fadeScaleIn 0.6s var(--az-ease) both;
+}
+
+.channelAvatarFallbackLetter {
+  font-family: var(--font-display, system-ui);
+  font-weight: 800;
+  font-size: 28px;
+  color: var(--az-text-bright);
+  text-transform: uppercase;
+}
+
+/* Channel name */
+.channelName {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--az-text-dim);
+  margin-bottom: 16px;
+  animation: fadeScaleIn 0.6s var(--az-ease) 0.1s both;
+}
+
+/* THE GRADE */
+.gradeDisplay {
+  font-family: var(--font-display, system-ui);
+  font-size: clamp(120px, 20vw, 200px);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  color: var(--grade-color, var(--az-accent));
+  text-shadow:
+    0 0 60px color-mix(in srgb, var(--grade-color, var(--az-accent)) 40%, transparent),
+    0 0 120px color-mix(in srgb, var(--grade-color, var(--az-accent)) 20%, transparent);
+  margin-bottom: 20px;
+  animation: gradeEntrance 0.8s var(--az-ease) 0.2s both;
+  will-change: transform, opacity;
+}
+
+.gradeLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--az-text-dim);
+  margin-bottom: 48px;
+  animation: fadeScaleIn 0.6s var(--az-ease) 0.5s both;
+}
+
+/* Scroll chevron */
+.scrollIndicator {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  animation: bounceFade 2.4s ease-in-out 1.5s infinite both;
+  opacity: 0.5;
+  cursor: default;
+}
+
+.scrollChevron {
+  width: 24px;
+  height: 24px;
+  color: var(--az-text-dim);
+}
+
+/* ─────────────────────────────────────────────────
+   SECTION WRAPPER
+───────────────────────────────────────────────── */
+.section {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+}
+
+/* ─────────────────────────────────────────────────
+   SECTION HEADERS
+───────────────────────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 16px;
+}
+
+.sectionEyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-accent);
+  background: var(--az-accent-subtle);
+  border: 1px solid rgba(200, 255, 46, 0.2);
+  border-radius: 999px;
+  padding: 5px 14px;
+}
+
+.sectionEyebrowDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--az-accent);
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-B: SCORE CARDS
+───────────────────────────────────────────────── */
+.scoresSection {
+  padding-top: 32px;
+}
+
+.scoresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* Base score card */
+.scoreCard {
+  background: var(--az-glass-bg);
+  border: 1px solid var(--az-glass-border);
+  border-top-color: var(--az-glass-border-top);
+  border-radius: 16px;
+  padding: 20px;
+  backdrop-filter: blur(var(--az-glass-blur));
+  -webkit-backdrop-filter: blur(var(--az-glass-blur));
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.25s var(--az-ease), box-shadow 0.25s var(--az-ease);
+}
+
+.scoreCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Scroll-reveal stagger animation */
+.scoreCard:nth-child(1) { animation-delay: 0ms; }
+.scoreCard:nth-child(2) { animation-delay: 100ms; }
+.scoreCard:nth-child(3) { animation-delay: 200ms; }
+.scoreCard:nth-child(4) { animation-delay: 300ms; }
+.scoreCard:nth-child(5) { animation-delay: 400ms; }
+.scoreCard:nth-child(6) { animation-delay: 500ms; }
+
+.scoreCardReveal {
+  animation: revealCard 0.6s var(--az-ease) both;
+}
+
+/* Card header row */
+.scoreCardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+/* Icon container */
+.scoreCardIcon {
+  width: 36px;
+  height: 36px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--az-glass-border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--az-text-muted);
+  flex-shrink: 0;
+}
+
+/* Score badge: value + letter */
+.scoreBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--badge-color, var(--az-accent)) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--badge-color, var(--az-accent)) 25%, transparent);
+}
+
+.scoreBadgeValue {
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--badge-color, var(--az-accent));
+  line-height: 1;
+}
+
+.scoreBadgeSep {
+  font-size: 10px;
+  color: color-mix(in srgb, var(--badge-color, var(--az-accent)) 40%, transparent);
+}
+
+.scoreBadgeLetter {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--badge-color, var(--az-accent));
+  line-height: 1;
+}
+
+/* Card body */
+.scoreCardTitle {
+  font-family: var(--font-body, system-ui);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--az-text-bright);
+  margin-bottom: 6px;
+  text-align: left;
+  text-align-last: left;
+}
+
+.scoreCardDesc {
+  font-size: 12px;
+  color: var(--az-text-muted);
+  line-height: 1.5;
+  text-align: left;
+  text-align-last: left;
+}
+
+/* Blurred card variant */
+.scoreCardBlurred {
+  filter: blur(6px);
+  pointer-events: none;
+  user-select: none;
+}
+
+.scoreCardLockOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(10, 10, 14, 0.15);
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.scoreCardLockIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--az-text-dim);
+}
+
+.scoreCardLockText {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--az-text-dim);
+}
+
+/* Card wrapper for the blur+overlay pattern */
+.scoreCardWrapper {
+  position: relative;
+}
+
+/* ─────────────────────────────────────────────────
+   RADAR + INSIGHT ZONE
+───────────────────────────────────────────────── */
+.radarInsightRow {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  align-items: start;
+  padding-bottom: 80px;
+}
+
+.radarWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.radarLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-text-dim);
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-C: INSIGHT CARD
+───────────────────────────────────────────────── */
+.insightCard {
+  background: var(--az-glass-bg);
+  border: 1px solid var(--az-glass-border);
+  border-top-color: var(--az-glass-border-top);
+  border-radius: 20px;
+  padding: 28px 32px;
+  backdrop-filter: blur(var(--az-glass-blur));
+  -webkit-backdrop-filter: blur(var(--az-glass-blur));
+  position: relative;
+  overflow: hidden;
+}
+
+/* Left accent line */
+.insightCard::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: 0;
+  width: 3px;
+  height: 36px;
+  background: var(--az-accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.insightEyebrow {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--az-accent);
+  margin-bottom: 14px;
+  display: block;
+}
+
+.insightTextVisible {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--az-text-bright);
+  margin-bottom: 0;
+  text-align: left;
+  text-align-last: left;
+}
+
+.insightBlurWrap {
+  position: relative;
+  margin-top: 12px;
+}
+
+.insightBlurText {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--az-text-muted);
+  filter: blur(5px);
+  user-select: none;
+  /* Gradient mask fades bottom */
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0));
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0));
+  text-align: left;
+  text-align-last: left;
+  pointer-events: none;
+}
+
+.insightHint {
+  margin-top: 16px;
+  font-size: 13px;
+  color: var(--az-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-align: left;
+  text-align-last: left;
+}
+
+.insightHintAccent {
+  color: var(--az-accent);
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-D: BLUR WALL (3 deep dive cards)
+───────────────────────────────────────────────── */
+.blurWallSection {
+  padding-bottom: 80px;
+}
+
+.blurWallGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.blurCard {
+  background: var(--az-glass-bg);
+  border: 1px solid var(--az-glass-border);
+  border-top-color: var(--az-glass-border-top);
+  border-radius: 16px;
+  height: 200px;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(var(--az-glass-blur));
+  -webkit-backdrop-filter: blur(var(--az-glass-blur));
+}
+
+.blurCardHeader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 20px 20px 16px;
+  z-index: 2;
+}
+
+.blurCardTitle {
+  font-family: var(--font-body, system-ui);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--az-text-bright);
+  margin-bottom: 4px;
+  text-align: left;
+  text-align-last: left;
+}
+
+.blurCardSub {
+  font-size: 11px;
+  color: var(--az-text-dim);
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: left;
+  text-align-last: left;
+}
+
+/* Blurred content body */
+.blurCardBody {
+  position: absolute;
+  inset: 0;
+  top: 68px;
+  padding: 0 20px 20px;
+  filter: blur(6px);
+  user-select: none;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Fake content lines */
+.blurLine {
+  height: 10px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.blurLine:nth-child(1) { width: 90%; }
+.blurLine:nth-child(2) { width: 75%; }
+.blurLine:nth-child(3) { width: 82%; }
+.blurLine:nth-child(4) { width: 60%; }
+
+/* Lock overlay on blur cards */
+.blurCardLock {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  z-index: 3;
+}
+
+.blurCardLockIcon {
+  width: 22px;
+  height: 22px;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.blurCardLockText {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.18);
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-E: CTA CARD
+───────────────────────────────────────────────── */
+.ctaSection {
+  padding-bottom: 120px;
+}
+
+.ctaCard {
+  background: var(--az-glass-bg);
+  border: 1px solid var(--az-glass-border);
+  border-top-color: var(--az-glass-border-top);
+  border-radius: 24px;
+  padding: 48px 40px;
+  backdrop-filter: blur(var(--az-glass-blur));
+  -webkit-backdrop-filter: blur(var(--az-glass-blur));
+  max-width: 640px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle glow behind CTA card */
+.ctaCard::before {
+  content: '';
+  position: absolute;
+  bottom: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 200px;
+  background: radial-gradient(ellipse, rgba(200, 255, 46, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ctaHeadline {
+  font-family: var(--font-display, system-ui);
+  font-weight: 800;
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--az-text-bright);
+  margin-bottom: 28px;
+  text-align: center;
+  text-align-last: center;
+}
+
+.ctaChecklist {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto 36px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ctaCheckItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--az-text-muted);
+  text-align: left;
+}
+
+.ctaCheckIcon {
+  width: 16px;
+  height: 16px;
+  color: var(--az-accent);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.ctaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 32px;
+  background: var(--az-accent);
+  color: #0A0A0C;
+  font-family: var(--font-body, system-ui);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -0.01em;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: background 0.18s var(--az-ease), transform 0.2s var(--az-ease), box-shadow 0.2s var(--az-ease);
+  margin-bottom: 20px;
+  white-space: nowrap;
+}
+
+.ctaBtn:hover {
+  background: var(--az-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(200, 255, 46, 0.32);
+}
+
+.ctaBtn:active {
+  transform: translateY(0);
+}
+
+.ctaBtnArrow {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s var(--az-ease);
+}
+
+.ctaBtn:hover .ctaBtnArrow {
+  transform: translateX(3px);
+}
+
+.ctaTrust {
+  font-size: 13px;
+  color: var(--az-text-dim);
+  text-align: center;
+  text-align-last: center;
+}
+
+/* ─────────────────────────────────────────────────
+   KEYFRAMES
+───────────────────────────────────────────────── */
+@keyframes fadeScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes gradeEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes bounceFade {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+  50%       { transform: translateX(-50%) translateY(8px); opacity: 0.8; }
+}
+
+@keyframes revealCard {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drawRadar {
+  from { stroke-dashoffset: 600; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* ─────────────────────────────────────────────────
+   REDUCED MOTION
+───────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .gradeDisplay,
+  .channelAvatar,
+  .channelAvatarFallback,
+  .channelName,
+  .gradeLabel,
+  .scrollIndicator,
+  .scoreCardReveal {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   RESPONSIVE — TABLET
+───────────────────────────────────────────────── */
+@media (max-width: 860px) {
+  .scoresGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .radarInsightRow {
+    grid-template-columns: 1fr;
+  }
+
+  .radarWrap {
+    order: 2;
+  }
+
+  .insightCard {
+    order: 1;
+  }
+
+  .blurWallGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .blurCard {
+    height: 160px;
+  }
+
+  .ctaCard {
+    padding: 36px 24px;
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   RESPONSIVE — MOBILE
+───────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .gradeHero {
+    padding: 60px 20px 40px;
+  }
+
+  .scoresGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .section {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .ctaCard {
+    padding: 28px 20px;
+  }
+
+  .ctaHeadline {
+    font-size: 24px;
+  }
+
+  .sectionHeader {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
