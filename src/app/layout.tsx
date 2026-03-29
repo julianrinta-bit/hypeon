@@ -4,8 +4,7 @@ import './globals.css';
 import ScrollProgress from '@/components/layout/ScrollProgress';
 import CustomCursor from '@/components/layout/CustomCursor';
 import Nav from '@/components/layout/Nav';
-import Footer from '@/components/layout/Footer';
-import StickyMobileCTA from '@/components/landing/StickyMobileCTA';
+import ConditionalShell from '@/components/layout/ConditionalShell';
 import ExitIntentModal from '@/components/landing/ExitIntentModal';
 import CookieConsent from '@/components/layout/CookieConsent';
 import ScrollToTop from '@/components/ui/ScrollToTop';
@@ -73,8 +72,7 @@ export default function RootLayout({
         <CustomCursor />
         <Nav />
         {children}
-        <Footer />
-        <StickyMobileCTA />
+        <ConditionalShell />
         <ScrollToTop />
         <ExitIntentModal />
         <CookieConsent />
