@@ -38,6 +38,9 @@
   line-height: 1.6;
   overflow-x: hidden;
   scrollbar-width: none;
+  user-select: none;
+  -webkit-user-select: none;
+  position: relative;
 }
 
 .page::-webkit-scrollbar {
@@ -1397,5 +1400,83 @@
 
   .titleCard {
     padding: 16px 18px;
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   ANTI-COPY: TAB VISIBILITY BLUR
+───────────────────────────────────────────────── */
+.pageBlurred {
+  filter: blur(20px);
+  transition: filter 300ms ease;
+  pointer-events: none;
+}
+
+.page {
+  transition: filter 300ms ease;
+}
+
+/* ─────────────────────────────────────────────────
+   WATERMARK OVERLAY
+   Fixed over entire report, pointer-events: none
+   so buttons and links remain clickable.
+───────────────────────────────────────────────── */
+.watermarkOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 48px 80px;
+  padding: 40px;
+}
+
+.watermarkItem {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.06);
+  white-space: nowrap;
+  transform: rotate(-35deg);
+  display: inline-block;
+  transform-origin: center;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────
+   COUNTDOWN TIMER
+───────────────────────────────────────────────── */
+.countdownTimer {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-accent, #c8ff2e);
+  margin: 20px 0 24px;
+  opacity: 0.85;
+}
+
+/* ─────────────────────────────────────────────────
+   PRINT BLOCK
+   When user tries to print, hide all content and
+   show a message directing them to book a call.
+───────────────────────────────────────────────── */
+@media print {
+  .page {
+    display: none !important;
+  }
+
+  body::after {
+    content: 'This report cannot be printed. Visit hypeon.media/analyze to request a new analysis.';
+    display: block;
+    padding: 40px;
+    font-size: 18px;
+    text-align: center;
+    font-family: system-ui, sans-serif;
+    color: #0A0A0C;
   }
 }

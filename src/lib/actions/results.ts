@@ -103,11 +103,13 @@ export interface TeaserData {
   weightedScores: WeightedScores | null;
   outliers: OutliersData | null;
   deepDives: DeepDives;
+  expiresAt: string; // ISO string: completed_at + 24h
+  userEmail: string | null; // For watermark — from profiles table
 }
 
 export type TeaserResult =
   | { found: true; data: TeaserData }
-  | { found: false; reason: 'not_found' | 'not_ready' };
+  | { found: false; reason: 'not_found' | 'not_ready' | 'expired' };
 
 // ── Score metadata ──────────────────────────────────────────────────────────
 
@@ -126,7 +128,7 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   // First check if the job exists and is complete
   const { data: job } = await supabase
     .from('analysis_jobs')
-    .select('id, status, channel_id')
+    .select('id, status, channel_id, completed_at, user_id')
     .eq('public_id', publicId)
     .maybeSingle();
 
@@ -136,6 +138,15 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
 
   if (job.status !== 'complete') {
     return { found: false, reason: 'not_ready' };
+  }
+
+  // 24-hour expiry check
+  if (job.completed_at) {
+    const completedAt = new Date(job.completed_at as string);
+    const expiresAt = new Date(completedAt.getTime() + 24 * 60 * 60 * 1000);
+    if (new Date() > expiresAt) {
+      return { found: false, reason: 'expired' };
+    }
   }
 
   // Fetch the analysis results (including new fields)
@@ -170,6 +181,15 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
     .select('name, thumbnail_url')
     .eq('id', job.channel_id)
     .single();
+
+  // Fetch user email for watermark (from auth.users via service role)
+  let userEmail: string | null = null;
+  if (job.user_id) {
+    const { data: authUser } = await supabase.auth.admin.getUserById(
+      job.user_id as string
+    );
+    userEmail = authUser?.user?.email ?? null;
+  }
 
   // Fetch deep dives (4 module types)
   const { data: deepDiveRows } = await supabase
@@ -243,6 +263,12 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
         : analysis.outliers) as OutliersData
     : null;
 
+  // Compute expiresAt (completed_at + 24h, or fallback to created_at + 24h)
+  const baseTime = job.completed_at
+    ? new Date(job.completed_at as string)
+    : new Date(analysis.created_at as string);
+  const expiresAt = new Date(baseTime.getTime() + 24 * 60 * 60 * 1000).toISOString();
+
   return {
     found: true,
     data: {
@@ -257,6 +283,8 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
       weightedScores,
       outliers,
       deepDives,
+      expiresAt,
+      userEmail,
     },
   };
 }
