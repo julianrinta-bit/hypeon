@@ -494,6 +494,514 @@
 }
 
 /* ─────────────────────────────────────────────────
+   SECTION SUBHEAD
+───────────────────────────────────────────────── */
+.sectionSubhead {
+  font-size: 14px;
+  color: var(--az-text-muted);
+  margin-top: -20px;
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-F: OUTLIER ANALYSIS
+───────────────────────────────────────────────── */
+.outlierGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.outlierColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.outlierColumnTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-body, system-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--az-text-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin: 0 0 4px;
+}
+
+.outlierColumnDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.outlierList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.outlierCard {
+  background: var(--az-glass-bg);
+  border: 1px solid var(--az-glass-border);
+  border-top-color: var(--az-glass-border-top);
+  border-radius: 14px;
+  padding: 16px 18px;
+  backdrop-filter: blur(var(--az-glass-blur));
+  -webkit-backdrop-filter: blur(var(--az-glass-blur));
+  transition: transform 0.22s var(--az-ease), box-shadow 0.22s var(--az-ease);
+}
+
+.outlierCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+.outlierCardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.outlierTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--az-text-bright);
+  line-height: 1.4;
+  flex: 1;
+  margin: 0;
+}
+
+.outlierBadge {
+  flex-shrink: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--outlier-color, #34D399) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--outlier-color, #34D399) 28%, transparent);
+  color: var(--outlier-color, #34D399);
+  white-space: nowrap;
+}
+
+.outlierExplanation {
+  font-size: 12px;
+  color: var(--az-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+.outlierEmpty {
+  font-size: 13px;
+  color: var(--az-text-dim);
+  font-style: italic;
+  padding: 16px 0;
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-G: HOOK MASTERY
+───────────────────────────────────────────────── */
+.hookList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hookRow {
+  background: var(--az-glass-bg);
+  border: 1px solid var(--az-glass-border);
+  border-top-color: var(--az-glass-border-top);
+  border-radius: 16px;
+  padding: 20px 24px;
+  backdrop-filter: blur(var(--az-glass-blur));
+  -webkit-backdrop-filter: blur(var(--az-glass-blur));
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 12px 16px;
+  align-items: start;
+}
+
+.hookLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-text-dim);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.hookOriginal {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.hookOriginalText {
+  font-size: 13px;
+  color: var(--az-text-dim);
+  line-height: 1.5;
+  text-decoration: line-through;
+  text-decoration-color: rgba(255, 255, 255, 0.18);
+  margin: 0;
+}
+
+.hookArrow {
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--az-accent);
+  display: flex;
+  align-items: center;
+  padding-top: 22px;
+  opacity: 0.7;
+}
+
+.hookRewritten {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.hookRewrittenText {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--az-text-bright);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.hookRationale {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  border-top: 1px solid var(--az-glass-border);
+  padding-top: 12px;
+  font-size: 12px;
+  color: var(--az-text-muted);
+  line-height: 1.55;
+}
+
+.hookRationaleLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-accent);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-H: TITLE LABORATORY
+───────────────────────────────────────────────── */
+.titleGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.titleCard {
+  background: var(--az-glass-bg);
+  border: 1px solid var(--az-glass-border);
+  border-top-color: var(--az-glass-border-top);
+  border-radius: 16px;
+  padding: 20px 22px;
+  backdrop-filter: blur(var(--az-glass-blur));
+  -webkit-backdrop-filter: blur(var(--az-glass-blur));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  position: relative;
+  transition: transform 0.22s var(--az-ease), box-shadow 0.22s var(--az-ease);
+}
+
+.titleCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+.titleCardOriginal {
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--az-glass-border);
+}
+
+.titleCardOriginalLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-text-dim);
+  display: block;
+  margin-bottom: 6px;
+}
+
+.titleCardOriginalText {
+  font-size: 13px;
+  color: var(--az-text-muted);
+  line-height: 1.45;
+  margin: 0;
+  font-style: italic;
+}
+
+.titleAltList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.titleAltItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--az-text-bright);
+  line-height: 1.45;
+}
+
+.titleAltIcon {
+  flex-shrink: 0;
+  color: var(--az-accent);
+  margin-top: 2px;
+}
+
+.titleImprovementBadge {
+  display: inline-block;
+  align-self: flex-start;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(200, 255, 46, 0.10);
+  border: 1px solid rgba(200, 255, 46, 0.22);
+  color: var(--az-accent);
+  letter-spacing: 0.04em;
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-I: CONTENT GAPS
+───────────────────────────────────────────────── */
+.gapGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.gapCard {
+  background: var(--az-glass-bg);
+  border: 1px solid var(--az-glass-border);
+  border-top-color: var(--az-glass-border-top);
+  border-radius: 16px;
+  padding: 18px 20px;
+  backdrop-filter: blur(var(--az-glass-blur));
+  -webkit-backdrop-filter: blur(var(--az-glass-blur));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.22s var(--az-ease), box-shadow 0.22s var(--az-ease);
+}
+
+.gapCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+.gapCardBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.gapPriorityBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--priority-color, #FBBF24) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--priority-color, #FBBF24) 28%, transparent);
+  color: var(--priority-color, #FBBF24);
+  letter-spacing: 0.04em;
+}
+
+.gapDifficultyBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--difficulty-color, #34D399) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--difficulty-color, #34D399) 22%, transparent);
+  color: var(--difficulty-color, #34D399);
+  text-transform: capitalize;
+  letter-spacing: 0.04em;
+}
+
+.gapViewsBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--az-glass-border);
+  color: var(--az-text-muted);
+  letter-spacing: 0.04em;
+}
+
+.gapTopic {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--az-text-bright);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.gapAngle {
+  font-size: 12px;
+  color: var(--az-text-muted);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ─────────────────────────────────────────────────
+   ZONE R-J: COMPETITOR PLAYBOOK
+───────────────────────────────────────────────── */
+.competitorList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.competitorCard {
+  background: var(--az-glass-bg);
+  border: 1px solid var(--az-glass-border);
+  border-top-color: var(--az-glass-border-top);
+  border-radius: 16px;
+  padding: 22px 26px;
+  backdrop-filter: blur(var(--az-glass-blur));
+  -webkit-backdrop-filter: blur(var(--az-glass-blur));
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  transition: transform 0.22s var(--az-ease), box-shadow 0.22s var(--az-ease);
+}
+
+.competitorCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.25);
+}
+
+.competitorCardHead {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.competitorName {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-accent);
+}
+
+.competitorVideoTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--az-text-bright);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.competitorTakeaway {
+  font-size: 14px;
+  color: var(--az-text);
+  line-height: 1.6;
+  margin: 0;
+  padding: 14px 16px;
+  background: rgba(200, 255, 46, 0.04);
+  border-left: 3px solid var(--az-accent);
+  border-radius: 0 8px 8px 0;
+}
+
+.competitorApplicable {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--az-text-muted);
+  line-height: 1.55;
+}
+
+.competitorApplicableLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--az-text-dim);
+}
+
+.competitorExpand {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.competitorExpandBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--az-text-dim);
+  transition: color 0.18s;
+}
+
+.competitorExpandBtn:hover {
+  color: var(--az-text-muted);
+}
+
+.competitorExpandChevron {
+  transition: transform 0.22s var(--az-ease);
+}
+
+.competitorExpandChevronOpen {
+  transform: rotate(180deg);
+}
+
+.competitorStructureText {
+  font-size: 13px;
+  color: var(--az-text-muted);
+  line-height: 1.6;
+  margin: 0;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--az-glass-border);
+  border-radius: 10px;
+}
+
+/* ─────────────────────────────────────────────────
    ZONE R-D: BLUR WALL (3 deep dive cards)
 ───────────────────────────────────────────────── */
 .blurWallSection {
@@ -813,6 +1321,30 @@
   .ctaCard {
     padding: 36px 24px;
   }
+
+  /* New sections — tablet */
+  .outlierGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .titleGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .gapGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hookRow {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+  }
+
+  .hookOriginal { grid-column: 1; grid-row: 1; }
+  .hookArrow    { grid-column: 1; grid-row: 2; padding-top: 0; justify-self: start; transform: rotate(90deg); }
+  .hookRewritten { grid-column: 1; grid-row: 3; }
+  .hookRationale { grid-column: 1; grid-row: 4; }
 }
 
 /* ─────────────────────────────────────────────────
@@ -843,5 +1375,27 @@
   .sectionHeader {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  /* New sections — mobile */
+  .gapGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .competitorCard {
+    padding: 18px 18px;
+  }
+
+  .competitorTakeaway {
+    font-size: 13px;
+    padding: 12px 14px;
+  }
+
+  .hookRow {
+    padding: 16px 18px;
+  }
+
+  .titleCard {
+    padding: 16px 18px;
   }
 }
