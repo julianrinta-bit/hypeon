@@ -340,74 +340,18 @@ export default function TeaserClient({ data, publicId: _publicId }: Props) {
         <div className={styles.insightCard} aria-label="Key insight">
           <span className={styles.insightEyebrow}>Key Insight</span>
 
-          <p className={styles.insightTextVisible}>{data.insight}</p>
-
-          {data.fullRecommendationLength > 1 && (
-            <div className={styles.insightBlurWrap} aria-hidden="true">
-              <p className={styles.insightBlurText}>
-                Your channel shows strong potential in areas where competitors are failing to execute.
-                The primary opportunity window involves a systematic approach to content architecture
-                that transforms occasional breakout videos into a reliable growth engine.
-                This requires addressing specific patterns in your upload cadence and thumbnail strategy.
-              </p>
-            </div>
-          )}
-
-          <p className={styles.insightHint}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <rect x="3" y="11" width="18" height="11" rx="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            <span className={styles.insightHintAccent}>
-              {data.fullRecommendationLength - 1} more insight{data.fullRecommendationLength - 1 !== 1 ? 's' : ''}
-            </span>
-            &nbsp;in the full analysis
-          </p>
+          <div
+            className={styles.insightTextVisible}
+            dangerouslySetInnerHTML={{
+              __html: data.insight
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n/g, '<br/>')
+            }}
+          />
         </div>
       </div>
 
-      {/* ── Zone R-D: Blur Wall ──────────────────────────────────────────── */}
-      <section
-        className={`${styles.section} ${styles.blurWallSection}`}
-        ref={blurRef}
-        aria-label="Deep dive sections (locked)"
-        style={{ opacity: blurVisible ? 1 : 0, transition: 'opacity 0.5s var(--az-ease) 0.1s' }}
-      >
-        <div className={styles.sectionHeader}>
-          <div className={styles.sectionEyebrow}>
-            <span className={styles.sectionEyebrowDot} aria-hidden="true" />
-            Full Report Preview
-          </div>
-        </div>
-
-        <div className={styles.blurWallGrid}>
-          {[
-            { title: 'Deep Dive Breakdown', sub: '14 metrics analyzed' },
-            { title: 'Content DNA',          sub: 'Topic clusters & gaps' },
-            { title: 'Competitive Landscape', sub: '8 competitors mapped' },
-          ].map(({ title, sub }) => (
-            <div key={title} className={styles.blurCard} aria-hidden="true">
-              <div className={styles.blurCardHeader}>
-                <p className={styles.blurCardTitle}>{title}</p>
-                <p className={styles.blurCardSub}>{sub}</p>
-              </div>
-              <div className={styles.blurCardBody}>
-                <div className={styles.blurLine} />
-                <div className={styles.blurLine} />
-                <div className={styles.blurLine} />
-                <div className={styles.blurLine} />
-              </div>
-              <div className={styles.blurCardLock}>
-                <svg className={styles.blurCardLockIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-                <span className={styles.blurCardLockText}>Unlocks on call</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* Zone R-D: Blur Wall — hidden for testing */}
 
       {/* ── Zone R-E: CTA ────────────────────────────────────────────────── */}
       <section
