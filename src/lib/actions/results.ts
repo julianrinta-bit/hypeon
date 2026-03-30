@@ -100,14 +100,16 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
     }))
     .sort((a, b) => b.value - a.value);
 
-  // Top 3 visible, bottom 3 blurred
-  scoreEntries.forEach((score, i) => {
-    score.visible = i < 3;
+  // TODO: For production, top 3 visible, bottom 3 blurred
+  // For now, all visible for testing
+  scoreEntries.forEach((score) => {
+    score.visible = true;
   });
 
-  // Extract first sentence of recommendation as the insight
+  // TODO: For production, only first sentence visible
+  // For now, full recommendation for testing
   const fullRec = analysis.recommendation || '';
-  const firstSentence = fullRec.match(/^[^.!?]+[.!?]/)?.[0] || fullRec.slice(0, 120);
+  const firstSentence = fullRec; // Show everything for testing
   const recSentences = fullRec.split(/[.!?]\s+/).filter(Boolean).length;
 
   return {

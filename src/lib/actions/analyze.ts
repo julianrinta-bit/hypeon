@@ -15,11 +15,7 @@ const supabase = createClient(
 
 // ── pgmq client (separate schema) ──────────────────────────────────────────
 
-const pgmq = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { db: { schema: 'pgmq_public' }, auth: { autoRefreshToken: false, persistSession: false } }
-);
+// pgmq wrappers are in public schema (pgmq_send, pgmq_read, pgmq_delete)
 
 // ── Schema ──────────────────────────────────────────────────────────────────
 
@@ -208,7 +204,7 @@ export async function submitAnalysis(data: {
   }
 
   // 9. Enqueue in pgmq (non-fatal — cron picks up DB rows anyway)
-  const { error: enqueueError } = await pgmq.rpc('send', {
+  const { error: enqueueError } = await supabase.rpc('pgmq_send', {
     queue_name: 'analysis_jobs',
     message: { job_id: job.id },
   });
