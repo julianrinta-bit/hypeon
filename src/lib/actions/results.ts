@@ -17,6 +17,80 @@ export interface TeaserScore {
   visible: boolean; // true for top 3, false for blurred
 }
 
+// ── Outlier types ────────────────────────────────────────────────────────────
+
+export interface OutlierVideo {
+  title: string;
+  percent_above_avg?: number;
+  percent_below_avg?: number;
+  explanation: string;
+}
+
+export interface OutliersData {
+  overperformers: OutlierVideo[];
+  underperformers: OutlierVideo[];
+}
+
+// ── Weighted scores ──────────────────────────────────────────────────────────
+
+export interface WeightedScores {
+  composite_score?: number;
+  [key: string]: number | undefined;
+}
+
+// ── Deep dive types ──────────────────────────────────────────────────────────
+
+export interface HookRewrite {
+  original_hook: string;
+  rewritten_hook: string;
+  improvement_rationale: string;
+}
+
+export interface HookMasteryContent {
+  rewrites: HookRewrite[];
+}
+
+export interface TitleAlternative {
+  original_title: string;
+  alternatives: string[];
+  predicted_improvement: string;
+}
+
+export interface TitleLaboratoryContent {
+  alternatives: TitleAlternative[];
+}
+
+export interface CompetitorBreakdown {
+  competitor_name: string;
+  video_title: string;
+  key_takeaway: string;
+  applicable_to_user: string;
+  structure_analysis: string;
+}
+
+export interface CompetitorPlaybookContent {
+  breakdowns: CompetitorBreakdown[];
+}
+
+export interface ContentGap {
+  topic: string;
+  priority: number;
+  difficulty: string;
+  content_angle: string;
+  estimated_monthly_views: number;
+}
+
+export interface ContentGapsContent {
+  gaps: ContentGap[];
+}
+
+export interface DeepDives {
+  hook_mastery: HookMasteryContent | null;
+  title_laboratory: TitleLaboratoryContent | null;
+  competitor_playbook: CompetitorPlaybookContent | null;
+  content_gaps: ContentGapsContent | null;
+}
+
 export interface TeaserData {
   channelName: string;
   channelThumbnail: string | null;
@@ -25,6 +99,10 @@ export interface TeaserData {
   insight: string; // First sentence of recommendation
   fullRecommendationLength: number; // So we can show "... and X more insights"
   analyzedAt: string;
+  recommendation: string;
+  weightedScores: WeightedScores | null;
+  outliers: OutliersData | null;
+  deepDives: DeepDives;
 }
 
 export type TeaserResult =
@@ -60,10 +138,11 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
     return { found: false, reason: 'not_ready' };
   }
 
-  // Fetch the analysis results
+  // Fetch the analysis results (including new fields)
   const { data: analysis } = await supabase
     .from('analyses')
     .select(`
+      id,
       overall_grade,
       score_content_consistency,
       score_title_quality,
@@ -72,6 +151,8 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
       score_growth_trajectory,
       score_outlier_detection,
       recommendation,
+      weighted_scores,
+      outliers,
       created_at
     `)
     .eq('job_id', job.id)
@@ -89,6 +170,43 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
     .select('name, thumbnail_url')
     .eq('id', job.channel_id)
     .single();
+
+  // Fetch deep dives (4 module types)
+  const { data: deepDiveRows } = await supabase
+    .from('deep_dives')
+    .select('module_type, content')
+    .eq('analysis_id', analysis.id);
+
+  // Parse deep dive modules
+  const deepDives: DeepDives = {
+    hook_mastery: null,
+    title_laboratory: null,
+    competitor_playbook: null,
+    content_gaps: null,
+  };
+
+  if (deepDiveRows) {
+    for (const row of deepDiveRows) {
+      const content = typeof row.content === 'string'
+        ? JSON.parse(row.content)
+        : row.content;
+
+      switch (row.module_type) {
+        case 'hook_mastery':
+          deepDives.hook_mastery = content as HookMasteryContent;
+          break;
+        case 'title_laboratory':
+          deepDives.title_laboratory = content as TitleLaboratoryContent;
+          break;
+        case 'competitor_playbook':
+          deepDives.competitor_playbook = content as CompetitorPlaybookContent;
+          break;
+        case 'content_gaps':
+          deepDives.content_gaps = content as ContentGapsContent;
+          break;
+      }
+    }
+  }
 
   // Build scores array, sorted by value (highest first)
   const scoreEntries = Object.entries(SCORE_META)
@@ -112,6 +230,19 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   const firstSentence = fullRec; // Show everything for testing
   const recSentences = fullRec.split(/[.!?]\s+/).filter(Boolean).length;
 
+  // Parse JSONB fields (may already be objects or may be strings)
+  const weightedScores: WeightedScores | null = analysis.weighted_scores
+    ? (typeof analysis.weighted_scores === 'string'
+        ? JSON.parse(analysis.weighted_scores)
+        : analysis.weighted_scores) as WeightedScores
+    : null;
+
+  const outliers: OutliersData | null = analysis.outliers
+    ? (typeof analysis.outliers === 'string'
+        ? JSON.parse(analysis.outliers)
+        : analysis.outliers) as OutliersData
+    : null;
+
   return {
     found: true,
     data: {
@@ -122,6 +253,10 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
       insight: firstSentence,
       fullRecommendationLength: recSentences,
       analyzedAt: analysis.created_at,
+      recommendation: fullRec,
+      weightedScores,
+      outliers,
+      deepDives,
     },
   };
 }

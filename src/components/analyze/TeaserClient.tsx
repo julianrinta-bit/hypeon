@@ -5,15 +5,27 @@
  *
  * Zones:
  *   R-A  Grade Hero      — Avatar, channel name, giant grade letter, scroll chevron
- *   R-B  Score Cards     — Top 3 visible / bottom 3 blurred + radar chart
- *   R-C  Insight         — First sentence visible, rest blurred
- *   R-D  Blur Wall       — 3 locked deep-dive cards
+ *   R-B  Score Cards     — All 6 visible (testing mode) + radar chart
+ *   R-C  Insight         — Full recommendation visible
+ *   R-F  Outlier Analysis — Overperformers + underperformers
+ *   R-G  Hook Mastery    — Deep dive: hook rewrites
+ *   R-H  Title Lab       — Deep dive: title alternatives
+ *   R-I  Content Gaps    — Deep dive: content gap grid
+ *   R-J  Competitor PB   — Deep dive: competitor breakdowns
  *   R-E  CTA             — "Book a Free Strategy Call"
  */
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
-import type { TeaserData, TeaserScore } from '@/lib/actions/results';
+import type {
+  TeaserData,
+  TeaserScore,
+  OutlierVideo,
+  HookRewrite,
+  TitleAlternative,
+  CompetitorBreakdown,
+  ContentGap,
+} from '@/lib/actions/results';
 import styles from './teaser.module.css';
 import RadarChart from './RadarChart';
 
@@ -58,6 +70,14 @@ function scoreBadgeColor(value: number): string {
   if (value >= 50) return '#FBBF24';
   if (value >= 30) return '#FB923C';
   return '#F87171';
+}
+
+// ── Markdown renderer (inline bold + line breaks) ─────────────────────────────
+
+function renderMarkdown(text: string): string {
+  return text
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br/>');
 }
 
 // ── Score dimension icons (inline SVG) ───────────────────────────────────────
@@ -231,6 +251,207 @@ function ScoreCard({ score, index }: { score: TeaserScore; index: number }) {
   );
 }
 
+// ── Outlier card ──────────────────────────────────────────────────────────────
+
+function OutlierCard({ video, type }: { video: OutlierVideo; type: 'over' | 'under' }) {
+  const pct = type === 'over' ? video.percent_above_avg : video.percent_below_avg;
+  const color = type === 'over' ? '#34D399' : '#F87171';
+  const sign = type === 'over' ? '+' : '-';
+
+  return (
+    <div className={styles.outlierCard}>
+      <div className={styles.outlierCardHead}>
+        <p className={styles.outlierTitle}>{video.title}</p>
+        {pct != null && (
+          <span
+            className={styles.outlierBadge}
+            style={{ '--outlier-color': color } as React.CSSProperties}
+          >
+            {sign}{Math.round(pct)}% avg
+          </span>
+        )}
+      </div>
+      <p
+        className={styles.outlierExplanation}
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(video.explanation) }}
+      />
+    </div>
+  );
+}
+
+// ── Hook rewrite row ──────────────────────────────────────────────────────────
+
+function HookRow({ rewrite, index }: { rewrite: HookRewrite; index: number }) {
+  return (
+    <div className={styles.hookRow} style={{ animationDelay: `${index * 60}ms` }}>
+      <div className={styles.hookOriginal}>
+        <span className={styles.hookLabel}>Original</span>
+        <p
+          className={styles.hookOriginalText}
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(rewrite.original_hook) }}
+        />
+      </div>
+      <div className={styles.hookArrow} aria-hidden="true">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 12h14M12 5l7 7-7 7"/>
+        </svg>
+      </div>
+      <div className={styles.hookRewritten}>
+        <span className={styles.hookLabel}>Rewritten</span>
+        <p
+          className={styles.hookRewrittenText}
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(rewrite.rewritten_hook) }}
+        />
+      </div>
+      <div className={styles.hookRationale}>
+        <span className={styles.hookRationaleLabel}>Why it works</span>
+        <p
+          dangerouslySetInnerHTML={{ __html: renderMarkdown(rewrite.improvement_rationale) }}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ── Title alternative card ────────────────────────────────────────────────────
+
+function TitleCard({ item }: { item: TitleAlternative }) {
+  return (
+    <div className={styles.titleCard}>
+      <div className={styles.titleCardOriginal}>
+        <span className={styles.titleCardOriginalLabel}>Original</span>
+        <p className={styles.titleCardOriginalText}>{item.original_title}</p>
+      </div>
+      <ul className={styles.titleAltList}>
+        {item.alternatives.map((alt, i) => (
+          <li key={i} className={styles.titleAltItem}>
+            <svg className={styles.titleAltIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            <span dangerouslySetInnerHTML={{ __html: renderMarkdown(alt) }} />
+          </li>
+        ))}
+      </ul>
+      {item.predicted_improvement && (
+        <span className={styles.titleImprovementBadge}>
+          {item.predicted_improvement}
+        </span>
+      )}
+    </div>
+  );
+}
+
+// ── Content gap card ──────────────────────────────────────────────────────────
+
+function ContentGapCard({ gap }: { gap: ContentGap }) {
+  const priorityColor = gap.priority >= 8 ? '#F87171' : gap.priority >= 5 ? '#FBBF24' : '#34D399';
+  const difficultyColor = gap.difficulty?.toLowerCase() === 'hard' ? '#F87171'
+    : gap.difficulty?.toLowerCase() === 'medium' ? '#FBBF24' : '#34D399';
+
+  return (
+    <div className={styles.gapCard}>
+      <div className={styles.gapCardBadges}>
+        <span
+          className={styles.gapPriorityBadge}
+          style={{ '--priority-color': priorityColor } as React.CSSProperties}
+        >
+          P{gap.priority}
+        </span>
+        <span
+          className={styles.gapDifficultyBadge}
+          style={{ '--difficulty-color': difficultyColor } as React.CSSProperties}
+        >
+          {gap.difficulty}
+        </span>
+        {gap.estimated_monthly_views > 0 && (
+          <span className={styles.gapViewsBadge}>
+            ~{gap.estimated_monthly_views >= 1000
+              ? `${Math.round(gap.estimated_monthly_views / 1000)}K`
+              : gap.estimated_monthly_views} views/mo
+          </span>
+        )}
+      </div>
+      <p className={styles.gapTopic}>{gap.topic}</p>
+      <p
+        className={styles.gapAngle}
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(gap.content_angle) }}
+      />
+    </div>
+  );
+}
+
+// ── Competitor breakdown card ─────────────────────────────────────────────────
+
+function CompetitorCard({ breakdown }: { breakdown: CompetitorBreakdown }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className={styles.competitorCard}>
+      <div className={styles.competitorCardHead}>
+        <span className={styles.competitorName}>{breakdown.competitor_name}</span>
+        <p className={styles.competitorVideoTitle}>{breakdown.video_title}</p>
+      </div>
+      <p
+        className={styles.competitorTakeaway}
+        dangerouslySetInnerHTML={{ __html: renderMarkdown(breakdown.key_takeaway) }}
+      />
+      {breakdown.applicable_to_user && (
+        <div className={styles.competitorApplicable}>
+          <span className={styles.competitorApplicableLabel}>Applies to you</span>
+          <p dangerouslySetInnerHTML={{ __html: renderMarkdown(breakdown.applicable_to_user) }} />
+        </div>
+      )}
+      {breakdown.structure_analysis && (
+        <div className={styles.competitorExpand}>
+          <button
+            className={styles.competitorExpandBtn}
+            onClick={() => setExpanded(e => !e)}
+            aria-expanded={expanded}
+          >
+            {expanded ? 'Hide' : 'Show'} structure analysis
+            <svg
+              className={[styles.competitorExpandChevron, expanded ? styles.competitorExpandChevronOpen : ''].filter(Boolean).join(' ')}
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 9l6 6 6-6"/>
+            </svg>
+          </button>
+          {expanded && (
+            <p
+              className={styles.competitorStructureText}
+              dangerouslySetInnerHTML={{ __html: renderMarkdown(breakdown.structure_analysis) }}
+            />
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Section wrapper with reveal ───────────────────────────────────────────────
+
+function RevealSection({ children, className, 'aria-label': ariaLabel }: { children: React.ReactNode; className?: string; 'aria-label'?: string }) {
+  const { ref, visible } = useReveal(0.08);
+  return (
+    <section
+      ref={ref}
+      className={[styles.section, className].filter(Boolean).join(' ')}
+      style={{ opacity: visible ? 1 : 0, transition: 'opacity 0.5s var(--az-ease) 0.05s' }}
+      aria-label={ariaLabel}
+    >
+      {children}
+    </section>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function TeaserClient({ data, publicId: _publicId }: Props) {
@@ -239,8 +460,16 @@ export default function TeaserClient({ data, publicId: _publicId }: Props) {
 
   const { ref: scoresRef, visible: scoresVisible } = useReveal();
   const { ref: insightRef, visible: insightVisible } = useReveal();
-  const { ref: blurRef, visible: blurVisible } = useReveal();
   const { ref: ctaRef, visible: ctaVisible } = useReveal();
+
+  const hasOutliers = data.outliers &&
+    ((data.outliers.overperformers?.length ?? 0) > 0 ||
+     (data.outliers.underperformers?.length ?? 0) > 0);
+
+  const hasHooks = (data.deepDives.hook_mastery?.rewrites?.length ?? 0) > 0;
+  const hasTitles = (data.deepDives.title_laboratory?.alternatives?.length ?? 0) > 0;
+  const hasGaps = (data.deepDives.content_gaps?.gaps?.length ?? 0) > 0;
+  const hasCompetitors = (data.deepDives.competitor_playbook?.breakdowns?.length ?? 0) > 0;
 
   return (
     <div
@@ -343,15 +572,137 @@ export default function TeaserClient({ data, publicId: _publicId }: Props) {
           <div
             className={styles.insightTextVisible}
             dangerouslySetInnerHTML={{
-              __html: data.insight
-                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                .replace(/\n/g, '<br/>')
+              __html: renderMarkdown(data.insight)
             }}
           />
         </div>
       </div>
 
-      {/* Zone R-D: Blur Wall — hidden for testing */}
+      {/* ── Zone R-F: Outlier Analysis ───────────────────────────────────── */}
+      {hasOutliers && (
+        <RevealSection aria-label="Outlier analysis">
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionEyebrow}>
+              <span className={styles.sectionEyebrowDot} aria-hidden="true" />
+              Outlier Analysis
+            </div>
+          </div>
+
+          <div className={styles.outlierGrid}>
+            {/* Overperformers */}
+            <div className={styles.outlierColumn}>
+              <h3 className={styles.outlierColumnTitle}>
+                <span className={styles.outlierColumnDot} style={{ background: '#34D399' }} />
+                Overperformers
+              </h3>
+              <div className={styles.outlierList}>
+                {(data.outliers!.overperformers ?? []).map((v, i) => (
+                  <OutlierCard key={i} video={v} type="over" />
+                ))}
+                {(data.outliers!.overperformers ?? []).length === 0 && (
+                  <p className={styles.outlierEmpty}>No overperformers detected.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Underperformers */}
+            <div className={styles.outlierColumn}>
+              <h3 className={styles.outlierColumnTitle}>
+                <span className={styles.outlierColumnDot} style={{ background: '#F87171' }} />
+                Underperformers
+              </h3>
+              <div className={styles.outlierList}>
+                {(data.outliers!.underperformers ?? []).map((v, i) => (
+                  <OutlierCard key={i} video={v} type="under" />
+                ))}
+                {(data.outliers!.underperformers ?? []).length === 0 && (
+                  <p className={styles.outlierEmpty}>No underperformers detected.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </RevealSection>
+      )}
+
+      {/* ── Zone R-G: Hook Mastery ───────────────────────────────────────── */}
+      {hasHooks && (
+        <RevealSection aria-label="Hook mastery deep dive">
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionEyebrow}>
+              <span className={styles.sectionEyebrowDot} aria-hidden="true" />
+              Hook Mastery
+            </div>
+          </div>
+          <p className={styles.sectionSubhead}>
+            Your existing hooks, rewritten for maximum retention.
+          </p>
+          <div className={styles.hookList}>
+            {data.deepDives.hook_mastery!.rewrites.map((r, i) => (
+              <HookRow key={i} rewrite={r} index={i} />
+            ))}
+          </div>
+        </RevealSection>
+      )}
+
+      {/* ── Zone R-H: Title Laboratory ───────────────────────────────────── */}
+      {hasTitles && (
+        <RevealSection aria-label="Title laboratory deep dive">
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionEyebrow}>
+              <span className={styles.sectionEyebrowDot} aria-hidden="true" />
+              Title Laboratory
+            </div>
+          </div>
+          <p className={styles.sectionSubhead}>
+            Alternative titles engineered for higher click-through rate.
+          </p>
+          <div className={styles.titleGrid}>
+            {data.deepDives.title_laboratory!.alternatives.map((item, i) => (
+              <TitleCard key={i} item={item} />
+            ))}
+          </div>
+        </RevealSection>
+      )}
+
+      {/* ── Zone R-I: Content Gaps ───────────────────────────────────────── */}
+      {hasGaps && (
+        <RevealSection aria-label="Content gaps deep dive">
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionEyebrow}>
+              <span className={styles.sectionEyebrowDot} aria-hidden="true" />
+              Content Gaps
+            </div>
+          </div>
+          <p className={styles.sectionSubhead}>
+            High-opportunity topics your channel is not covering yet.
+          </p>
+          <div className={styles.gapGrid}>
+            {data.deepDives.content_gaps!.gaps.map((gap, i) => (
+              <ContentGapCard key={i} gap={gap} />
+            ))}
+          </div>
+        </RevealSection>
+      )}
+
+      {/* ── Zone R-J: Competitor Playbook ────────────────────────────────── */}
+      {hasCompetitors && (
+        <RevealSection aria-label="Competitor playbook deep dive">
+          <div className={styles.sectionHeader}>
+            <div className={styles.sectionEyebrow}>
+              <span className={styles.sectionEyebrowDot} aria-hidden="true" />
+              Competitor Playbook
+            </div>
+          </div>
+          <p className={styles.sectionSubhead}>
+            What your competitors are doing — and how to outmaneuver them.
+          </p>
+          <div className={styles.competitorList}>
+            {data.deepDives.competitor_playbook!.breakdowns.map((b, i) => (
+              <CompetitorCard key={i} breakdown={b} />
+            ))}
+          </div>
+        </RevealSection>
+      )}
 
       {/* ── Zone R-E: CTA ────────────────────────────────────────────────── */}
       <section
