@@ -15,7 +15,7 @@
  *   R-E  CTA             — "Book a Free Strategy Call"
  */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import type {
   TeaserData,
@@ -34,6 +34,45 @@ import RadarChart from './RadarChart';
 interface Props {
   data: TeaserData;
   publicId: string;
+}
+
+// ── Countdown hook ────────────────────────────────────────────────────────────
+
+function useCountdown(expiresAt: string) {
+  const getRemaining = useCallback(() => {
+    const diff = new Date(expiresAt).getTime() - Date.now();
+    if (diff <= 0) return null;
+    const totalMinutes = Math.floor(diff / 60000);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    return { hours, minutes };
+  }, [expiresAt]);
+
+  const [remaining, setRemaining] = useState(getRemaining);
+
+  useEffect(() => {
+    const id = setInterval(() => setRemaining(getRemaining()), 60000);
+    return () => clearInterval(id);
+  }, [getRemaining]);
+
+  return remaining;
+}
+
+// ── CTA Button (shared) ───────────────────────────────────────────────────────
+
+function CtaButton({ label }: { label: string }) {
+  return (
+    <a
+      href="#"
+      className={styles.ctaBtn}
+      aria-label="Book a free strategy call to receive the full PDF"
+    >
+      {label}
+      <svg className={styles.ctaBtnArrow} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M5 12h14M12 5l7 7-7 7"/>
+      </svg>
+    </a>
+  );
 }
 
 // ── Grade helpers ─────────────────────────────────────────────────────────────
@@ -457,10 +496,20 @@ function RevealSection({ children, className, 'aria-label': ariaLabel }: { child
 export default function TeaserClient({ data, publicId: _publicId }: Props) {
   const color = gradeColor(data.overallGrade);
   const radarScores = mapScoresToRadar(data.scores);
+  const remaining = useCountdown(data.expiresAt);
 
   const { ref: scoresRef, visible: scoresVisible } = useReveal();
   const { ref: insightRef, visible: insightVisible } = useReveal();
   const { ref: ctaRef, visible: ctaVisible } = useReveal();
+
+  // Tab visibility blur
+  const [isBlurred, setIsBlurred] = useState(false);
+
+  useEffect(() => {
+    const handleVisibility = () => setIsBlurred(document.hidden);
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, []);
 
   const hasOutliers = data.outliers &&
     ((data.outliers.overperformers?.length ?? 0) > 0 ||
@@ -471,11 +520,32 @@ export default function TeaserClient({ data, publicId: _publicId }: Props) {
   const hasGaps = (data.deepDives.content_gaps?.gaps?.length ?? 0) > 0;
   const hasCompetitors = (data.deepDives.competitor_playbook?.breakdowns?.length ?? 0) > 0;
 
+  // Watermark rows: repeat the email in a grid pattern
+  const watermarkText = data.userEmail ?? 'hypeon.media';
+  const watermarkRepeat = Array.from({ length: 80 }, (_, i) => (
+    <span key={i} className={styles.watermarkItem}>{watermarkText}</span>
+  ));
+
+  // Countdown display — null means expired (client-side)
+  const countdownLabel = remaining
+    ? `Report expires in ${remaining.hours}h ${remaining.minutes}m`
+    : 'Report has expired';
+
   return (
     <div
-      className={styles.page}
+      className={[
+        styles.page,
+        isBlurred ? styles.pageBlurred : '',
+      ].filter(Boolean).join(' ')}
       style={{ '--grade-color': color } as React.CSSProperties}
+      onContextMenu={e => e.preventDefault()}
+      onCopy={e => e.preventDefault()}
     >
+
+      {/* ── Watermark overlay ─────────────────────────────────────────── */}
+      <div className={styles.watermarkOverlay} aria-hidden="true">
+        {watermarkRepeat}
+      </div>
 
       {/* ── Zone R-A: Grade Hero ─────────────────────────────────────────── */}
       <section className={styles.gradeHero} aria-label="Channel grade">
@@ -514,6 +584,15 @@ export default function TeaserClient({ data, publicId: _publicId }: Props) {
           </div>
 
           <p className={styles.gradeLabel}>Overall Channel Grade</p>
+
+          {/* Countdown timer */}
+          <p className={styles.countdownTimer} aria-live="polite">
+            {countdownLabel}
+          </p>
+
+          {/* Top CTA */}
+          <CtaButton label="To discuss your strategy and receive the full PDF — Book a Free Call" />
+
         </div>
 
         {/* Scroll chevron */}
@@ -731,16 +810,7 @@ export default function TeaserClient({ data, publicId: _publicId }: Props) {
             ))}
           </ul>
 
-          <a
-            href="#"
-            className={styles.ctaBtn}
-            aria-label="Book a free 30-minute strategy call"
-          >
-            Book a Free Strategy Call
-            <svg className={styles.ctaBtnArrow} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M5 12h14M12 5l7 7-7 7"/>
-            </svg>
-          </a>
+          <CtaButton label="To discuss your strategy and receive the full PDF — Book a Free Call" />
 
           <p className={styles.ctaTrust}>
             Free. 30 minutes. No pitch unless you ask.
