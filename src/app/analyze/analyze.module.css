@@ -1102,23 +1102,10 @@
 ───────────────────────────────────────────────── */
 .decodeWord {
   display: inline-block;
-  position: relative;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82em;
+  letter-spacing: -0.02em;
   vertical-align: baseline;
-}
-
-/* Ghost text — invisible, reserves the exact dimensions of "Sees" */
-.decodeGhost {
-  visibility: hidden;
-  display: inline;
-}
-
-/* Visible scramble text — absolutely positioned over ghost, inherits color */
-.decodeVisible {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: baseline;
-  color: inherit;
 }
 
 .decodeWordDecoded {

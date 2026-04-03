@@ -31,8 +31,7 @@ function useDecodeAnimation(finalText: string) {
     if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    // Only chars with similar width to S/e — no wide chars (W, M) that cause reflow
-    const chars = 'ABCDEFGHIJKLNOPRSTUVXYZ';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const len = finalText.length;
 
     const timeout = setTimeout(() => {
@@ -41,8 +40,8 @@ function useDecodeAnimation(finalText: string) {
 
       const tick = setInterval(() => {
         frame++;
-        // Lock one letter every 8 frames (~640ms per char at 80ms tick)
-        if (frame % 8 === 0 && locked < len) locked++;
+        // Lock one letter every 10 frames (~500ms per char at 50ms tick)
+        if (frame % 10 === 0 && locked < len) locked++;
 
         let display = '';
         for (let i = 0; i < len; i++) {
@@ -57,7 +56,7 @@ function useDecodeAnimation(finalText: string) {
           setDisplayed(finalText);
           setDecoded(true);
         }
-      }, 80);
+      }, 50);
 
       return () => clearInterval(tick);
     }, 800);
@@ -363,10 +362,8 @@ export default function AnalyzeClient() {
             <em className={styles.heroHeadlineAccent}>
               <span
                 className={`${styles.decodeWord} ${decodeFinished ? styles.decodeWordDecoded : ''}`}
-                aria-label="Sees"
               >
-                <span className={styles.decodeGhost} aria-hidden="true">Sees</span>
-                <span className={styles.decodeVisible}>{decodeDisplayed}</span>
+                {decodeDisplayed}
               </span>
               {' '}in Your Channel
             </em>
