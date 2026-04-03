@@ -39,7 +39,7 @@ export default function StickyMobileCTA() {
   return (
     <div
       className={`sticky-mobile-cta${visible ? ' visible' : ''}${dismissed ? ' dismissed' : ''}`}
-      aria-label="Free audit call to action"
+      aria-label="Channel audit call to action"
     >
       <button
         className="sticky-mobile-cta-dismiss"
@@ -48,8 +48,8 @@ export default function StickyMobileCTA() {
       >
         &times;
       </button>
-      <span className="sticky-mobile-cta-text">Free Audit</span>
-      <a href="/#contact" className="sticky-mobile-cta-btn" onClick={handleCTAClick}>
+      <span className="sticky-mobile-cta-text">Channel Audit</span>
+      <a href="/analyze" className="sticky-mobile-cta-btn" onClick={handleCTAClick}>
         Get Started &rarr;
       </a>
     </div>
