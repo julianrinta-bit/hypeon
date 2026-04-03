@@ -31,7 +31,8 @@ function useDecodeAnimation(finalText: string) {
     if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    // Only chars with similar width to S/e — no wide chars (W, M) that cause reflow
+    const chars = 'ABCDEFGHIJKLNOPRSTUVXYZ';
     const len = finalText.length;
 
     const timeout = setTimeout(() => {
