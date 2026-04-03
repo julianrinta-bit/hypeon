@@ -1102,10 +1102,13 @@
 ───────────────────────────────────────────────── */
 .decodeWord {
   display: inline-block;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.82em;
-  letter-spacing: -0.02em;
+  /* Same font as headline — width is fixed via JS measurement */
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
   vertical-align: baseline;
+  text-align: center;
 }
 
 .decodeWordDecoded {
