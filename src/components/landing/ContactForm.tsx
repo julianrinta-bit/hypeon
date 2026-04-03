@@ -8,10 +8,10 @@ import RevealOnScroll from '@/components/ui/RevealOnScroll';
 type ServiceKey = 'youtube' | 'creative' | 'products' | 'unsure';
 
 const serviceConfig = {
-  youtube:  { btn: 'Send Me My Free Audit',     showYT: true,  delivery: 'Delivered within 48 hours' },
-  creative: { btn: 'Get My Free Strategy Brief', showYT: false, delivery: 'Initial review within 48 hours' },
+  youtube:  { btn: 'Get Started',                showYT: true,  delivery: 'Response within 48 hours' },
+  creative: { btn: 'Get Started',                showYT: false, delivery: 'Response within 48 hours' },
   products: { btn: 'Start the Conversation',     showYT: false, delivery: 'Response within 24 hours' },
-  unsure:   { btn: 'Get My Free Audit',          showYT: false, delivery: 'Delivered within 48 hours' },
+  unsure:   { btn: 'Get Started',                showYT: false, delivery: 'Response within 48 hours' },
 };
 
 const placeholders: Record<ServiceKey, string> = {
@@ -134,7 +134,7 @@ export default function ContactForm() {
                 Find out what<br />you{"'"}re <em>leaving<br />on the table.</em>
               </h2>
               <p className="contact-sub">
-                Free audit. No pitch deck. Just a breakdown of where you are, where you could be, and the gap between the two.
+                No pitch deck. Just a breakdown of where you are, where you could be, and the gap between the two.
               </p>
               <a href="mailto:hello@hypeon.media" className="contact-email-link">
                 Or email us at hello@hypeon.media
@@ -323,7 +323,7 @@ export default function ContactForm() {
               {/* Friction reducers */}
               <div className="friction-reducers" id="friction-reducers">
                 <span>
-                  <span className="check">&#10003;</span> No credit card required
+                  <span className="check">&#10003;</span> No commitment required
                 </span>
                 <span>
                   <span className="check">&#10003;</span> {config.delivery}
