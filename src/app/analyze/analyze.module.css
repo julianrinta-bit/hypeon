@@ -1102,19 +1102,22 @@
 ───────────────────────────────────────────────── */
 .decodeWord {
   display: inline-block;
-  font-variant-numeric: tabular-nums;
+  position: relative;
 }
 
-/* Invisible replica of final text sets the width — scramble never causes reflow */
-.decodeWord::after {
-  content: attr(aria-label);
-  display: block;
-  height: 0;
-  overflow: hidden;
+/* Invisible text that reserves the exact width + height of "Sees" */
+.decodeGhost {
   visibility: hidden;
 }
 
-.decodeWordDecoded {
+/* Visible scramble text positioned exactly on top of the ghost */
+.decodeVisible {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.decodeWordDecoded .decodeVisible {
   animation: decodeFlash 0.6s ease-out forwards;
 }
 
