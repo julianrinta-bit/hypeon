@@ -40,8 +40,8 @@ function useDecodeAnimation(finalText: string) {
 
       const tick = setInterval(() => {
         frame++;
-        // Lock one letter every 14 frames (~460ms per char at 33ms tick)
-        if (frame % 14 === 0 && locked < len) locked++;
+        // Lock one letter every 8 frames (~640ms per char at 80ms tick)
+        if (frame % 8 === 0 && locked < len) locked++;
 
         let display = '';
         for (let i = 0; i < len; i++) {
@@ -56,7 +56,7 @@ function useDecodeAnimation(finalText: string) {
           setDisplayed(finalText);
           setDecoded(true);
         }
-      }, 33);
+      }, 80);
 
       return () => clearInterval(tick);
     }, 800);
