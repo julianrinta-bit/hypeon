@@ -1,0 +1,453 @@
+/*
+  promoGate.module.css
+  Styles for PromoGate, PromoInput, and PricingPanel.
+  Design tokens mirror analyze.module.css exactly.
+*/
+
+/* ─────────────────────────────────────────────────
+   SHARED TOKENS (inherit from .page on the parent)
+───────────────────────────────────────────────── */
+
+/* ─────────────────────────────────────────────────
+   GLASS PANEL BASE
+───────────────────────────────────────────────── */
+.glassPanel {
+  background: rgba(10, 10, 14, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  max-width: 600px;
+  margin: 0 auto 32px;
+  padding: 36px 32px;
+  animation: slideInPanel 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideInPanel {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glassPanel {
+    animation: fadeInPanel 0.3s ease both;
+  }
+  @keyframes fadeInPanel {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   PROMO GATE — YES/NO
+───────────────────────────────────────────────── */
+.gateHeadline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: #E5E7EB;
+  margin: 0 0 8px;
+  text-align: center;
+  text-align-last: center;
+}
+
+.gateSub {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: #9CA3AF;
+  margin: 0 0 28px;
+  text-align: center;
+  text-align-last: center;
+}
+
+.gateButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btnYes {
+  flex: 1;
+  max-width: 200px;
+  height: 52px;
+  background: #c8ff2e;
+  color: #0A0A0C;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btnYes:hover {
+  background: #b8ee20;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(200, 255, 46, 0.32);
+}
+
+.btnYes:active { transform: translateY(0); }
+
+.btnNo {
+  flex: 1;
+  max-width: 200px;
+  height: 52px;
+  background: #161619;
+  color: #D1D5DB;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btnNo:hover {
+  background: #1a1a1f;
+  border-color: rgba(255, 255, 255, 0.22);
+  transform: translateY(-2px);
+}
+
+.btnNo:active { transform: translateY(0); }
+
+@media (max-width: 767px) {
+  .gateButtons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btnYes,
+  .btnNo {
+    max-width: 100%;
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   PROMO INPUT — CODE ENTRY
+───────────────────────────────────────────────── */
+.inputHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.backBtn {
+  background: none;
+  border: none;
+  color: #9CA3AF;
+  font-family: var(--font-body);
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: color 0.2s;
+  flex-shrink: 0;
+}
+
+.backBtn:hover { color: #E5E7EB; }
+
+.inputLabel {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #E5E7EB;
+  flex: 1;
+  text-align: center;
+  text-align-last: center;
+}
+
+/* Code input row */
+.codeRow {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.codeInput {
+  flex: 1;
+  height: 56px;
+  background: rgba(22, 22, 25, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  padding: 0 18px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  color: #E5E7EB;
+  outline: none;
+  transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(8px);
+  text-transform: uppercase;
+}
+
+.codeInput::placeholder {
+  color: #6B7280;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.codeInput:focus {
+  border-color: #c8ff2e;
+  box-shadow: 0 0 0 3px rgba(200, 255, 46, 0.12), 0 0 20px rgba(200, 255, 46, 0.06);
+}
+
+.codeInputValid {
+  border-color: rgba(200, 255, 46, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(200, 255, 46, 0.14) !important;
+}
+
+.codeInputInvalid {
+  border-color: rgba(248, 113, 113, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.10) !important;
+  animation: shake 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-6px); }
+  40%       { transform: translateX(6px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codeInputInvalid {
+    animation: none;
+  }
+}
+
+.applyBtn {
+  height: 56px;
+  padding: 0 24px;
+  background: #c8ff2e;
+  color: #0A0A0C;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  transition: background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.applyBtn:hover {
+  background: #b8ee20;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(200, 255, 46, 0.32);
+}
+
+.applyBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Feedback messages */
+.codeMsg {
+  font-family: var(--font-body);
+  font-size: 13px;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.codeMsgValid {
+  color: #c8ff2e;
+  animation: validPulse 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.codeMsgInvalid { color: #F87171; }
+
+@keyframes validPulse {
+  0%   { opacity: 0; transform: scale(0.95); }
+  60%  { opacity: 1; transform: scale(1.02); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .codeMsgValid { animation: none; }
+}
+
+/* Spinner */
+.spinner {
+  width: 16px;
+  height: 16px;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─────────────────────────────────────────────────
+   PRICING PANEL
+───────────────────────────────────────────────── */
+.pricingHeader {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.pricingPrice {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 2.5rem;
+  color: #c8ff2e;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.pricingPriceSub {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: #9CA3AF;
+}
+
+.valuePoints {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.valuePoint {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: #D1D5DB;
+  text-align: left;
+  text-align-last: left;
+}
+
+.valueCheck {
+  color: #c8ff2e;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.pricingCta {
+  width: 100%;
+  height: 56px;
+  padding: 0 28px;
+  background: #c8ff2e;
+  color: #0A0A0C;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: -0.01em;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  transition: background 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: visible;
+}
+
+.pricingCta:hover {
+  background: #b8ee20;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(200, 255, 46, 0.32);
+}
+
+.pricingCta:active { transform: translateY(0); }
+
+.pricingCta::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  border: 2px solid #c8ff2e;
+  animation: ctaRingPricing 3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes ctaRingPricing {
+  0%   { transform: scale(1);    opacity: 0.6; }
+  70%  { transform: scale(1.08); opacity: 0; }
+  100% { transform: scale(1.08); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pricingCta::after { animation: none; }
+}
+
+.promoSwitch {
+  margin-top: 16px;
+  text-align: center;
+  text-align-last: center;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.promoSwitchLink {
+  background: none;
+  border: none;
+  color: #c8ff2e;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.2s;
+}
+
+.promoSwitchLink:hover { opacity: 0.8; }
+
+/* ─────────────────────────────────────────────────
+   PROMO BADGE (shown above URL input when code applied)
+───────────────────────────────────────────────── */
+.promoBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: #c8ff2e;
+  background: rgba(200, 255, 46, 0.10);
+  border: 1px solid rgba(200, 255, 46, 0.22);
+  border-radius: 999px;
+  padding: 5px 14px;
+  margin-bottom: 14px;
+  animation: slideInPanel 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
