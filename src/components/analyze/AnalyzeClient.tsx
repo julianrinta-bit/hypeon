@@ -26,12 +26,36 @@ type PromoState    = 'gate' | 'code-entry' | 'code-valid' | 'pricing' | 'paid' |
 function useDecodeAnimation(finalText: string) {
   const [displayed, setDisplayed] = useState(finalText);
   const [decoded, setDecoded]     = useState(false);
+  const [fixedWidth, setFixedWidth] = useState<number | null>(null);
+  const measureRef = useRef<HTMLSpanElement | null>(null);
+
+  // Measure the final text width on mount so the container never reflows
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    // Create an offscreen span styled identically to the headline
+    const probe = document.createElement('span');
+    probe.textContent = finalText;
+    probe.style.cssText = `
+      position: absolute; visibility: hidden; white-space: nowrap;
+      font-family: var(--font-display); font-weight: 800;
+      font-size: inherit; letter-spacing: -0.03em;
+    `;
+    // Insert into the decodeWord span's parent so it inherits computed font-size
+    const anchor = measureRef.current?.parentElement ?? document.body;
+    anchor.appendChild(probe);
+    const w = probe.getBoundingClientRect().width;
+    anchor.removeChild(probe);
+    setFixedWidth(Math.ceil(w));
+  }, [finalText]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    // Characters with similar advance width to S/e in Plus Jakarta Sans 800.
+    // Excludes wide glyphs (M, W, Q) and narrow glyphs (I, J, l) to keep
+    // the scramble text roughly the same width as "Sees".
+    const chars = 'ABCDEFGHKNOPRSTUVXYZ';
     const len = finalText.length;
 
     const timeout = setTimeout(() => {
@@ -64,7 +88,7 @@ function useDecodeAnimation(finalText: string) {
     return () => clearTimeout(timeout);
   }, [finalText]);
 
-  return { displayed, decoded };
+  return { displayed, decoded, fixedWidth, measureRef };
 }
 
 // ── Particles ──────────────────────────────────────────────────────────────
@@ -208,7 +232,7 @@ function FaqItem({ id, question, answer, openId, onToggle, revealDelay }: FaqIte
 
 export default function AnalyzeClient() {
   // Decode animation
-  const { displayed: decodeDisplayed, decoded: decodeFinished } = useDecodeAnimation('Sees');
+  const { displayed: decodeDisplayed, decoded: decodeFinished, fixedWidth: decodeWidth, measureRef: decodeRef } = useDecodeAnimation('Sees');
 
   // Promo gate state machine
   const searchParams = useSearchParams();
@@ -361,7 +385,9 @@ export default function AnalyzeClient() {
             See What YouTube<br />
             <em className={styles.heroHeadlineAccent}>
               <span
+                ref={decodeRef}
                 className={`${styles.decodeWord} ${decodeFinished ? styles.decodeWordDecoded : ''}`}
+                style={decodeWidth ? { minWidth: `${decodeWidth}px` } : undefined}
               >
                 {decodeDisplayed}
               </span>
