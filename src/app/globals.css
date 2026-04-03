@@ -667,6 +667,9 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 }
 
 @media (max-width: 768px) {
+  .hero-headline {
+    font-size: clamp(2.4rem, 8vw, 3.5rem);
+  }
   .hero-scroll-hint { display: none; }
 }
 
