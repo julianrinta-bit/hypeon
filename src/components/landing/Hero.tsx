@@ -20,7 +20,7 @@ export default function Hero() {
             </p>
             <div className="hero-cta-row">
               <a href="#contact" className="btn-primary magnetic">
-                <span>Get a Free Channel Audit</span>
+                <span>Get a Channel Audit</span>
                 <span className="arrow">&rarr;</span>
               </a>
               <a href="#work" className="btn-ghost">See how we think &rarr;</a>
