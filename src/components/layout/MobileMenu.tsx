@@ -135,7 +135,7 @@ export default function MobileMenu() {
         <a href="/#about" className="mobile-menu-link" onClick={close}>About</a>
         <a href="/blog" className="mobile-menu-link" onClick={close}>Blog</a>
         <a href="/login" className="mobile-menu-link" onClick={close}>Log in</a>
-        <a href="/analyze" className="mobile-menu-cta" onClick={close}>Free Channel Audit &rarr;</a>
+        <a href="/analyze" className="mobile-menu-cta" onClick={close}>Channel Audit &rarr;</a>
       </div>
     </>
   );

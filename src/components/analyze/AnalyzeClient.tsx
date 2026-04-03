@@ -353,7 +353,7 @@ export default function AnalyzeClient() {
         <div className={styles.heroContent}>
           <div className={styles.heroEyebrow}>
             <span className={styles.heroEyebrowDot} aria-hidden="true" />
-            Free Expert Channel Analysis
+            Expert Channel Analysis
           </div>
 
           <h1 className={styles.heroHeadline}>
@@ -370,7 +370,7 @@ export default function AnalyzeClient() {
           </h1>
 
           <p className={styles.heroSub}>
-            Free in-depth channel analysis by the team behind 5B+ YouTube views.<br />
+            In-depth channel analysis by the team behind 5B+ YouTube views.<br />
             No OAuth. No credit card. Just paste your URL.
           </p>
 

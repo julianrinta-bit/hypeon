@@ -77,6 +77,10 @@
   flex: 1;
   max-width: 200px;
   height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   background: #c8ff2e;
   color: #0A0A0C;
   font-family: var(--font-body);
@@ -102,6 +106,10 @@
   flex: 1;
   max-width: 200px;
   height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
   background: #161619;
   color: #D1D5DB;
   font-family: var(--font-body);
