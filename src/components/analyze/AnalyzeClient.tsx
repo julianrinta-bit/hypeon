@@ -391,7 +391,9 @@ export default function AnalyzeClient() {
               >
                 {decodeDisplayed}
               </span>
-              {' '}in Your Channel
+              <br className={styles.decodeBrMobile} />
+              <span className={styles.decodeRestDesktop}>{' '}</span>
+              in Your Channel
             </em>
           </h1>
 

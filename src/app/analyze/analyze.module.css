@@ -1111,6 +1111,25 @@
   text-align: center;
 }
 
+/* Line break after "Sees" — only on mobile so reflow is invisible */
+.decodeBrMobile {
+  display: none;
+}
+
+/* Space between "Sees" and "in Your Channel" — hidden on mobile */
+.decodeRestDesktop {
+  display: inline;
+}
+
+@media (max-width: 768px) {
+  .decodeBrMobile {
+    display: block;
+  }
+  .decodeRestDesktop {
+    display: none;
+  }
+}
+
 .decodeWordDecoded {
   animation: decodeFlash 0.6s ease-out forwards;
 }
