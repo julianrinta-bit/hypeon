@@ -27,7 +27,7 @@ export default function Nav() {
           <li><a href="/blog">Blog</a></li>
         </ul>
         <a href="/login" className="nav-login">Log in</a>
-        <a href="/analyze" className="nav-cta magnetic">Free Channel Audit</a>
+        <a href="/analyze" className="nav-cta magnetic">Channel Audit</a>
         <MobileMenu />
       </nav>
     </>
