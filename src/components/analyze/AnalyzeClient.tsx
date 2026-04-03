@@ -364,7 +364,8 @@ export default function AnalyzeClient() {
                 className={`${styles.decodeWord} ${decodeFinished ? styles.decodeWordDecoded : ''}`}
                 aria-label="Sees"
               >
-                {decodeDisplayed}
+                <span className={styles.decodeGhost} aria-hidden="true">Sees</span>
+                <span className={styles.decodeVisible}>{decodeDisplayed}</span>
               </span>
               {' '}in Your Channel
             </em>
