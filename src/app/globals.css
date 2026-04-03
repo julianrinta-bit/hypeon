@@ -667,8 +667,20 @@ button { font: inherit; cursor: pointer; border: none; background: none; color: 
 }
 
 @media (max-width: 768px) {
+  .hero {
+    min-height: auto;
+    padding-top: clamp(6rem, 14vh, 10rem);
+    padding-bottom: clamp(3rem, 6vh, 5rem);
+  }
   .hero-headline {
     font-size: clamp(2.4rem, 8vw, 3.5rem);
+  }
+  .hero-cta-row {
+    justify-content: center;
+  }
+  .hero-cta-row .btn-primary {
+    width: 100%;
+    justify-content: center;
   }
   .hero-scroll-hint { display: none; }
 }
