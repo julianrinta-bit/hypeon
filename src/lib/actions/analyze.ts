@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { headers } from 'next/headers';
 import { randomBytes } from 'crypto';
+import { isValidPromoCode } from '@/config/promoCodes';
 
 // ── Admin client (service role — bypasses RLS) ──────────────────────────────
 
@@ -33,6 +34,7 @@ const AnalyzeSchema = z.object({
   region: z.enum(['mena', 'europe', 'na', 'latam', 'south_asia', 'apac_south', 'east_asia', 'africa']).optional(),
   name: z.string().min(1, 'Name is required').max(200),
   email: z.string().email('Invalid email').max(200),
+  promo_code: z.string().optional(),
 });
 
 // ── Rate limiter ────────────────────────────────────────────────────────────
@@ -83,6 +85,7 @@ export async function submitAnalysis(data: {
   region?: string;
   name: string;
   email: string;
+  promo_code?: string;
 }): Promise<AnalyzeResult> {
   // 1. Validate
   const parsed = AnalyzeSchema.safeParse(data);
@@ -98,8 +101,11 @@ export async function submitAnalysis(data: {
     return { success: false, error: 'Too many submissions. Please try again later.' };
   }
 
-  const { channel_url: rawUrl, goal, publishing_frequency, production_level, region, name, email } = parsed.data;
+  const { channel_url: rawUrl, goal, publishing_frequency, production_level, region, name, email, promo_code: rawPromoCode } = parsed.data;
   const channelUrl = normalizeChannelUrl(rawUrl);
+
+  // Server-side re-validation of promo code (anti-tamper)
+  const validatedPromoCode = rawPromoCode && isValidPromoCode(rawPromoCode) ? rawPromoCode.toUpperCase().trim() : undefined;
 
   // 3. Find or create user (admin API — auto-confirmed, no verification email)
   //    Try to create first. If email already exists, look up the existing user.
@@ -192,9 +198,12 @@ export async function submitAnalysis(data: {
   await supabase.from('profiles').update(profileUpdate).eq('id', userId);
 
   // 8. Create analysis job
+  const jobPayload: Record<string, unknown> = { user_id: userId, channel_id: channelId, goal, status: 'queued' };
+  if (validatedPromoCode) jobPayload.promo_code = validatedPromoCode;
+
   const { data: job, error: jobError } = await supabase
     .from('analysis_jobs')
-    .insert({ user_id: userId, channel_id: channelId, goal, status: 'queued' })
+    .insert(jobPayload)
     .select('id, public_id')
     .single();
 
