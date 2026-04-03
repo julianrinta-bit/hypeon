@@ -19,7 +19,7 @@ export default function Hero() {
               <strong>10</strong> years &nbsp;/&nbsp; <strong>50+</strong> channels &nbsp;/&nbsp; <strong>15</strong> languages &nbsp;/&nbsp; <strong>5 billion</strong> views
             </p>
             <div className="hero-cta-row">
-              <a href="#contact" className="btn-primary magnetic">
+              <a href="/analyze" className="btn-primary magnetic">
                 <span>Get a Channel Audit</span>
                 <span className="arrow">&rarr;</span>
               </a>
