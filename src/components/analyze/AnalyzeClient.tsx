@@ -31,7 +31,7 @@ function useDecodeAnimation(finalText: string) {
     if (typeof window === 'undefined') return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const len = finalText.length;
 
     const timeout = setTimeout(() => {
@@ -40,7 +40,8 @@ function useDecodeAnimation(finalText: string) {
 
       const tick = setInterval(() => {
         frame++;
-        if (frame % 7 === 0 && locked < len) locked++;
+        // Lock one letter every 14 frames (~460ms per char at 33ms tick)
+        if (frame % 14 === 0 && locked < len) locked++;
 
         let display = '';
         for (let i = 0; i < len; i++) {
@@ -55,10 +56,10 @@ function useDecodeAnimation(finalText: string) {
           setDisplayed(finalText);
           setDecoded(true);
         }
-      }, 16);
+      }, 33);
 
       return () => clearInterval(tick);
-    }, 300);
+    }, 800);
 
     return () => clearTimeout(timeout);
   }, [finalText]);
