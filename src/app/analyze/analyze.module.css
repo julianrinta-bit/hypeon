@@ -1101,23 +1101,20 @@
    DECODE WORD
 ───────────────────────────────────────────────── */
 .decodeWord {
-  display: inline-block;
-  position: relative;
+  display: inline-grid;
 }
 
-/* Invisible text that reserves the exact width + height of "Sees" */
+/* Both spans occupy the same grid cell — ghost reserves size, visible shows text */
+.decodeGhost,
+.decodeVisible {
+  grid-area: 1 / 1;
+}
+
 .decodeGhost {
   visibility: hidden;
 }
 
-/* Visible scramble text positioned exactly on top of the ghost */
-.decodeVisible {
-  position: absolute;
-  left: 0;
-  top: 0;
-}
-
-.decodeWordDecoded .decodeVisible {
+.decodeWordDecoded {
   animation: decodeFlash 0.6s ease-out forwards;
 }
 
