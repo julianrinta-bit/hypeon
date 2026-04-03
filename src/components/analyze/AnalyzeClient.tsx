@@ -1,9 +1,15 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import RadarChart from './RadarChart';
 import { submitAnalysis } from '@/lib/actions/analyze';
+import { trackEvent } from '@/lib/pixel';
+import { isValidPromoCode } from '@/config/promoCodes';
+import PromoGate from './PromoGate';
+import PromoInput from './PromoInput';
+import PricingPanel from './PricingPanel';
+import promoStyles from './promoGate.module.css';
 import styles from '@/app/analyze/analyze.module.css';
 
 // ── Types ──────────────────────────────────────────────────────────────────
@@ -13,6 +19,7 @@ type FreqValue     = 'rare' | 'monthly' | 'weekly' | 'daily' | null;
 type ProdValue     = 'phone' | 'decent' | 'pro' | 'full' | null;
 type RegionValue   = 'mena' | 'europe' | 'na' | 'latam' | 'south_asia' | 'apac_south' | 'east_asia' | 'africa' | null;
 type SubmitState   = 'idle' | 'loading' | 'success';
+type PromoState    = 'gate' | 'code-entry' | 'code-valid' | 'pricing' | 'paid' | 'url-step';
 
 // ── Decode animation ───────────────────────────────────────────────────────
 
@@ -202,6 +209,21 @@ export default function AnalyzeClient() {
   // Decode animation
   const { displayed: decodeDisplayed, decoded: decodeFinished } = useDecodeAnimation('Sees');
 
+  // Promo gate state machine
+  const searchParams = useSearchParams();
+  const [promoState,   setPromoState]   = useState<PromoState>('gate');
+  const [appliedCode,  setAppliedCode]  = useState<string | null>(null);
+
+  // Check URL param on mount — e.g. /analyze?code=DIVE
+  useEffect(() => {
+    const codeParam = searchParams.get('code');
+    if (codeParam && isValidPromoCode(codeParam)) {
+      const upperCode = codeParam.toUpperCase().trim();
+      setAppliedCode(upperCode);
+      setPromoState('url-step');
+    }
+  }, [searchParams]);
+
   // URL input
   const [urlValue,      setUrlValue]      = useState('');
   const [urlValid,      setUrlValid]      = useState<'idle' | 'valid' | 'error'>('idle');
@@ -251,6 +273,8 @@ export default function AnalyzeClient() {
     const val = urlValue.trim();
     if (!val) { setUrlValid('error'); return; }
 
+    trackEvent('Lead');
+
     setStep2Open(true);
     setUrlLocked(true);
 
@@ -288,9 +312,11 @@ export default function AnalyzeClient() {
         region: selectedRegion || undefined,
         name: name.trim(),
         email: email.trim(),
+        promo_code: appliedCode || undefined,
       });
 
       if (result.success && result.publicId) {
+        trackEvent('CompleteRegistration');
         setSubmitState('success');
         // Redirect to waiting room after brief success animation
         setTimeout(() => {
@@ -301,7 +327,7 @@ export default function AnalyzeClient() {
         setSubmitError(result.error || 'Something went wrong. Please try again.');
       }
     });
-  }, [name, email, emailConfirm, urlValue, selectedGoal, selectedFreq, selectedProd, selectedRegion, router, startTransition]);
+  }, [name, email, emailConfirm, urlValue, selectedGoal, selectedFreq, selectedProd, selectedRegion, appliedCode, router, startTransition]);
 
   // ── FAQ toggle ──────────────────────────────────────────────────────────
   const handleFaqToggle = useCallback((id: string) => {
@@ -348,48 +374,92 @@ export default function AnalyzeClient() {
             No OAuth. No credit card. Just paste your URL.
           </p>
 
-          {/* STEP 1: URL Input */}
-          <div className={styles.inputRow} id="analyze">
-            <input
-              type="url"
-              className={urlInputClass}
-              value={urlValue}
-              onChange={e => handleUrlChange(e.target.value)}
-              placeholder="youtube.com/@yourchannel"
-              autoComplete="off"
-              spellCheck={false}
-              readOnly={urlLocked}
-              style={urlLocked ? { opacity: 0.6 } : undefined}
-              aria-label="YouTube channel URL"
+          {/* PROMO GATE STATE MACHINE */}
+          {promoState === 'gate' && (
+            <PromoGate
+              onYes={() => setPromoState('code-entry')}
+              onNo={() => setPromoState('pricing')}
             />
-            <button
-              className={styles.analyzeBtn}
-              onClick={handleStep1}
-              type="button"
-              disabled={urlLocked}
-              style={urlLocked ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
-              aria-label="Analyze my channel"
-            >
-              {urlLocked ? (
-                <>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                    <path d="M3 8L6.5 11.5L13 4" stroke="#0A0A0C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-                  Channel URL saved
-                </>
-              ) : (
-                <>
-                  <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" aria-hidden="true">
-                    <circle cx="7" cy="7" r="4.5" stroke="#0A0A0C" strokeWidth="1.8"/>
-                    <path d="M10.5 10.5L13.5 13.5" stroke="#0A0A0C" strokeWidth="1.8" strokeLinecap="round"/>
-                  </svg>
-                  Analyze My Channel
-                </>
-              )}
-            </button>
-          </div>
+          )}
+          {promoState === 'code-entry' && (
+            <PromoInput
+              onValid={(code) => { setAppliedCode(code); setPromoState('url-step'); }}
+              onBack={() => setPromoState('gate')}
+            />
+          )}
+          {promoState === 'pricing' && (
+            <PricingPanel onSwitchToCode={() => setPromoState('code-entry')} />
+          )}
 
-          {/* STEP 2: Qualification Panel */}
+          {/* STEP 1: URL Input — only shown once access is granted */}
+          {(promoState === 'url-step' || promoState === 'paid') && (
+            <div id="analyze">
+              {/* Promo badge */}
+              {appliedCode && (
+                <div style={{ textAlign: 'center' }}>
+                  <span className={promoStyles.promoBadge}>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M2 6L5 9L10 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    FREE with code {appliedCode}
+                  </span>
+                </div>
+              )}
+              {promoState === 'paid' && !appliedCode && (
+                <div style={{ textAlign: 'center' }}>
+                  <span className={promoStyles.promoBadge}>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                      <path d="M2 6L5 9L10 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Paid audit — $200
+                  </span>
+                </div>
+              )}
+
+              <div className={styles.inputRow}>
+                <input
+                  type="url"
+                  className={urlInputClass}
+                  value={urlValue}
+                  onChange={e => handleUrlChange(e.target.value)}
+                  placeholder="youtube.com/@yourchannel"
+                  autoComplete="off"
+                  spellCheck={false}
+                  readOnly={urlLocked}
+                  style={urlLocked ? { opacity: 0.6 } : undefined}
+                  aria-label="YouTube channel URL"
+                />
+                <button
+                  className={styles.analyzeBtn}
+                  onClick={handleStep1}
+                  type="button"
+                  disabled={urlLocked}
+                  style={urlLocked ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
+                  aria-label="Analyze my channel"
+                >
+                  {urlLocked ? (
+                    <>
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                        <path d="M3 8L6.5 11.5L13 4" stroke="#0A0A0C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                      Channel URL saved
+                    </>
+                  ) : (
+                    <>
+                      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" aria-hidden="true">
+                        <circle cx="7" cy="7" r="4.5" stroke="#0A0A0C" strokeWidth="1.8"/>
+                        <path d="M10.5 10.5L13.5 13.5" stroke="#0A0A0C" strokeWidth="1.8" strokeLinecap="round"/>
+                      </svg>
+                      Analyze My Channel
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* STEP 2: Qualification Panel — only when access granted */}
+          {(promoState === 'url-step' || promoState === 'paid') && (
           <div
             ref={qualifyPanelRef}
             className={`${styles.qualifyPanel} ${step2Open ? styles.qualifyPanelOpen : ''}`}
@@ -586,6 +656,7 @@ export default function AnalyzeClient() {
             )}
             <p className={styles.qualifyFine}>No spam. No selling your data. Just your channel audit.</p>
           </div>
+          )}
 
           {/* Trust strip */}
           <div className={styles.trustStrip}>
