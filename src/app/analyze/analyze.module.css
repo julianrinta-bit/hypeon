@@ -1102,8 +1102,16 @@
 ───────────────────────────────────────────────── */
 .decodeWord {
   display: inline-block;
-  min-width: 3.2ch;
   font-variant-numeric: tabular-nums;
+}
+
+/* Invisible replica of final text sets the width — scramble never causes reflow */
+.decodeWord::after {
+  content: attr(aria-label);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
 }
 
 .decodeWordDecoded {
