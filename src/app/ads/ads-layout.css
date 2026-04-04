@@ -1,0 +1,4 @@
+/* Hide ALL public chrome inside /ads routes — only the dashboard shell remains */
+body:has(.ads-layout-shell) > *:not(.ads-layout-shell) {
+  display: none !important;
+}
