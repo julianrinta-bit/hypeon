@@ -160,6 +160,52 @@
   line-height: 1.4;
 }
 
+/* ─── Expert insights block ─────────────────────────────────────── */
+.insightsBlock {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  animation: insightFadeIn 0.8s ease-out both;
+}
+
+@keyframes insightFadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightsBlock { animation: none; opacity: 1; }
+}
+
+.insightsLabel {
+  display: block;
+  font-family: var(--font-mono, 'IBM Plex Mono', monospace);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(240, 240, 236, 0.35);
+  margin-bottom: 12px;
+}
+
+.insightDiagnosis {
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(240, 240, 236, 0.75);
+  font-style: italic;
+  margin: 0 0 10px;
+}
+
+.insightQuestion {
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(240, 240, 236, 0.55);
+  font-style: italic;
+  margin: 0;
+}
+
 /* ─── Footer note ───────────────────────────────────────────────── */
 .footer {
   font-family: var(--font-body);

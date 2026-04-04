@@ -40,6 +40,9 @@ export type ChannelSnapshot = {
   painLabel: string;
   painValue: string;
   painSubLabel: string;
+  // Expert insights
+  insightDiagnosis: string;
+  insightQuestion: string;
 };
 
 export type SnapshotResult =
@@ -117,6 +120,72 @@ function formatChannelAge(months: number): string {
   if (months >= 24) return `${(months / 12).toFixed(1)} years`;
   if (months >= 12) return `${Math.floor(months / 12)} year`;
   return `${months} months`;
+}
+
+function generateInsights(
+  pattern: PainPattern,
+  subscriberCount: number,
+  contentLeverageFormatted: string,
+  subscriberConversion: number,
+  uploadVelocityPerMonth: number,
+  totalVideos: number,
+  channelAgeFormatted: string,
+): { insightDiagnosis: string; insightQuestion: string } {
+  const subscriberFormatted = formatMetricNumber(subscriberCount);
+  const conversionDivisor = subscriberConversion > 0 ? Math.round(subscriberConversion) : 0;
+
+  switch (pattern) {
+    case 'ghost_audience':
+      return {
+        insightDiagnosis: `${totalVideos} uploads reaching ${contentLeverageFormatted} views each — with ${subscriberFormatted} subscribers, most of your audience has gone silent.`,
+        insightQuestion: `Whether it's the algorithm, your upload schedule, or your content format — that's what the full human audit answers.`,
+      };
+
+    case 'leaky_funnel':
+      return {
+        insightDiagnosis: `${contentLeverageFormatted} views per upload is strong reach. But at 1 subscriber per ${formatMetricNumber(conversionDivisor)} views, your content isn't building a community.`,
+        insightQuestion: `Is it your CTAs, your channel page, or your content niche? That's what the full human audit answers.`,
+      };
+
+    case 'treadmill':
+      return {
+        insightDiagnosis: `${uploadVelocityPerMonth} uploads per month is serious commitment. At ${contentLeverageFormatted} views each, the effort isn't translating to traction.`,
+        insightQuestion: `Is it your titles, your thumbnails, or your niche targeting? That's what the full human audit answers.`,
+      };
+
+    case 'dormant_giant':
+      return {
+        insightDiagnosis: `${totalVideos} uploads over ${channelAgeFormatted} — that's dedication. At ${subscriberFormatted} subscribers, your growth hasn't matched your consistency.`,
+        insightQuestion: `Whether it's positioning, content format, or discoverability — that's what the full human audit answers.`,
+      };
+
+    case 'view_rich_sub_poor':
+      return {
+        insightDiagnosis: `${contentLeverageFormatted} views per video proves your content connects. But ${subscriberFormatted} subscribers means viewers aren't staying.`,
+        insightQuestion: `What's stopping viewers from subscribing — your CTAs, your content arc, or your niche? That's what the full human audit answers.`,
+      };
+
+    case 'healthy':
+    default: {
+      const question = `What specific moves would accelerate your growth from here — that's what the full human audit answers.`;
+      if (subscriberCount > 500_000) {
+        return {
+          insightDiagnosis: `${contentLeverageFormatted} views per upload with ${subscriberFormatted} subscribers — strong foundation. The question is what's next.`,
+          insightQuestion: question,
+        };
+      }
+      if (subscriberCount >= 50_000) {
+        return {
+          insightDiagnosis: `${totalVideos} uploads averaging ${contentLeverageFormatted} views — solid traction. The gap between where you are and where you could be is what matters.`,
+          insightQuestion: question,
+        };
+      }
+      return {
+        insightDiagnosis: `${channelAgeFormatted} in, ${subscriberFormatted} subscribers, averaging ${contentLeverageFormatted} views — you have signal. The audit finds what to amplify.`,
+        insightQuestion: question,
+      };
+    }
+  }
 }
 
 function detectPain(
@@ -327,9 +396,20 @@ export async function fetchChannelSnapshot(channelUrl: string): Promise<Snapshot
 
   // New derived metrics
   const contentLeverage = videoCount > 0 ? Math.round(viewCount / videoCount) : 0;
+  const contentLeverageFormatted = formatMetricNumber(contentLeverage);
   const subscriberConversion = subscriberCount > 0 ? viewCount / subscriberCount : 0;
   const uploadVelocityPerMonth = Math.round(videosPerMonth * 10) / 10;
+  const channelAgeFormatted = formatChannelAge(channelAgeMonths);
   const pain = detectPain(subscriberCount, viewCount, videoCount, channelAgeMonths, uploadVelocityPerMonth);
+  const insights = generateInsights(
+    pain.pattern,
+    subscriberCount,
+    contentLeverageFormatted,
+    subscriberConversion,
+    uploadVelocityPerMonth,
+    videoCount,
+    channelAgeFormatted,
+  );
 
   const snapshot: ChannelSnapshot = {
     channelId,
@@ -347,15 +427,18 @@ export async function fetchChannelSnapshot(channelUrl: string): Promise<Snapshot
     recencyLabel: getRecencyLabel(lastUploadDaysAgo),
     // New metrics
     contentLeverage,
-    contentLeverageFormatted: formatMetricNumber(contentLeverage),
+    contentLeverageFormatted,
     subscriberConversion,
     uploadVelocityPerMonth,
     totalVideos: videoCount,
-    channelAgeFormatted: formatChannelAge(channelAgeMonths),
+    channelAgeFormatted,
     painPattern: pain.pattern,
     painLabel: pain.label,
     painValue: pain.value,
     painSubLabel: pain.subLabel,
+    // Expert insights
+    insightDiagnosis: insights.insightDiagnosis,
+    insightQuestion: insights.insightQuestion,
   };
 
   return { snapshot };
