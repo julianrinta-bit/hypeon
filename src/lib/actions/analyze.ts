@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { headers } from 'next/headers';
 import { randomBytes } from 'crypto';
 import { isValidPromoCode } from '@/config/promoCodes';
+import { checkRateLimit } from '@/lib/rate-limit';
 
 // ── Admin client (service role — bypasses RLS) ──────────────────────────────
 
@@ -36,22 +37,6 @@ const AnalyzeSchema = z.object({
   email: z.string().email('Invalid email').max(200),
   promo_code: z.string().optional(),
 });
-
-// ── Rate limiter ────────────────────────────────────────────────────────────
-
-const ipCounts = new Map<string, { count: number; resetAt: number }>();
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  const entry = ipCounts.get(ip);
-  if (!entry || now > entry.resetAt) {
-    ipCounts.set(ip, { count: 1, resetAt: now + 3600_000 });
-    return true;
-  }
-  if (entry.count >= 3) return false;
-  entry.count++;
-  return true;
-}
 
 // ── Normalize channel URL ───────────────────────────────────────────────────
 // Ensure we always store a full URL, even if user pastes just @handle
@@ -86,7 +71,14 @@ export async function submitAnalysis(data: {
   name: string;
   email: string;
   promo_code?: string;
+  /** Honeypot field — must be empty; bots fill it automatically */
+  website_url?: string;
 }): Promise<AnalyzeResult> {
+  // 0. Honeypot — bots fill hidden fields; silently accept and return fake success
+  if (data.website_url) {
+    return { success: true, publicId: 'blocked' };
+  }
+
   // 1. Validate
   const parsed = AnalyzeSchema.safeParse(data);
   if (!parsed.success) {
@@ -94,11 +86,16 @@ export async function submitAnalysis(data: {
     return { success: false, error: firstError || 'Invalid input' };
   }
 
-  // 2. Rate limit
+  // 2. Rate limit (5 submissions per IP per hour)
   const headersList = await headers();
-  const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
-  if (!checkRateLimit(ip)) {
-    return { success: false, error: 'Too many submissions. Please try again later.' };
+  const ip =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    headersList.get('x-real-ip') ||
+    'unknown';
+  const rateCheck = checkRateLimit(ip, { maxRequests: 5, windowMs: 3_600_000 });
+  if (!rateCheck.allowed) {
+    const retryMinutes = Math.ceil(rateCheck.retryAfterMs / 60_000);
+    return { success: false, error: `Too many requests. Please try again in ${retryMinutes} minute${retryMinutes === 1 ? '' : 's'}.` };
   }
 
   const { channel_url: rawUrl, goal, publishing_frequency, production_level, region, name, email, promo_code: rawPromoCode } = parsed.data;
