@@ -341,7 +341,7 @@ export default function AnalyzeClient() {
         <div className={styles.heroContent}>
           <div className={styles.heroEyebrow}>
             <span className={styles.heroEyebrowDot} aria-hidden="true" />
-            Free YouTube Audit
+            YouTube Channel Audit
           </div>
 
           <h1 className={styles.heroHeadline}>
@@ -352,7 +352,7 @@ export default function AnalyzeClient() {
           </h1>
 
           <p className={styles.heroSub}>
-            Paste your channel URL. Get a free 6-axis audit scoring your content, titles, growth, and monetization — by the team behind 5 billion YouTube views.
+            Paste your channel URL. Get a 6-axis audit scoring your content, titles, growth, and monetization — by the team behind 5 billion YouTube views.
           </p>
 
           {/* STEP 1: URL Input */}
@@ -365,7 +365,7 @@ export default function AnalyzeClient() {
                   <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                     <path d="M2 6L5 9L10 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
-                  FREE with code {appliedCode}
+                  Complimentary access — code {appliedCode}
                 </span>
               </div>
             )}
@@ -516,7 +516,7 @@ export default function AnalyzeClient() {
               disabled={submitState !== 'idle' || isPending}
               style={submitState !== 'idle' || isPending ? { opacity: 0.7, pointerEvents: 'none' } : undefined}
             >
-              {submitState === 'idle' && 'Run My Free Audit'}
+              {submitState === 'idle' && 'Run My Audit'}
               {submitState === 'loading' && (
                 <>
                   <svg
@@ -784,8 +784,8 @@ export default function AnalyzeClient() {
               />
               <FaqItem
                 id="faq-3"
-                question="Is it really free?"
-                answer="Yes. We believe in showing expertise first, asking later. The audit is our way of proving we know what we're talking about before we ask for a budget. If the report doesn't convince you we can help — you're out nothing."
+                question="How much does the audit cost?"
+                answer="A full channel audit is $200. Promotional codes — included in our partner campaigns and select invitations — grant complimentary access. Either way, you receive the same in-depth 6-axis analysis."
                 openId={openFaqId}
                 onToggle={handleFaqToggle}
                 revealDelay={styles.revealDelay3}
