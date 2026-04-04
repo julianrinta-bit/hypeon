@@ -1,6 +1,6 @@
 /* SnapshotCard.module.css */
 
-/* ─── Card wrapper ─────────────────────────────────── */
+/* ─── Card wrapper ──────────────────────────────────────────────── */
 .card {
   background: rgba(10, 10, 14, 0.82);
   backdrop-filter: blur(16px) saturate(160%);
@@ -8,8 +8,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-top-color: rgba(255, 255, 255, 0.18);
   border-radius: 16px;
-  padding: 24px;
-  max-width: 640px;
+  padding: 28px;
+  max-width: 600px;
   margin: 0 auto 28px;
   animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -19,8 +19,8 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ─── Top row: avatar + name + handle + subs ──────── */
-.topRow {
+/* ─── Header: avatar + channel info ────────────────────────────── */
+.header {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -33,7 +33,16 @@
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.avatarPlaceholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.06);
 }
 
@@ -45,7 +54,7 @@
 .channelName {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 16px;
+  font-size: 1rem;
   color: #f0f0ec;
   line-height: 1.25;
   white-space: nowrap;
@@ -53,87 +62,135 @@
   text-overflow: ellipsis;
 }
 
-.channelHandle {
+.channelMeta {
   font-family: var(--font-mono);
-  font-size: 11px;
-  color: rgba(240, 240, 236, 0.45);
-  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(240, 240, 236, 0.4);
+  margin-top: 3px;
 }
 
-.subCount {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  font-weight: 600;
-  color: #c8ff2e;
-  white-space: nowrap;
-  flex-shrink: 0;
+.metaDot {
+  color: rgba(240, 240, 236, 0.2);
 }
 
-/* ─── Metric grid 2×2 ────────────────────────────── */
-.metricGrid {
+/* ─── Metrics 2×2 grid ──────────────────────────────────────────── */
+.metricsGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 18px;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.metricCell {
-  background: rgba(255, 255, 255, 0.03);
+/* ─── Standard metric tile ──────────────────────────────────────── */
+.metricTile {
   border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 10px;
-  padding: 14px 16px;
+  border-radius: 12px;
+  padding: 20px;
+  background: transparent;
 }
 
 .metricLabel {
   font-family: var(--font-body);
   font-size: 10px;
   font-weight: 500;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgba(240, 240, 236, 0.35);
-  margin-bottom: 6px;
+  color: rgba(240, 240, 236, 0.4);
+  margin-bottom: 0;
 }
 
 .metricValue {
   font-family: var(--font-mono);
-  font-size: 16px;
+  font-size: 2rem;
   font-weight: 600;
   color: #f0f0ec;
-  line-height: 1.2;
+  line-height: 1.15;
+  margin: 8px 0 4px;
+  /* Allow wrapping on very small tiles */
+  word-break: break-word;
+}
+
+/* Inline unit text within the value (e.g., "1 per [119]") */
+.metricValueUnit {
+  font-size: 2rem;
+  font-weight: 600;
+  font-family: inherit;
 }
 
 .metricSub {
   font-family: var(--font-body);
-  font-size: 11px;
-  color: rgba(240, 240, 236, 0.45);
-  margin-top: 3px;
+  font-size: 12px;
+  color: rgba(240, 240, 236, 0.5);
+  line-height: 1.4;
 }
 
-/* Pace / recency pill */
-.pacePill {
-  display: inline-block;
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  border-radius: 999px;
-  padding: 2px 8px;
-  margin-top: 4px;
+/* ─── Pain indicator tile ───────────────────────────────────────── */
+.painTile {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-left: 3px solid #F59E0B;
+  border-radius: 12px;
+  padding: 20px;
+  background: transparent;
 }
 
-.pacePill.active  { color: #34D399; background: rgba(52, 211, 153, 0.10); }
-.pacePill.slowing { color: #FBBF24; background: rgba(251, 191, 36, 0.10); }
-.pacePill.inactive{ color: #F87171; background: rgba(248, 113, 113, 0.10); }
-.pacePill.prolific { color: #c8ff2e; background: rgba(200, 255, 46, 0.10); }
-.pacePill.steady   { color: #34D399; background: rgba(52, 211, 153, 0.10); }
-.pacePill.sporadic { color: #FBBF24; background: rgba(251, 191, 36, 0.10); }
-.pacePill.dormant  { color: #F87171; background: rgba(248, 113, 113, 0.10); }
-
-/* ─── Footer note ─────────────────────────────────── */
-.footerNote {
+.painLabel {
   font-family: var(--font-body);
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #F59E0B;
+  margin-bottom: 0;
+}
+
+.painValue {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 600;
+  color: #f0f0ec;
+  line-height: 1.15;
+  margin: 8px 0 4px;
+  word-break: break-word;
+}
+
+.painSub {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: rgba(240, 240, 236, 0.6);
+  line-height: 1.4;
+}
+
+/* ─── Footer note ───────────────────────────────────────────────── */
+.footer {
+  font-family: var(--font-body);
+  font-size: 12px;
   color: rgba(240, 240, 236, 0.28);
   text-align: center;
   line-height: 1.5;
+  font-style: italic;
+  margin-top: 20px;
+  margin-bottom: 0;
+}
+
+/* ─── Mobile (≤ 767px) ──────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .card {
+    padding: 20px 16px;
+  }
+
+  .metricsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .metricTile,
+  .painTile {
+    padding: 16px;
+  }
+
+  .metricValue,
+  .metricValueUnit,
+  .painValue {
+    font-size: 1.75rem;
+  }
 }

@@ -5,6 +5,14 @@ import { checkRateLimit } from '@/lib/rate-limit';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
+export type PainPattern =
+  | 'ghost_audience'
+  | 'leaky_funnel'
+  | 'treadmill'
+  | 'dormant_giant'
+  | 'view_rich_sub_poor'
+  | 'healthy';
+
 export type ChannelSnapshot = {
   channelId: string;
   name: string;
@@ -14,12 +22,24 @@ export type ChannelSnapshot = {
   videoCount: number;
   viewCount: number;
   publishedAt: string;
-  // Derived
+  // Derived — legacy
   channelAgeMonths: number;
   videosPerMonth: number;
   viewsPerSubscriber: number;
   paceLabel: 'Prolific' | 'Steady' | 'Sporadic' | 'Dormant';
   recencyLabel: 'Active' | 'Slowing' | 'Inactive';
+  // Derived — new metrics
+  contentLeverage: number;
+  contentLeverageFormatted: string;
+  subscriberConversion: number;
+  uploadVelocityPerMonth: number;
+  totalVideos: number;
+  channelAgeFormatted: string;
+  // Pain detection
+  painPattern: PainPattern;
+  painLabel: string;
+  painValue: string;
+  painSubLabel: string;
 };
 
 export type SnapshotResult =
@@ -84,6 +104,92 @@ function getRecencyLabel(lastUploadDaysAgo: number): ChannelSnapshot['recencyLab
   if (lastUploadDaysAgo <= 7) return 'Active';
   if (lastUploadDaysAgo <= 30) return 'Slowing';
   return 'Inactive';
+}
+
+function formatMetricNumber(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 10_000) return `${Math.round(n / 1_000)}K`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
+  return n.toLocaleString();
+}
+
+function formatChannelAge(months: number): string {
+  if (months >= 24) return `${(months / 12).toFixed(1)} years`;
+  if (months >= 12) return `${Math.floor(months / 12)} year`;
+  return `${months} months`;
+}
+
+function detectPain(
+  subscriberCount: number,
+  viewCount: number,
+  videoCount: number,
+  channelAgeMonths: number,
+  uploadVelocityPerMonth: number,
+): { pattern: PainPattern; label: string; value: string; subLabel: string } {
+  const viewsPerVideo = videoCount > 0 ? viewCount / videoCount : 0;
+  const viewsPerSub = subscriberCount > 0 ? viewCount / subscriberCount : 0;
+
+  // 1. ghost_audience
+  if (subscriberCount > 100_000 && viewsPerVideo < subscriberCount * 0.02) {
+    const pct = ((viewsPerVideo / subscriberCount) * 100).toFixed(1);
+    return {
+      pattern: 'ghost_audience',
+      label: 'Audience Reach',
+      value: `${pct}% of your subs`,
+      subLabel: "most of your audience isn't seeing your videos",
+    };
+  }
+
+  // 2. leaky_funnel
+  if (viewsPerSub > 500 && subscriberCount < viewCount / 200) {
+    const viewsPerSubRounded = Math.round(viewsPerSub);
+    return {
+      pattern: 'leaky_funnel',
+      label: 'Growth Efficiency',
+      value: `1 sub per ${viewsPerSubRounded} views`,
+      subLabel: "your views aren't converting to a community",
+    };
+  }
+
+  // 3. treadmill
+  if (uploadVelocityPerMonth > 12 && viewsPerVideo < 1000) {
+    return {
+      pattern: 'treadmill',
+      label: 'Effort vs. Return',
+      value: `${uploadVelocityPerMonth.toFixed(0)}/mo → ${formatMetricNumber(Math.round(viewsPerVideo))} avg views`,
+      subLabel: "high output, low traction — something's off",
+    };
+  }
+
+  // 4. dormant_giant
+  const years = channelAgeMonths / 12;
+  if (channelAgeMonths > 60 && subscriberCount < (channelAgeMonths / 12) * 1000) {
+    const subsPerYear = Math.round(subscriberCount / years);
+    return {
+      pattern: 'dormant_giant',
+      label: 'Growth Pace',
+      value: `${formatMetricNumber(subsPerYear)}/yr avg`,
+      subLabel: `${years.toFixed(0)} years of content, still building momentum`,
+    };
+  }
+
+  // 5. view_rich_sub_poor
+  if (viewsPerVideo > 50_000 && subscriberCount < 50_000) {
+    return {
+      pattern: 'view_rich_sub_poor',
+      label: 'Conversion Gap',
+      value: `${formatMetricNumber(Math.round(viewsPerVideo))} views/vid but ${formatMetricNumber(subscriberCount)} subs`,
+      subLabel: "your content reaches — but doesn't stick",
+    };
+  }
+
+  // 6. healthy (default)
+  return {
+    pattern: 'healthy',
+    label: 'Channel Maturity',
+    value: formatChannelAge(channelAgeMonths),
+    subLabel: 'your full growth trajectory is in the audit',
+  };
 }
 
 // ── YouTube API call ────────────────────────────────────────────────────────
@@ -219,6 +325,12 @@ export async function fetchChannelSnapshot(channelUrl: string): Promise<Snapshot
     }
   }
 
+  // New derived metrics
+  const contentLeverage = videoCount > 0 ? Math.round(viewCount / videoCount) : 0;
+  const subscriberConversion = subscriberCount > 0 ? viewCount / subscriberCount : 0;
+  const uploadVelocityPerMonth = Math.round(videosPerMonth * 10) / 10;
+  const pain = detectPain(subscriberCount, viewCount, videoCount, channelAgeMonths, uploadVelocityPerMonth);
+
   const snapshot: ChannelSnapshot = {
     channelId,
     name,
@@ -229,10 +341,21 @@ export async function fetchChannelSnapshot(channelUrl: string): Promise<Snapshot
     viewCount,
     publishedAt,
     channelAgeMonths,
-    videosPerMonth: Math.round(videosPerMonth * 10) / 10,
+    videosPerMonth: uploadVelocityPerMonth,
     viewsPerSubscriber,
     paceLabel: getPaceLabel(videosPerMonth),
     recencyLabel: getRecencyLabel(lastUploadDaysAgo),
+    // New metrics
+    contentLeverage,
+    contentLeverageFormatted: formatMetricNumber(contentLeverage),
+    subscriberConversion,
+    uploadVelocityPerMonth,
+    totalVideos: videoCount,
+    channelAgeFormatted: formatChannelAge(channelAgeMonths),
+    painPattern: pain.pattern,
+    painLabel: pain.label,
+    painValue: pain.value,
+    painSubLabel: pain.subLabel,
   };
 
   return { snapshot };
