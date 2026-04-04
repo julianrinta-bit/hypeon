@@ -282,5 +282,302 @@ export async function updateBudget(
   }
 }
 
+/**
+ * Fetch per-ad daily insights for sparklines (last N days).
+ */
+export async function getAdInsightsDaily(
+  adIds: string[],
+  days: number = 7
+): Promise<{ data: DailyInsight[]; error?: string }> {
+  if (adIds.length === 0) return { data: [] };
+  try {
+    const token = getToken();
+    const fields = ['ad_id', 'ad_name', 'date_start', 'clicks', 'impressions', 'spend', 'ctr', 'cpc'].join(',');
+
+    const params = new URLSearchParams({
+      access_token: token,
+      level: 'ad',
+      fields,
+      date_preset: days === 7 ? 'last_7d' : 'last_30d',
+      time_increment: '1',
+      filtering: JSON.stringify([{ field: 'ad.id', operator: 'IN', value: adIds }]),
+    });
+
+    const url = `${META_API_BASE}/${AD_ACCOUNT_ID}/insights?${params}`;
+    const res = await fetch(url, { cache: 'no-store' });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      const msg = errBody?.error?.message ?? `Meta API HTTP ${res.status}`;
+      return { data: [], error: msg };
+    }
+
+    const json = await res.json();
+    const raw: {
+      ad_id: string;
+      ad_name: string;
+      date_start: string;
+      clicks: string;
+      impressions: string;
+      spend: string;
+      ctr: string;
+      cpc: string;
+    }[] = json.data ?? [];
+
+    const data: DailyInsight[] = raw.map(r => ({
+      ad_id:       r.ad_id,
+      ad_name:     r.ad_name,
+      date:        r.date_start,
+      clicks:      parseInt(r.clicks, 10) || 0,
+      impressions: parseInt(r.impressions, 10) || 0,
+      spend:       parseFloat(r.spend) || 0,
+      ctr:         parseFloat(r.ctr) || 0,
+      cpc:         parseFloat(r.cpc) || 0,
+    }));
+
+    return { data };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    return { data: [], error: msg };
+  }
+}
+
+/**
+ * List ad images (creatives) from the ad account.
+ */
+export async function listAdImages(): Promise<{ data: AdImage[]; error?: string }> {
+  try {
+    const token = getToken();
+    const params = new URLSearchParams({
+      access_token: token,
+      fields: 'id,name,url_128,url,status',
+      limit: '20',
+    });
+
+    const url = `${META_API_BASE}/${AD_ACCOUNT_ID}/adimages?${params}`;
+    const res = await fetch(url, { cache: 'no-store' });
+
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      const msg = errBody?.error?.message ?? `Meta API HTTP ${res.status}`;
+      return { data: [], error: msg };
+    }
+
+    const json = await res.json();
+    const raw: { hash: string; name: string; url_128?: string; url?: string; status?: string }[] = json.data ?? [];
+
+    const data: AdImage[] = raw.map(r => ({
+      hash:   r.hash,
+      name:   r.name,
+      url:    r.url_128 ?? r.url ?? '',
+      status: r.status ?? 'ACTIVE',
+    }));
+
+    return { data };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    return { data: [], error: msg };
+  }
+}
+
+/**
+ * Create a full campaign chain: campaign → adset → creative → ad.
+ * The campaign is created in PAUSED state.
+ */
+export async function createFullCampaign(data: CreateCampaignData): Promise<{ result?: CreateCampaignResult; error?: string }> {
+  try {
+    const token = getToken();
+
+    // Step 1: Create campaign
+    const campaignBody = new URLSearchParams({
+      access_token: token,
+      name: data.campaignName,
+      objective: 'OUTCOME_TRAFFIC',
+      status: 'PAUSED',
+      special_ad_categories: '[]',
+    });
+
+    const campaignRes = await fetch(`${META_API_BASE}/${AD_ACCOUNT_ID}/campaigns`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: campaignBody.toString(),
+    });
+
+    if (!campaignRes.ok) {
+      const e = await campaignRes.json().catch(() => ({}));
+      return { error: e?.error?.message ?? `Campaign creation failed: HTTP ${campaignRes.status}` };
+    }
+
+    const campaignJson = await campaignRes.json();
+    const newCampaignId: string = campaignJson.id;
+
+    // Step 2: Create ad set(s)
+    const geos = data.geoPreset === 'Both' ? ['MENA', 'EU'] : [data.geoPreset];
+    const MENA_COUNTRIES = ['AE', 'SA', 'EG', 'KW', 'QA', 'BH', 'OM', 'JO', 'LB'];
+    const EU_COUNTRIES   = ['DE', 'FR', 'ES', 'IT', 'NL', 'SE', 'NO', 'DK', 'FI', 'PL'];
+
+    const adsetIds: string[] = [];
+
+    for (const geo of geos) {
+      const countries = geo === 'MENA' ? MENA_COUNTRIES : EU_COUNTRIES;
+      const budgetKRW = data.dailyBudgetUSD * KRW_TO_USD;
+      const budgetCents = Math.round(budgetKRW * 100);
+
+      const targeting = {
+        geo_locations: { countries },
+        age_min: data.ageMin,
+        age_max: data.ageMax,
+        flexible_spec: [{
+          interests: [
+            { id: '6003486767788', name: 'YouTube' },
+            { id: '6003107902433', name: 'Video editing' },
+            { id: '6003349442621', name: 'Adobe Premiere Pro' },
+          ],
+        }],
+      };
+
+      const adsetBody = new URLSearchParams({
+        access_token: token,
+        campaign_id: newCampaignId,
+        name: `${data.campaignName} — ${geo}`,
+        status: 'PAUSED',
+        daily_budget: budgetCents.toString(),
+        billing_event: 'IMPRESSIONS',
+        optimization_goal: 'LINK_CLICKS',
+        targeting: JSON.stringify(targeting),
+      });
+
+      const adsetRes = await fetch(`${META_API_BASE}/${AD_ACCOUNT_ID}/adsets`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: adsetBody.toString(),
+      });
+
+      if (!adsetRes.ok) {
+        const e = await adsetRes.json().catch(() => ({}));
+        return { error: e?.error?.message ?? `Ad set creation failed for ${geo}` };
+      }
+
+      const adsetJson = await adsetRes.json();
+      adsetIds.push(adsetJson.id);
+    }
+
+    // Step 3: Create ad creative
+    const linkUrl = data.promoCode
+      ? `${data.linkUrl}${data.linkUrl.includes('?') ? '&' : '?'}code=${data.promoCode}`
+      : data.linkUrl;
+
+    const objectStorySpec = {
+      page_id: '1085640007961416',
+      link_data: {
+        image_hash: data.imageHash,
+        link: linkUrl,
+        message: data.primaryText,
+        name: data.headline,
+        call_to_action: { type: 'LEARN_MORE', value: { link: linkUrl } },
+      },
+    };
+
+    const creativeBody = new URLSearchParams({
+      access_token: token,
+      name: `${data.campaignName} — Creative`,
+      object_story_spec: JSON.stringify(objectStorySpec),
+    });
+
+    const creativeRes = await fetch(`${META_API_BASE}/${AD_ACCOUNT_ID}/adcreatives`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: creativeBody.toString(),
+    });
+
+    if (!creativeRes.ok) {
+      const e = await creativeRes.json().catch(() => ({}));
+      return { error: e?.error?.message ?? `Creative creation failed` };
+    }
+
+    const creativeJson = await creativeRes.json();
+    const creativeId: string = creativeJson.id;
+
+    // Step 4: Create ads
+    const adIds: string[] = [];
+
+    for (const adsetId of adsetIds) {
+      const adBody = new URLSearchParams({
+        access_token: token,
+        adset_id: adsetId,
+        name: `${data.campaignName} — Ad`,
+        status: 'PAUSED',
+        creative: JSON.stringify({ creative_id: creativeId }),
+      });
+
+      const adRes = await fetch(`${META_API_BASE}/${AD_ACCOUNT_ID}/ads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: adBody.toString(),
+      });
+
+      if (!adRes.ok) {
+        const e = await adRes.json().catch(() => ({}));
+        return { error: e?.error?.message ?? `Ad creation failed` };
+      }
+
+      const adJson = await adRes.json();
+      adIds.push(adJson.id);
+    }
+
+    return {
+      result: {
+        campaignId: newCampaignId,
+        adsetIds,
+        creativeId,
+        adIds,
+      },
+    };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    return { error: msg };
+  }
+}
+
+// ── Additional Types ──────────────────────────────────────────────────────────
+
+export type DailyInsight = {
+  ad_id:       string;
+  ad_name:     string;
+  date:        string;
+  clicks:      number;
+  impressions: number;
+  spend:       number;
+  ctr:         number;
+  cpc:         number;
+};
+
+export type AdImage = {
+  hash:   string;
+  name:   string;
+  url:    string;
+  status: string;
+};
+
+export type CreateCampaignData = {
+  campaignName:  string;
+  dailyBudgetUSD: number;
+  geoPreset:     'MENA' | 'Europe' | 'Both';
+  ageMin:        number;
+  ageMax:        number;
+  imageHash:     string;
+  primaryText:   string;
+  headline:      string;
+  linkUrl:       string;
+  promoCode:     string;
+};
+
+export type CreateCampaignResult = {
+  campaignId: string;
+  adsetIds:   string[];
+  creativeId: string;
+  adIds:      string[];
+};
+
 // Export constant for use in other modules
 export { KRW_TO_USD };
