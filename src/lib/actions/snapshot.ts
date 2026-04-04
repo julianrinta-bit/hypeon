@@ -441,5 +441,36 @@ export async function fetchChannelSnapshot(channelUrl: string): Promise<Snapshot
     insightQuestion: insights.insightQuestion,
   };
 
+  // Log scan to Supabase for prospect tracking (fire-and-forget, don't block)
+  try {
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    if (supabaseUrl && supabaseKey) {
+      fetch(`${supabaseUrl}/rest/v1/channel_scans`, {
+        method: 'POST',
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal',
+        },
+        body: JSON.stringify({
+          channel_id: snapshot.channelId,
+          channel_name: snapshot.name,
+          handle: snapshot.handle,
+          subscriber_count: snapshot.subscriberCount,
+          video_count: snapshot.videoCount,
+          view_count: snapshot.viewCount,
+          content_leverage: snapshot.contentLeverage,
+          subscriber_conversion: snapshot.subscriberConversion,
+          pain_pattern: snapshot.painPattern,
+          insight_diagnosis: snapshot.insightDiagnosis,
+          scanned_at: new Date().toISOString(),
+          ip: ip,
+        }),
+      }).catch(() => {}); // silent — never block the user
+    }
+  } catch {} // silent
+
   return { snapshot };
 }
