@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import type { ChannelSnapshot } from '@/lib/actions/snapshot';
 import styles from './SnapshotCard.module.css';
 
@@ -38,12 +39,21 @@ export default function SnapshotCard({ snapshot }: SnapshotCardProps) {
     painLabel,
     painValue,
     painSubLabel,
+    insightDiagnosis,
+    insightQuestion,
   } = snapshot;
 
   // Subscriber conversion: "1 per X views"
   const conversionDivisor = subscriberConversion > 0
     ? Math.round(subscriberConversion)
     : 0;
+
+  // Delayed reveal — creates the perception of analysis
+  const [showInsights, setShowInsights] = useState(false);
+  useEffect(() => {
+    const timer = setTimeout(() => setShowInsights(true), 6000);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className={styles.card}>
@@ -114,6 +124,19 @@ export default function SnapshotCard({ snapshot }: SnapshotCardProps) {
         </div>
 
       </div>
+
+      {/* Expert insights — revealed 6 seconds after render */}
+      {showInsights && (
+        <div className={styles.insightsBlock}>
+          <span className={styles.insightsLabel}>Quick take:</span>
+          <p className={styles.insightDiagnosis}>
+            &ldquo;{insightDiagnosis}&rdquo;
+          </p>
+          <p className={styles.insightQuestion}>
+            &ldquo;{insightQuestion}&rdquo;
+          </p>
+        </div>
+      )}
 
       {/* Footer */}
       <p className={styles.footer}>
