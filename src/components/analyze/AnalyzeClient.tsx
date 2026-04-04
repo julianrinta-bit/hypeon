@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback, useTransition } from 'react';
+import React, { useEffect, useRef, useState, useCallback, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import RadarChart from './RadarChart';
 import { submitAnalysis } from '@/lib/actions/analyze';
@@ -228,6 +228,18 @@ function FaqItem({ id, question, answer, openId, onToggle, revealDelay }: FaqIte
   );
 }
 
+// ── Tracking wrappers ──────────────────────────────────────────────────────
+
+function PromoGateTracker({ children }: { children: React.ReactNode }) {
+  useEffect(() => { trackEvent('PromoGateViewed'); }, []);
+  return <>{children}</>;
+}
+
+function URLStepTracker({ children }: { children: React.ReactNode }) {
+  useEffect(() => { trackEvent('URLInputViewed'); }, []);
+  return <>{children}</>;
+}
+
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export default function AnalyzeClient() {
@@ -240,12 +252,31 @@ export default function AnalyzeClient() {
   const [appliedCode,  setAppliedCode]  = useState<string | null>(null);
 
   // Check URL param on mount — e.g. /analyze?code=DIVE
+  // Also auto-skip gate for Facebook traffic (fbclid or referrer)
   useEffect(() => {
-    const codeParam = searchParams.get('code');
+    const params = new URLSearchParams(window.location.search);
+
+    // 1. Explicit code in URL
+    const codeParam = params.get('code');
     if (codeParam && isValidPromoCode(codeParam)) {
-      const upperCode = codeParam.toUpperCase().trim();
-      setAppliedCode(upperCode);
+      setAppliedCode(codeParam.toUpperCase().trim());
       setPromoState('url-step');
+      return;
+    }
+
+    // 2. Facebook traffic (fbclid present OR referrer is Facebook)
+    const fbclid = params.get('fbclid');
+    const referrer = document.referrer.toLowerCase();
+    const isFromFacebook =
+      fbclid ||
+      referrer.includes('facebook.com') ||
+      referrer.includes('fb.com') ||
+      referrer.includes('l.facebook.com');
+
+    if (isFromFacebook) {
+      setPromoState('url-step');
+      trackEvent('PromoGateSkipped', { reason: 'facebook_traffic' });
+      return;
     }
   }, [searchParams]);
 
@@ -263,10 +294,8 @@ export default function AnalyzeClient() {
   const [selectedRegion, setSelectedRegion] = useState<RegionValue>(null);
 
   // Contact fields
-  const [name,         setName]         = useState('');
-  const [email,        setEmail]        = useState('');
-  const [emailConfirm, setEmailConfirm] = useState('');
-  const [emailMatch,   setEmailMatch]   = useState<'idle' | 'match' | 'noMatch'>('idle');
+  const [name,  setName]  = useState('');
+  const [email, setEmail] = useState('');
 
   // Submit state
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
@@ -282,14 +311,37 @@ export default function AnalyzeClient() {
   useParallax();
 
   // ── URL validation ──────────────────────────────────────────────────────
+  // Generous validation — accept anything that might be a YouTube reference.
+  // Let the server handle the actual resolution.
   const handleUrlChange = useCallback((val: string) => {
     setUrlValue(val);
-    if (!val) { setUrlValid('idle'); return; }
+    if (!val.trim()) { setUrlValid('idle'); return; }
+
+    const trimmed = val.trim().toLowerCase();
+
+    // Reject obviously non-YouTube input (plain words with spaces that aren't @handles or channel IDs)
+    const looksLikeJunk = trimmed.includes(' ') && !trimmed.startsWith('@');
+    if (looksLikeJunk) {
+      setUrlValid('error');
+      trackEvent('URLValidationError', { input: val });
+      return;
+    }
+
     const isYt =
-      val.startsWith('youtube.com') ||
-      val.startsWith('https://youtube.com') ||
-      val.startsWith('https://www.youtube.com') ||
-      val.startsWith('@');
+      // Full URLs — http or https, with or without www/m
+      /^https?:\/\/(www\.|m\.)?youtube\.com/.test(trimmed) ||
+      // Without protocol
+      /^(www\.|m\.)?youtube\.com/.test(trimmed) ||
+      // @handle
+      trimmed.startsWith('@') ||
+      // Channel ID (UCxxxxxxxxxx)
+      /^uc[a-z0-9_-]{20,}$/i.test(trimmed) ||
+      // Bare channel name — single word, no spaces (treated as @name on server)
+      /^[a-z0-9._-]+$/i.test(trimmed);
+
+    if (!isYt) {
+      trackEvent('URLValidationError', { input: val });
+    }
     setUrlValid(isYt ? 'valid' : 'error');
   }, []);
 
@@ -299,6 +351,7 @@ export default function AnalyzeClient() {
     if (!val) { setUrlValid('error'); return; }
 
     trackEvent('Lead');
+    trackEvent('QualifyFormViewed');
 
     setStep2Open(true);
     setUrlLocked(true);
@@ -308,21 +361,10 @@ export default function AnalyzeClient() {
     }, 200);
   }, [urlValue]);
 
-  // ── Email match check ───────────────────────────────────────────────────
-  useEffect(() => {
-    if (!emailConfirm) { setEmailMatch('idle'); return; }
-    const isMatch = email === emailConfirm && email.includes('@');
-    setEmailMatch(isMatch ? 'match' : 'noMatch');
-  }, [email, emailConfirm]);
-
   // ── Submit ──────────────────────────────────────────────────────────────
   const handleSubmit = useCallback(() => {
     if (!name.trim()) return;
     if (!email.trim() || !email.includes('@')) return;
-    if (email !== emailConfirm) {
-      setEmailMatch('noMatch');
-      return;
-    }
     if (!selectedGoal) return;
 
     setSubmitState('loading');
@@ -352,7 +394,7 @@ export default function AnalyzeClient() {
         setSubmitError(result.error || 'Something went wrong. Please try again.');
       }
     });
-  }, [name, email, emailConfirm, urlValue, selectedGoal, selectedFreq, selectedProd, selectedRegion, appliedCode, router, startTransition]);
+  }, [name, email, urlValue, selectedGoal, selectedFreq, selectedProd, selectedRegion, appliedCode, router, startTransition]);
 
   // ── FAQ toggle ──────────────────────────────────────────────────────────
   const handleFaqToggle = useCallback((id: string) => {
@@ -404,10 +446,12 @@ export default function AnalyzeClient() {
 
           {/* PROMO GATE STATE MACHINE */}
           {promoState === 'gate' && (
-            <PromoGate
-              onYes={() => setPromoState('code-entry')}
-              onNo={() => setPromoState('pricing')}
-            />
+            <PromoGateTracker>
+              <PromoGate
+                onYes={() => setPromoState('code-entry')}
+                onNo={() => setPromoState('pricing')}
+              />
+            </PromoGateTracker>
           )}
           {promoState === 'code-entry' && (
             <PromoInput
@@ -421,6 +465,7 @@ export default function AnalyzeClient() {
 
           {/* STEP 1: URL Input — only shown once access is granted */}
           {(promoState === 'url-step' || promoState === 'paid') && (
+            <URLStepTracker>
             <div id="analyze">
               {/* Promo badge */}
               {appliedCode && (
@@ -450,6 +495,7 @@ export default function AnalyzeClient() {
                   className={urlInputClass}
                   value={urlValue}
                   onChange={e => handleUrlChange(e.target.value)}
+                  onFocus={() => trackEvent('URLInputFocused')}
                   placeholder="youtube.com/@yourchannel"
                   autoComplete="off"
                   spellCheck={false}
@@ -484,6 +530,7 @@ export default function AnalyzeClient() {
                 </button>
               </div>
             </div>
+            </URLStepTracker>
           )}
 
           {/* STEP 2: Qualification Panel — only when access granted */}
@@ -626,27 +673,7 @@ export default function AnalyzeClient() {
                   autoComplete="email"
                   aria-label="Email address"
                 />
-                <input
-                  type="email"
-                  className={styles.qEmail}
-                  value={emailConfirm}
-                  onChange={e => setEmailConfirm(e.target.value)}
-                  placeholder="Confirm your email"
-                  autoComplete="off"
-                  aria-label="Confirm email address"
-                />
               </div>
-              <p
-                className={`${styles.emailMatchMsg} ${
-                  emailMatch === 'match'   ? styles.match   :
-                  emailMatch === 'noMatch' ? styles.noMatch : ''
-                }`}
-                role="status"
-                aria-live="polite"
-              >
-                {emailMatch === 'match'   && '✓ Emails match'}
-                {emailMatch === 'noMatch' && '✗ Emails don\'t match'}
-              </p>
             </div>
 
             {/* Submit */}
