@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import RadarChart from './RadarChart';
 import { submitAnalysis } from '@/lib/actions/analyze';
 import { fetchChannelSnapshot, type ChannelSnapshot } from '@/lib/actions/snapshot';
+import { sendVerificationCode } from '@/lib/actions/verify-email';
 import { trackEvent } from '@/lib/pixel';
 import { isValidPromoCode } from '@/config/promoCodes';
 import PromoInput from './PromoInput';
@@ -199,6 +200,9 @@ export default function AnalyzeClient() {
 
   // ── Email + verified ─────────────────────────────────────────────────────
   const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
+  // Inline email from SnapshotCard — after sending code, show EmailGate in code stage
+  const [inlineEmail, setInlineEmail] = useState<string | null>(null);
+  const [inlineEmailSending, setInlineEmailSending] = useState(false);
 
   // ── Submit ──────────────────────────────────────────────────────────────
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -304,6 +308,20 @@ export default function AnalyzeClient() {
     setSnapshot(null);
     setScanError(null);
     setTimeout(() => { topInputRef.current?.focus(); }, 50);
+  }, []);
+
+  // ── Inline email submitted from SnapshotCard ────────────────────────────
+  const handleInlineEmailSubmit = useCallback(async (email: string) => {
+    const trimmed = email.trim();
+    if (!trimmed || !trimmed.includes('@')) return;
+    setInlineEmailSending(true);
+    const result = await sendVerificationCode(trimmed);
+    setInlineEmailSending(false);
+    if ('error' in result) {
+      // Surface error — for now just set inlineEmail so EmailGate can show error
+      // We still advance so EmailGate handles the retry
+    }
+    setInlineEmail(trimmed);
   }, []);
 
   // ── Email verified — submit the analysis ────────────────────────────────
@@ -580,13 +598,19 @@ export default function AnalyzeClient() {
         </div>
       </section>
 
-      {/* ── SNAPSHOT + EMAIL GATE ────────────────────── */}
+      {/* ── SNAPSHOT + CODE GATE ────────────────────── */}
       {(flowState === 'snapshot' || flowState === 'submitting') && snapshot && (
         <section
           ref={snapshotRef}
           style={{ padding: '60px 24px 40px', maxWidth: 720, margin: '0 auto' }}
         >
-          <SnapshotCard snapshot={snapshot} />
+          {/* SnapshotCard now includes the inline email field */}
+          <SnapshotCard
+            snapshot={snapshot}
+            onEmailSubmit={handleInlineEmailSubmit}
+            emailSubmitting={inlineEmailSending}
+            promoCode={appliedCode}
+          />
 
           {/* Honeypot — invisible to bots */}
           <input
@@ -600,6 +624,7 @@ export default function AnalyzeClient() {
             aria-hidden="true"
           />
 
+          {/* Code verification — appears after inline email is submitted */}
           {flowState === 'submitting' ? (
             <div style={{ textAlign: 'center', padding: '32px 24px', color: 'rgba(240,240,236,0.6)', fontFamily: 'var(--font-mono)', fontSize: 13 }}>
               <svg
@@ -612,12 +637,14 @@ export default function AnalyzeClient() {
               </svg>
               Submitting your audit request...
             </div>
-          ) : (
+          ) : inlineEmail ? (
             <>
               <EmailGate
                 onVerified={handleVerified}
                 appliedCode={appliedCode}
                 onApplyCode={() => setPromoState('code-entry')}
+                initialEmail={inlineEmail}
+                initialStage="code"
               />
               {submitError && (
                 <p style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
@@ -625,7 +652,7 @@ export default function AnalyzeClient() {
                 </p>
               )}
             </>
-          )}
+          ) : null}
         </section>
       )}
 

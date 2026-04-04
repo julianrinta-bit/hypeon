@@ -27,13 +27,16 @@ interface EmailGateProps {
   onVerified: (email: string) => void;
   appliedCode: string | null;
   onApplyCode: () => void;
+  /** When provided, skip directly to code-verification stage with this email */
+  initialEmail?: string;
+  initialStage?: 'email' | 'code';
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
 
-export default function EmailGate({ onVerified, appliedCode, onApplyCode }: EmailGateProps) {
-  const [stage, setStage] = useState<'email' | 'code'>('email');
-  const [email, setEmail] = useState('');
+export default function EmailGate({ onVerified, appliedCode, onApplyCode, initialEmail, initialStage }: EmailGateProps) {
+  const [stage, setStage] = useState<'email' | 'code'>(initialStage ?? 'email');
+  const [email, setEmail] = useState(initialEmail ?? '');
   const [emailError, setEmailError] = useState(false);
   const [digits, setDigits] = useState(['', '', '', '', '', '']);
   const [codeError, setCodeError] = useState<string | null>(null);
