@@ -125,6 +125,14 @@ export default function SnapshotCard({ snapshot }: SnapshotCardProps) {
 
       </div>
 
+      {/* Loading indicator before insights appear */}
+      {!showInsights && (
+        <div className={styles.insightsLoading}>
+          <span className={styles.insightsSpinner} aria-hidden="true" />
+          <span>Reviewing channel patterns...</span>
+        </div>
+      )}
+
       {/* Expert insights — revealed 6 seconds after render */}
       {showInsights && (
         <div className={styles.insightsBlock}>
