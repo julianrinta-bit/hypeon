@@ -130,68 +130,59 @@ function generateInsights(
   uploadVelocityPerMonth: number,
   totalVideos: number,
   channelAgeFormatted: string,
-  contentLeverage: number,
 ): { insightDiagnosis: string; insightQuestion: string } {
   const subscriberFormatted = formatMetricNumber(subscriberCount);
   const conversionDivisor = subscriberConversion > 0 ? Math.round(subscriberConversion) : 0;
 
   switch (pattern) {
-    case 'ghost_audience': {
-      // pct = views-per-upload as % of subscriber base
-      const pct = subscriberCount > 0
-        ? ((contentLeverage / subscriberCount) * 100).toFixed(1)
-        : '0';
+    case 'ghost_audience':
       return {
         insightDiagnosis: `${totalVideos} uploads reaching ${contentLeverageFormatted} views each — with ${subscriberFormatted} subscribers, most of your audience has gone silent.`,
-        insightQuestion: `Your recent uploads are reaching roughly ${pct}% of your subscriber base. Healthy channels in this range typically hit 8–15%.`,
+        insightQuestion: `Whether it's the algorithm, your upload schedule, or your content format — that's what the full human audit answers.`,
       };
-    }
 
-    case 'leaky_funnel': {
-      const viewsPerSub = conversionDivisor > 0 ? formatMetricNumber(conversionDivisor) : '?';
+    case 'leaky_funnel':
       return {
-        insightDiagnosis: `${contentLeverageFormatted} views per upload is strong reach. But at 1 subscriber per ${viewsPerSub} views, your content isn't building a community.`,
-        insightQuestion: `At 1 subscriber per ${viewsPerSub} views, something between your content and your channel page is leaking. Most channels your size convert at 1 per 80–120.`,
+        insightDiagnosis: `${contentLeverageFormatted} views per upload is strong reach. But at 1 subscriber per ${formatMetricNumber(conversionDivisor)} views, your content isn't building a community.`,
+        insightQuestion: `Is it your CTAs, your channel page, or your content niche? That's what the full human audit answers.`,
       };
-    }
 
     case 'treadmill':
       return {
         insightDiagnosis: `${uploadVelocityPerMonth} uploads per month is serious commitment. At ${contentLeverageFormatted} views each, the effort isn't translating to traction.`,
-        insightQuestion: `Your views-per-upload suggests the titles or thumbnails aren't grabbing — not the content itself. That's a fixable problem.`,
+        insightQuestion: `Is it your titles, your thumbnails, or your niche targeting? That's what the full human audit answers.`,
       };
 
-    case 'dormant_giant': {
-      const targetUploads = Math.max(Math.round(uploadVelocityPerMonth * 3), 4);
+    case 'dormant_giant':
       return {
         insightDiagnosis: `${totalVideos} uploads over ${channelAgeFormatted} — that's dedication. At ${subscriberFormatted} subscribers, your growth hasn't matched your consistency.`,
-        insightQuestion: `At ${uploadVelocityPerMonth}/mo, you're below the algorithm's visibility threshold. Channels in your niche that break out typically publish ${targetUploads}+ per month.`,
+        insightQuestion: `Whether it's positioning, content format, or discoverability — that's what the full human audit answers.`,
       };
-    }
 
     case 'view_rich_sub_poor':
       return {
         insightDiagnosis: `${contentLeverageFormatted} views per video proves your content connects. But ${subscriberFormatted} subscribers means viewers aren't staying.`,
-        insightQuestion: `${contentLeverageFormatted} views proves the content connects. The gap is likely in your calls-to-action, end screens, or channel positioning — all fixable.`,
+        insightQuestion: `What's stopping viewers from subscribing — your CTAs, your content arc, or your niche? That's what the full human audit answers.`,
       };
 
     case 'healthy':
     default: {
+      const question = `What specific moves would accelerate your growth from here — that's what the full human audit answers.`;
       if (subscriberCount > 500_000) {
         return {
           insightDiagnosis: `${contentLeverageFormatted} views per upload with ${subscriberFormatted} subscribers — strong foundation. The question is what's next.`,
-          insightQuestion: `Your subscriber conversion is strong at 1 per ${formatMetricNumber(conversionDivisor)}. The next unlock is typically reach expansion — SEO, Shorts strategy, or cross-platform distribution.`,
+          insightQuestion: question,
         };
       }
       if (subscriberCount >= 50_000) {
         return {
           insightDiagnosis: `${totalVideos} uploads averaging ${contentLeverageFormatted} views — solid traction. The gap between where you are and where you could be is what matters.`,
-          insightQuestion: `At ${contentLeverageFormatted} views per upload, you're past the noise floor. The gap between here and breakout is usually 2–3 specific changes.`,
+          insightQuestion: question,
         };
       }
       return {
         insightDiagnosis: `${channelAgeFormatted} in, ${subscriberFormatted} subscribers, averaging ${contentLeverageFormatted} views — you have signal. The audit finds what to amplify.`,
-        insightQuestion: `${contentLeverageFormatted} views with ${subscriberFormatted} subs means you have early traction. The audit identifies the exact levers to pull next.`,
+        insightQuestion: question,
       };
     }
   }
@@ -418,7 +409,6 @@ export async function fetchChannelSnapshot(channelUrl: string): Promise<Snapshot
     uploadVelocityPerMonth,
     videoCount,
     channelAgeFormatted,
-    contentLeverage,
   );
 
   const snapshot: ChannelSnapshot = {
@@ -462,6 +452,7 @@ export async function fetchChannelSnapshot(channelUrl: string): Promise<Snapshot
           'apikey': supabaseKey,
           'Authorization': `Bearer ${supabaseKey}`,
           'Content-Type': 'application/json',
+          'Content-Profile': 'public',
           'Prefer': 'return=minimal',
         },
         body: JSON.stringify({

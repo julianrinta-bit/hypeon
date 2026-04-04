@@ -23,12 +23,9 @@ function formatSubscribers(n: number): string {
 
 interface SnapshotCardProps {
   snapshot: ChannelSnapshot;
-  onEmailSubmit: (email: string) => void;
-  emailSubmitting?: boolean;
-  promoCode?: string | null;
 }
 
-export default function SnapshotCard({ snapshot, onEmailSubmit, emailSubmitting, promoCode }: SnapshotCardProps) {
+export default function SnapshotCard({ snapshot }: SnapshotCardProps) {
   const {
     name,
     handle,
@@ -53,7 +50,6 @@ export default function SnapshotCard({ snapshot, onEmailSubmit, emailSubmitting,
 
   // Delayed reveal — creates the perception of analysis
   const [showInsights, setShowInsights] = useState(false);
-  const [emailValue, setEmailValue] = useState('');
   useEffect(() => {
     const timer = setTimeout(() => setShowInsights(true), 6000);
     return () => clearTimeout(timer);
@@ -147,36 +143,13 @@ export default function SnapshotCard({ snapshot, onEmailSubmit, emailSubmitting,
           <p className={styles.insightQuestion}>
             &ldquo;{insightQuestion}&rdquo;
           </p>
-
-          {/* Inline email capture — appears with insights */}
-          <div className={styles.emailCapture}>
-            <div className={styles.emailRow}>
-              <input
-                type="email"
-                className={styles.emailInput}
-                value={emailValue}
-                onChange={e => setEmailValue(e.target.value)}
-                onKeyDown={e => { if (e.key === 'Enter') onEmailSubmit(emailValue); }}
-                placeholder="you@company.com"
-                autoComplete="email"
-                aria-label="Email for your audit"
-                disabled={emailSubmitting}
-              />
-              <button
-                className={styles.emailBtn}
-                onClick={() => onEmailSubmit(emailValue)}
-                disabled={emailSubmitting}
-                type="button"
-              >
-                {emailSubmitting ? 'Sending...' : 'Send Me the Full Audit'}
-              </button>
-            </div>
-            {promoCode && (
-              <p className={styles.promoBadge}>Complimentary access — code {promoCode}</p>
-            )}
-          </div>
         </div>
       )}
+
+      {/* Footer */}
+      <p className={styles.footer}>
+        Surface-level snapshot. Your full audit goes deeper.
+      </p>
 
     </div>
   );
