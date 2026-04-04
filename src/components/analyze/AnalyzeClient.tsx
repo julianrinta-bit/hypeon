@@ -297,6 +297,9 @@ export default function AnalyzeClient() {
   const [name,  setName]  = useState('');
   const [email, setEmail] = useState('');
 
+  // Honeypot — filled only by bots (visually hidden from humans)
+  const [honeypot, setHoneypot] = useState('');
+
   // Submit state
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -380,6 +383,7 @@ export default function AnalyzeClient() {
         name: name.trim(),
         email: email.trim(),
         promo_code: appliedCode || undefined,
+        website_url: honeypot || undefined,
       });
 
       if (result.success && result.publicId) {
@@ -394,7 +398,7 @@ export default function AnalyzeClient() {
         setSubmitError(result.error || 'Something went wrong. Please try again.');
       }
     });
-  }, [name, email, urlValue, selectedGoal, selectedFreq, selectedProd, selectedRegion, appliedCode, router, startTransition]);
+  }, [name, email, urlValue, selectedGoal, selectedFreq, selectedProd, selectedRegion, appliedCode, honeypot, router, startTransition]);
 
   // ── FAQ toggle ──────────────────────────────────────────────────────────
   const handleFaqToggle = useCallback((id: string) => {
@@ -675,6 +679,18 @@ export default function AnalyzeClient() {
                 />
               </div>
             </div>
+
+            {/* Honeypot — invisible to humans, filled by bots */}
+            <input
+              type="text"
+              name="website_url"
+              value={honeypot}
+              onChange={e => setHoneypot(e.target.value)}
+              style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+            />
 
             {/* Submit */}
             <button

@@ -1,5 +1,8 @@
 'use server';
 
+import { headers } from 'next/headers';
+import { checkRateLimit } from '@/lib/rate-limit';
+
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const AD_ACCOUNT_ID  = 'act_465018329259806';
@@ -85,6 +88,18 @@ function extractConversions(actions?: { action_type: string; value: string }[]):
 export async function getAdPerformance(
   datePreset: 'today' | 'yesterday' | 'last_7d' | 'last_30d' = 'today'
 ): Promise<{ data: AdPerformance[]; error?: string }> {
+  // Rate limit: 30 requests per IP per hour (dashboard auto-refreshes)
+  const headersList = await headers();
+  const ip =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    headersList.get('x-real-ip') ||
+    'unknown';
+  const rateCheck = checkRateLimit(`ads:${ip}`, { maxRequests: 30, windowMs: 3_600_000 });
+  if (!rateCheck.allowed) {
+    const retryMinutes = Math.ceil(rateCheck.retryAfterMs / 60_000);
+    return { data: [], error: `Rate limit exceeded. Try again in ${retryMinutes} minute${retryMinutes === 1 ? '' : 's'}.` };
+  }
+
   try {
     const token = getToken();
     const fields = [
@@ -155,6 +170,18 @@ export async function getAdPerformance(
  * Fetch campaign, ad sets, and ads with their current status.
  */
 export async function getCampaignStatus(): Promise<{ data: CampaignStatus | null; error?: string }> {
+  // Rate limit: 30 requests per IP per hour (dashboard auto-refreshes)
+  const headersList = await headers();
+  const ip =
+    headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    headersList.get('x-real-ip') ||
+    'unknown';
+  const rateCheck = checkRateLimit(`ads:${ip}`, { maxRequests: 30, windowMs: 3_600_000 });
+  if (!rateCheck.allowed) {
+    const retryMinutes = Math.ceil(rateCheck.retryAfterMs / 60_000);
+    return { data: null, error: `Rate limit exceeded. Try again in ${retryMinutes} minute${retryMinutes === 1 ? '' : 's'}.` };
+  }
+
   try {
     const token = getToken();
 
