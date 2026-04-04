@@ -1,0 +1,270 @@
+/*
+  ads.module.css
+  Styles for /ads password gate.
+  Design tokens mirror analyze.module.css exactly.
+*/
+
+/* ─────────────────────────────────────────────────
+   PAGE TOKENS
+───────────────────────────────────────────────── */
+.page {
+  --ads-accent:        #c8ff2e;
+  --ads-accent-hover:  #b8ee20;
+  --ads-accent-subtle: rgba(200, 255, 46, 0.10);
+
+  --ads-text:       #D1D5DB;
+  --ads-text-bright:#E5E7EB;
+  --ads-text-muted: #9CA3AF;
+  --ads-text-dim:   #6B7280;
+
+  --ads-glass-bg:        rgba(10, 10, 14, 0.82);
+  --ads-glass-border:    rgba(255, 255, 255, 0.08);
+  --ads-glass-border-top:rgba(255, 255, 255, 0.18);
+  --ads-glass-blur:      16px;
+
+  --ads-bg:         #0A0A0C;
+  --ads-bg-subtle:  #111114;
+  --ads-bg-elevated:#161619;
+
+  --ads-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ads-bg);
+  color: var(--ads-text);
+  font-family: var(--font-body);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ─────────────────────────────────────────────────
+   BACKGROUND GLOW
+───────────────────────────────────────────────── */
+.pageBg {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(200, 255, 46, 0.04) 0%, transparent 55%),
+    radial-gradient(ellipse at 20% 80%, rgba(200, 255, 46, 0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─────────────────────────────────────────────────
+   GLASS PANEL
+───────────────────────────────────────────────── */
+.glassPanel {
+  position: relative;
+  z-index: 1;
+  background: var(--ads-glass-bg);
+  border: 1px solid var(--ads-glass-border);
+  border-top-color: var(--ads-glass-border-top);
+  border-radius: 16px;
+  backdrop-filter: blur(var(--ads-glass-blur));
+  -webkit-backdrop-filter: blur(var(--ads-glass-blur));
+  width: 100%;
+  max-width: 440px;
+  padding: 40px 36px;
+  animation: slideInPanel 0.55s var(--ads-ease) both;
+}
+
+@keyframes slideInPanel {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glassPanel { animation: fadeIn 0.3s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+}
+
+/* ─────────────────────────────────────────────────
+   LOGO / HEADER
+───────────────────────────────────────────────── */
+.logoRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.logoIcon {
+  width: 32px;
+  height: 32px;
+  background: var(--ads-accent);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logoIconInner {
+  color: #0A0A0C;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.logoText {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ads-text-bright);
+}
+
+/* ─────────────────────────────────────────────────
+   TITLE
+───────────────────────────────────────────────── */
+.title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--ads-text-bright);
+  margin: 0 0 6px;
+  text-align: center;
+  text-align-last: center;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--ads-text-muted);
+  margin: 0 0 28px;
+  text-align: center;
+  text-align-last: center;
+}
+
+/* ─────────────────────────────────────────────────
+   FORM
+───────────────────────────────────────────────── */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.inputWrap {
+  position: relative;
+}
+
+.input {
+  width: 100%;
+  height: 52px;
+  background: rgba(22, 22, 25, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  padding: 0 18px;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--ads-text-bright);
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s var(--ads-ease), box-shadow 0.2s var(--ads-ease);
+  backdrop-filter: blur(8px);
+}
+
+.input::placeholder {
+  color: var(--ads-text-dim);
+  letter-spacing: normal;
+}
+
+.input:focus {
+  border-color: var(--ads-accent);
+  box-shadow: 0 0 0 3px rgba(200, 255, 46, 0.12), 0 0 20px rgba(200, 255, 46, 0.06);
+}
+
+.inputError {
+  border-color: rgba(248, 113, 113, 0.55) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.10) !important;
+  animation: shake 0.4s var(--ads-ease);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-7px); }
+  40%       { transform: translateX(7px); }
+  60%       { transform: translateX(-4px); }
+  80%       { transform: translateX(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .inputError { animation: none; }
+}
+
+/* ─────────────────────────────────────────────────
+   SUBMIT BUTTON
+───────────────────────────────────────────────── */
+.submitBtn {
+  width: 100%;
+  height: 52px;
+  background: var(--ads-accent);
+  color: #0A0A0C;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition:
+    background 0.18s var(--ads-ease),
+    transform 0.2s var(--ads-ease),
+    box-shadow 0.2s var(--ads-ease);
+}
+
+.submitBtn:hover {
+  background: var(--ads-accent-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(200, 255, 46, 0.32);
+}
+
+.submitBtn:active { transform: translateY(0); }
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ─────────────────────────────────────────────────
+   ERROR MESSAGE
+───────────────────────────────────────────────── */
+.errorMsg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: #F87171;
+  animation: fadeUp 0.3s var(--ads-ease);
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─────────────────────────────────────────────────
+   FOOTER NOTE
+───────────────────────────────────────────────── */
+.footerNote {
+  margin-top: 20px;
+  text-align: center;
+  text-align-last: center;
+  font-size: 12px;
+  color: var(--ads-text-dim);
+  font-family: var(--font-body);
+}
