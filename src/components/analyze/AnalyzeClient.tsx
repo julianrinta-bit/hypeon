@@ -4,16 +4,26 @@ import React, { useEffect, useRef, useState, useCallback, useTransition } from '
 import { useRouter, useSearchParams } from 'next/navigation';
 import RadarChart from './RadarChart';
 import { submitAnalysis } from '@/lib/actions/analyze';
+import { fetchChannelSnapshot, type ChannelSnapshot } from '@/lib/actions/snapshot';
 import { trackEvent } from '@/lib/pixel';
 import { isValidPromoCode } from '@/config/promoCodes';
 import PromoInput from './PromoInput';
+import ScanningAnimation from './ScanningAnimation';
+import SnapshotCard from './SnapshotCard';
+import EmailGate from './EmailGate';
 import promoStyles from './promoGate.module.css';
 import styles from '@/app/analyze/analyze.module.css';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-type SubmitState   = 'idle' | 'loading' | 'success';
-type PromoState    = 'url-step' | 'code-entry' | 'code-valid';
+type FlowState =
+  | 'url-input'
+  | 'scanning'
+  | 'snapshot'
+  | 'submitting'
+  | 'success';
+
+type PromoState = 'url-step' | 'code-entry' | 'code-valid';
 
 // ── Particles ──────────────────────────────────────────────────────────────
 
@@ -23,7 +33,6 @@ function Particles() {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    // Disable on mobile — saves CPU and avoids visual noise on small screens
     if (window.matchMedia('(max-width: 767px)').matches) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
@@ -164,27 +173,57 @@ function URLStepTracker({ children }: { children: React.ReactNode }) {
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export default function AnalyzeClient() {
-  // Promo state machine — starts at url-step (no gate)
   const searchParams = useSearchParams();
-  const [promoState,   setPromoState]   = useState<PromoState>('url-step');
-  const [appliedCode,  setAppliedCode]  = useState<string | null>(null);
+  const router = useRouter();
 
-  // Ref for top URL input (used by bottom CTA scroll)
-  const topInputRef = useRef<HTMLInputElement>(null);
+  // ── Flow state ──────────────────────────────────────────────────────────
+  const [flowState, setFlowState] = useState<FlowState>('url-input');
 
-  // Check URL param on mount — e.g. /analyze?code=DIVE
-  // Also auto-skip gate for Facebook traffic (fbclid or referrer)
+  // ── Promo / code ────────────────────────────────────────────────────────
+  const [promoState,  setPromoState]  = useState<PromoState>('url-step');
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
+
+  // ── Refs ────────────────────────────────────────────────────────────────
+  const topInputRef   = useRef<HTMLInputElement>(null);
+  const snapshotRef   = useRef<HTMLDivElement>(null);
+
+  // ── URL ─────────────────────────────────────────────────────────────────
+  const [urlValue, setUrlValue] = useState('');
+  const [urlValid, setUrlValid] = useState<'idle' | 'valid' | 'error'>('idle');
+  const [urlLocked, setUrlLocked] = useState(false);
+
+  // ── Scan ────────────────────────────────────────────────────────────────
+  const [snapshot, setSnapshot] = useState<ChannelSnapshot | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [isPendingScan, startScan] = useTransition();
+
+  // ── Email + verified ─────────────────────────────────────────────────────
+  const [verifiedEmail, setVerifiedEmail] = useState<string | null>(null);
+
+  // ── Submit ──────────────────────────────────────────────────────────────
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isPendingSubmit, startSubmit] = useTransition();
+
+  // ── Honeypot ────────────────────────────────────────────────────────────
+  const [honeypot, setHoneypot] = useState('');
+
+  // ── FAQ ─────────────────────────────────────────────────────────────────
+  const [openFaqId, setOpenFaqId] = useState<string | null>(null);
+
+  // Hooks
+  useScrollReveal();
+  useParallax();
+
+  // ── Check URL param on mount ─────────────────────────────────────────────
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
-    // 1. Explicit code in URL — store silently
     const codeParam = params.get('code');
     if (codeParam && isValidPromoCode(codeParam)) {
       setAppliedCode(codeParam.toUpperCase().trim());
       return;
     }
 
-    // 2. Facebook traffic — track but stay on url-step (already the default)
     const fbclid = params.get('fbclid');
     const referrer = document.referrer.toLowerCase();
     const isFromFacebook =
@@ -197,33 +236,6 @@ export default function AnalyzeClient() {
       trackEvent('PromoGateSkipped', { reason: 'facebook_traffic' });
     }
   }, [searchParams]);
-
-  // URL input
-  const [urlValue,      setUrlValue]      = useState('');
-  const [urlValid,      setUrlValid]      = useState<'idle' | 'valid' | 'error'>('idle');
-  const [step2Open,     setStep2Open]     = useState(false);
-  const [urlLocked,     setUrlLocked]     = useState(false);
-  const qualifyPanelRef = useRef<HTMLDivElement>(null);
-
-  // Contact fields
-  const [email, setEmail] = useState('');
-
-  // Honeypot — filled only by bots (visually hidden from humans)
-  const [honeypot, setHoneypot] = useState('');
-
-  // Submit state
-  const [submitState, setSubmitState] = useState<SubmitState>('idle');
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [emailError,  setEmailError]  = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const router = useRouter();
-
-  // FAQ
-  const [openFaqId, setOpenFaqId] = useState<string | null>(null);
-
-  // Hooks
-  useScrollReveal();
-  useParallax();
 
   // ── URL validation ──────────────────────────────────────────────────────
   const handleUrlChange = useCallback((val: string) => {
@@ -252,82 +264,144 @@ export default function AnalyzeClient() {
     setUrlValid(isYt ? 'valid' : 'error');
   }, []);
 
-  // ── Step 1: lock URL and show email field ───────────────────────────────
-  const handleStep1 = useCallback(() => {
+  // ── Scan: lock URL + call YouTube API ───────────────────────────────────
+  const handleScan = useCallback(() => {
     const val = urlValue.trim();
     if (!val) { setUrlValid('error'); return; }
 
-    trackEvent('Lead');
-    trackEvent('QualifyFormViewed');
-
-    setStep2Open(true);
+    setScanError(null);
     setUrlLocked(true);
+    setFlowState('scanning');
+    trackEvent('Lead');
 
-    setTimeout(() => {
-      qualifyPanelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }, 200);
+    startScan(async () => {
+      const result = await fetchChannelSnapshot(val);
+
+      if ('error' in result) {
+        setScanError(result.error);
+        setUrlLocked(false);
+        setFlowState('url-input');
+        return;
+      }
+
+      setSnapshot(result.snapshot);
+      setFlowState('snapshot');
+      trackEvent('ChannelScanned');
+      trackEvent('SnapshotViewed');
+      trackEvent('EmailGateViewed');
+
+      // Scroll to snapshot section
+      setTimeout(() => {
+        snapshotRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 200);
+    });
   }, [urlValue]);
 
-  // ── URL edit ────────────────────────────────────────────────────────────
+  // ── URL edit ─────────────────────────────────────────────────────────────
   const handleEditUrl = useCallback(() => {
     setUrlLocked(false);
-    setStep2Open(false);
-    setTimeout(() => {
-      topInputRef.current?.focus();
-    }, 50);
+    setFlowState('url-input');
+    setSnapshot(null);
+    setScanError(null);
+    setTimeout(() => { topInputRef.current?.focus(); }, 50);
   }, []);
 
-  // ── Submit ──────────────────────────────────────────────────────────────
-  const handleSubmit = useCallback(() => {
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail || !trimmedEmail.includes('@')) {
-      setEmailError(true);
-      setSubmitError('Please enter a valid email address');
-      return;
-    }
-
-    setEmailError(false);
-    setSubmitState('loading');
+  // ── Email verified — submit the analysis ────────────────────────────────
+  const handleVerified = useCallback((email: string) => {
+    setVerifiedEmail(email);
+    trackEvent('CodeVerified');
+    setFlowState('submitting');
     setSubmitError(null);
 
-    startTransition(async () => {
+    startSubmit(async () => {
       const result = await submitAnalysis({
         channel_url: urlValue.trim(),
-        email: trimmedEmail,
+        email,
         promo_code: appliedCode || undefined,
+        verified: true,
         website_url: honeypot || undefined,
       });
 
       if (result.success && result.publicId) {
-        trackEvent('CompleteRegistration');
-        setSubmitState('success');
-        setTimeout(() => {
-          router.push(`/analyze/status/${result.publicId}`);
-        }, 1500);
+        trackEvent('EmailSubmitted');
+        setFlowState('success');
       } else {
-        setSubmitState('idle');
         setSubmitError(result.error || 'Something went wrong. Please try again.');
+        setFlowState('snapshot');
       }
     });
-  }, [email, urlValue, appliedCode, honeypot, router, startTransition]);
+  }, [urlValue, appliedCode, honeypot]);
 
-  // ── FAQ toggle ──────────────────────────────────────────────────────────
+  // ── FAQ toggle ───────────────────────────────────────────────────────────
   const handleFaqToggle = useCallback((id: string) => {
     setOpenFaqId(prev => (prev === id ? null : id));
   }, []);
 
-  // ── Bottom CTA scroll ───────────────────────────────────────────────────
+  // ── Bottom CTA scroll ────────────────────────────────────────────────────
   const handleBottomCta = useCallback(() => {
     topInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setTimeout(() => { topInputRef.current?.focus(); }, 400);
   }, []);
 
-  // ── URL input class ─────────────────────────────────────────────────────
+  // ── URL input class ──────────────────────────────────────────────────────
   const urlInputClass = [
     styles.urlInput,
     urlValid === 'valid'  ? styles.urlInputValid : '',
     urlValid === 'error'  ? styles.urlInputError : '',
   ].filter(Boolean).join(' ');
+
+  // ── Success state ────────────────────────────────────────────────────────
+  if (flowState === 'success') {
+    return (
+      <div className={styles.page} id="main-content">
+        <Particles />
+        <section className={styles.zoneA} id="top">
+          <div className={styles.zoneABg} aria-hidden="true" />
+          <div className={styles.heroContent} style={{ maxWidth: 560 }}>
+            <div className={styles.heroEyebrow}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                <path d="M2 6L5 9L10 3" stroke="#c8ff2e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Audit Request Confirmed
+            </div>
+
+            <h1 className={styles.heroHeadline} style={{ fontSize: 'clamp(28px,4vw,48px)' }}>
+              Your audit is{' '}
+              <em className={styles.heroHeadlineAccent}>being prepared.</em>
+            </h1>
+
+            <p className={styles.heroSub}>
+              Our team will review{' '}
+              {snapshot?.name ? <strong style={{ color: '#f0f0ec' }}>{snapshot.name}</strong> : 'your channel'}{' '}
+              and deliver your personalized audit to{' '}
+              <strong style={{ color: '#f0f0ec' }}>{verifiedEmail}</strong>{' '}
+              within 24 hours.
+            </p>
+
+            <p style={{ fontSize: 13, color: 'rgba(240,240,236,0.4)', marginBottom: 32 }}>
+              Add <span style={{ fontFamily: 'var(--font-mono)', color: 'rgba(240,240,236,0.6)' }}>chris@hypeon.media</span> to your contacts to make sure you receive it.
+            </p>
+
+            <a
+              href="https://hypeon.media"
+              className={styles.analyzeBtn}
+              style={{ display: 'inline-flex', textDecoration: 'none' }}
+            >
+              Back to hypeon.media
+            </a>
+          </div>
+        </section>
+        <style>{`
+          @keyframes floatParticle {
+            0%   { opacity: 0; transform: translateY(100vh) scale(0.5); }
+            10%  { opacity: 0.3; }
+            90%  { opacity: 0.3; }
+            100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page} id="main-content">
@@ -355,10 +429,10 @@ export default function AnalyzeClient() {
             Paste your channel URL. Get a 6-axis audit scoring your content, titles, growth, and monetization — by the team behind 5 billion YouTube views.
           </p>
 
-          {/* STEP 1: URL Input */}
+          {/* URL Input */}
           <URLStepTracker>
           <div id="analyze">
-            {/* Promo badge (if code applied via URL param or inline entry) */}
+            {/* Promo badge */}
             {appliedCode && (
               <div style={{ textAlign: 'center', marginBottom: 12 }}>
                 <span className={promoStyles.promoBadge}>
@@ -378,6 +452,7 @@ export default function AnalyzeClient() {
                 value={urlValue}
                 onChange={e => handleUrlChange(e.target.value)}
                 onFocus={() => trackEvent('URLInputFocused')}
+                onKeyDown={e => { if (e.key === 'Enter' && !urlLocked) handleScan(); }}
                 placeholder="youtube.com/@yourchannel"
                 autoComplete="off"
                 spellCheck={false}
@@ -387,11 +462,11 @@ export default function AnalyzeClient() {
               />
               <button
                 className={styles.analyzeBtn}
-                onClick={handleStep1}
+                onClick={urlLocked ? handleEditUrl : handleScan}
                 type="button"
-                disabled={urlLocked}
-                style={urlLocked ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
-                aria-label="Analyze my channel"
+                disabled={flowState === 'scanning' || flowState === 'submitting'}
+                style={(flowState === 'scanning' || flowState === 'submitting') ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
+                aria-label={urlLocked ? 'Edit channel URL' : 'Scan my channel'}
               >
                 {urlLocked ? (
                   <>
@@ -406,13 +481,43 @@ export default function AnalyzeClient() {
                       <circle cx="7" cy="7" r="4.5" stroke="#0A0A0C" strokeWidth="1.8"/>
                       <path d="M10.5 10.5L13.5 13.5" stroke="#0A0A0C" strokeWidth="1.8" strokeLinecap="round"/>
                     </svg>
-                    Analyze My Channel
+                    Scan My Channel
                   </>
                 )}
               </button>
             </div>
 
-            {/* Promo code link (only when not locked, no code applied, not in code-entry) */}
+            {/* URL locked strip */}
+            {urlLocked && snapshot && (
+              <div style={{ textAlign: 'center', marginTop: 8 }}>
+                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '10px', color: 'rgba(240,240,236,0.4)' }}>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 6 }}>
+                    <path d="M2 6L5 9L10 3" stroke="#c8ff2e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  Channel URL saved:{' '}
+                  <span style={{ color: 'rgba(240,240,236,0.7)' }}>
+                    {urlValue.length > 36 ? urlValue.slice(0, 36) + '…' : urlValue}
+                  </span>
+                  {' '}
+                  <button
+                    type="button"
+                    className={styles.editUrlBtn}
+                    onClick={handleEditUrl}
+                  >
+                    Edit
+                  </button>
+                </span>
+              </div>
+            )}
+
+            {/* Scan error */}
+            {scanError && (
+              <p style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
+                {scanError}
+              </p>
+            )}
+
+            {/* Promo code link (only when URL not locked, no code) */}
             {!urlLocked && !appliedCode && promoState === 'url-step' && (
               <p className={styles.promoLink}>
                 Have a promo code?{' '}
@@ -438,111 +543,12 @@ export default function AnalyzeClient() {
           </div>
           </URLStepTracker>
 
-          {/* STEP 2: Email field — shown after URL is locked */}
-          <div
-            ref={qualifyPanelRef}
-            className={`${styles.qualifyPanel} ${step2Open ? styles.qualifyPanelOpen : ''}`}
-            aria-hidden={!step2Open}
-          >
-            <div className={styles.qualifyHeader}>
-              <span className={styles.qualifyStepBadge}>
-                {urlLocked && (
-                  <>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 6 }}>
-                      <path d="M2 6L5 9L10 3" stroke="#c8ff2e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Channel URL saved:{' '}
-                    <span style={{ color: 'rgba(240,240,236,0.7)', fontFamily: 'var(--font-mono)', fontSize: '10px' }}>
-                      {urlValue.length > 36 ? urlValue.slice(0, 36) + '…' : urlValue}
-                    </span>
-                    {' '}
-                    <button
-                      type="button"
-                      className={styles.editUrlBtn}
-                      onClick={handleEditUrl}
-                    >
-                      Edit
-                    </button>
-                  </>
-                )}
-              </span>
+          {/* ── Scanning animation ─────────────────── */}
+          {flowState === 'scanning' && (
+            <div style={{ marginTop: 24 }}>
+              <ScanningAnimation />
             </div>
-
-            {/* Email field */}
-            <div className={styles.qualifyQuestion}>
-              <label className={styles.qualifyLabel} htmlFor="audit-email">
-                Where should we send your audit?
-              </label>
-              <div className={styles.contactFields}>
-                <input
-                  id="audit-email"
-                  type="email"
-                  className={`${styles.qEmail} ${emailError ? styles.qEmailError : ''}`}
-                  value={email}
-                  onChange={e => {
-                    setEmail(e.target.value);
-                    if (emailError) { setEmailError(false); setSubmitError(null); }
-                  }}
-                  placeholder="you@company.com"
-                  autoComplete="email"
-                  aria-label="Email address"
-                  aria-describedby={emailError ? 'email-error-msg' : undefined}
-                />
-                {emailError && (
-                  <p id="email-error-msg" className={styles.emailErrorMsg}>
-                    Please enter a valid email address
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Honeypot — invisible to humans, filled by bots */}
-            <input
-              type="text"
-              name="website_url"
-              value={honeypot}
-              onChange={e => setHoneypot(e.target.value)}
-              style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-            />
-
-            {/* Submit */}
-            <button
-              className={`${styles.ctaBtn} ${styles.qualifySubmit}`}
-              onClick={handleSubmit}
-              type="button"
-              disabled={submitState !== 'idle' || isPending}
-              style={submitState !== 'idle' || isPending ? { opacity: 0.7, pointerEvents: 'none' } : undefined}
-            >
-              {submitState === 'idle' && 'Run My Audit'}
-              {submitState === 'loading' && (
-                <>
-                  <svg
-                    style={{ width: 18, height: 18, animation: 'spin 1s linear infinite' }}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    aria-hidden="true"
-                  >
-                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="30 70" strokeLinecap="round"/>
-                  </svg>
-                  Sending your audit request...
-                </>
-              )}
-              {submitState === 'success' && (
-                <span style={{ color: '#0A0A0C' }}>
-                  ✓ Audit queued — check your inbox!
-                </span>
-              )}
-            </button>
-            {submitError && !emailError && (
-              <p style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
-                {submitError}
-              </p>
-            )}
-            <p className={styles.qualifyFine}>No spam. No selling your data. Just your channel audit.</p>
-          </div>
+          )}
 
           {/* Trust strip */}
           <div className={styles.trustStrip}>
@@ -573,6 +579,55 @@ export default function AnalyzeClient() {
           </p>
         </div>
       </section>
+
+      {/* ── SNAPSHOT + EMAIL GATE ────────────────────── */}
+      {(flowState === 'snapshot' || flowState === 'submitting') && snapshot && (
+        <section
+          ref={snapshotRef}
+          style={{ padding: '60px 24px 40px', maxWidth: 720, margin: '0 auto' }}
+        >
+          <SnapshotCard snapshot={snapshot} />
+
+          {/* Honeypot — invisible to bots */}
+          <input
+            type="text"
+            name="website_url"
+            value={honeypot}
+            onChange={e => setHoneypot(e.target.value)}
+            style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+          />
+
+          {flowState === 'submitting' ? (
+            <div style={{ textAlign: 'center', padding: '32px 24px', color: 'rgba(240,240,236,0.6)', fontFamily: 'var(--font-mono)', fontSize: 13 }}>
+              <svg
+                style={{ width: 18, height: 18, animation: 'spin 1s linear infinite', display: 'inline-block', marginRight: 8, verticalAlign: 'middle' }}
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" stroke="#c8ff2e" strokeWidth="3" strokeDasharray="30 70" strokeLinecap="round"/>
+              </svg>
+              Submitting your audit request...
+            </div>
+          ) : (
+            <>
+              <EmailGate
+                onVerified={handleVerified}
+                appliedCode={appliedCode}
+                onApplyCode={() => setPromoState('code-entry')}
+              />
+              {submitError && (
+                <p style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
+                  {submitError}
+                </p>
+              )}
+            </>
+          )}
+        </section>
+      )}
 
       {/* ── ZONE B: BRIDGE + AURORA ──────────────────── */}
       <section className={styles.zoneB}>
@@ -821,14 +876,14 @@ export default function AnalyzeClient() {
               <button
                 className={styles.analyzeBtn}
                 type="button"
-                aria-label="Analyze my channel"
+                aria-label="Scan my channel"
                 onClick={handleBottomCta}
               >
                 <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" aria-hidden="true">
                   <circle cx="7" cy="7" r="4.5" stroke="#0A0A0C" strokeWidth="1.8"/>
                   <path d="M10.5 10.5L13.5 13.5" stroke="#0A0A0C" strokeWidth="1.8" strokeLinecap="round"/>
                 </svg>
-                Analyze My Channel
+                Scan My Channel
               </button>
             </div>
           </div>

@@ -71,12 +71,22 @@ export async function submitAnalysis(data: {
   name?: string;
   email: string;
   promo_code?: string;
+  /**
+   * Must be true — caller is responsible for verifying the email before
+   * calling this action. If false, the submission is silently dropped.
+   */
+  verified?: boolean;
   /** Honeypot field — must be empty; bots fill it automatically */
   website_url?: string;
 }): Promise<AnalyzeResult> {
   // 0. Honeypot — bots fill hidden fields; silently accept and return fake success
   if (data.website_url) {
     return { success: true, publicId: 'blocked' };
+  }
+
+  // 0b. Email must be verified via OTP before submission is processed
+  if (!data.verified) {
+    return { success: false, error: 'Email verification required.' };
   }
 
   // 1. Validate
