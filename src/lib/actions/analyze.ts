@@ -29,11 +29,11 @@ const AnalyzeSchema = z.object({
       /youtube\.com\/@/.test(url),
     { message: 'Must be a valid YouTube channel URL or @handle' }
   ),
-  goal: z.enum(['leads', 'audience', 'authority', 'revenue', 'brand']),
+  goal: z.enum(['leads', 'audience', 'authority', 'revenue', 'brand']).optional(),
   publishing_frequency: z.enum(['rare', 'monthly', 'weekly', 'daily']).optional(),
   production_level: z.enum(['phone', 'decent', 'pro', 'full']).optional(),
   region: z.enum(['mena', 'europe', 'na', 'latam', 'south_asia', 'apac_south', 'east_asia', 'africa']).optional(),
-  name: z.string().min(1, 'Name is required').max(200),
+  name: z.string().max(200).optional(),
   email: z.string().email('Invalid email').max(200),
   promo_code: z.string().optional(),
 });
@@ -64,11 +64,11 @@ export type AnalyzeResult = {
 
 export async function submitAnalysis(data: {
   channel_url: string;
-  goal: string;
+  goal?: string;
   publishing_frequency?: string;
   production_level?: string;
   region?: string;
-  name: string;
+  name?: string;
   email: string;
   promo_code?: string;
   /** Honeypot field — must be empty; bots fill it automatically */
@@ -113,7 +113,7 @@ export async function submitAnalysis(data: {
     email,
     password,
     email_confirm: true,
-    user_metadata: { name },
+    user_metadata: name ? { name } : {},
   });
 
   if (newUser?.user) {
@@ -184,10 +184,10 @@ export async function submitAnalysis(data: {
 
   // 7. Update profile with declared signals
   const profileUpdate: Record<string, unknown> = {
-    goal,
     channel_url: channelUrl,
     last_active_at: new Date().toISOString(),
   };
+  if (goal) profileUpdate.goal = goal;
   if (publishing_frequency) profileUpdate.publishing_frequency = publishing_frequency;
   if (production_level) profileUpdate.production_level = production_level;
   if (region) profileUpdate.region = region;
@@ -195,7 +195,8 @@ export async function submitAnalysis(data: {
   await supabase.from('profiles').update(profileUpdate).eq('id', userId);
 
   // 8. Create analysis job
-  const jobPayload: Record<string, unknown> = { user_id: userId, channel_id: channelId, goal, status: 'queued' };
+  const jobPayload: Record<string, unknown> = { user_id: userId, channel_id: channelId, status: 'queued' };
+  if (goal) jobPayload.goal = goal;
   if (validatedPromoCode) jobPayload.promo_code = validatedPromoCode;
 
   const { data: job, error: jobError } = await supabase

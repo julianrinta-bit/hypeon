@@ -6,90 +6,14 @@ import RadarChart from './RadarChart';
 import { submitAnalysis } from '@/lib/actions/analyze';
 import { trackEvent } from '@/lib/pixel';
 import { isValidPromoCode } from '@/config/promoCodes';
-import PromoGate from './PromoGate';
 import PromoInput from './PromoInput';
-import PricingPanel from './PricingPanel';
 import promoStyles from './promoGate.module.css';
 import styles from '@/app/analyze/analyze.module.css';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
-type GoalValue     = 'leads' | 'audience' | 'authority' | 'revenue' | 'brand' | null;
-type FreqValue     = 'rare' | 'monthly' | 'weekly' | 'daily' | null;
-type ProdValue     = 'phone' | 'decent' | 'pro' | 'full' | null;
-type RegionValue   = 'mena' | 'europe' | 'na' | 'latam' | 'south_asia' | 'apac_south' | 'east_asia' | 'africa' | null;
 type SubmitState   = 'idle' | 'loading' | 'success';
-type PromoState    = 'gate' | 'code-entry' | 'code-valid' | 'pricing' | 'paid' | 'url-step';
-
-// ── Decode animation ───────────────────────────────────────────────────────
-
-function useDecodeAnimation(finalText: string) {
-  const [displayed, setDisplayed] = useState(finalText);
-  const [decoded, setDecoded]     = useState(false);
-  const [fixedWidth, setFixedWidth] = useState<number | null>(null);
-  const measureRef = useRef<HTMLSpanElement | null>(null);
-
-  // Measure the final text width on mount so the container never reflows
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    // Create an offscreen span styled identically to the headline
-    const probe = document.createElement('span');
-    probe.textContent = finalText;
-    probe.style.cssText = `
-      position: absolute; visibility: hidden; white-space: nowrap;
-      font-family: var(--font-display); font-weight: 800;
-      font-size: inherit; letter-spacing: -0.03em;
-    `;
-    // Insert into the decodeWord span's parent so it inherits computed font-size
-    const anchor = measureRef.current?.parentElement ?? document.body;
-    anchor.appendChild(probe);
-    const w = probe.getBoundingClientRect().width;
-    anchor.removeChild(probe);
-    setFixedWidth(Math.ceil(w));
-  }, [finalText]);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    // Characters with similar advance width to S/e in Plus Jakarta Sans 800.
-    // Excludes wide glyphs (M, W, Q) and narrow glyphs (I, J, l) to keep
-    // the scramble text roughly the same width as "Sees".
-    const chars = 'ABCDEFGHKNOPRSTUVXYZ';
-    const len = finalText.length;
-
-    const timeout = setTimeout(() => {
-      let locked = 0;
-      let frame  = 0;
-
-      const tick = setInterval(() => {
-        frame++;
-        // Lock one letter every 10 frames (~500ms per char at 50ms tick)
-        if (frame % 10 === 0 && locked < len) locked++;
-
-        let display = '';
-        for (let i = 0; i < len; i++) {
-          display += i < locked
-            ? finalText[i]
-            : chars[Math.floor(Math.random() * chars.length)];
-        }
-        setDisplayed(display);
-
-        if (locked >= len) {
-          clearInterval(tick);
-          setDisplayed(finalText);
-          setDecoded(true);
-        }
-      }, 50);
-
-      return () => clearInterval(tick);
-    }, 800);
-
-    return () => clearTimeout(timeout);
-  }, [finalText]);
-
-  return { displayed, decoded, fixedWidth, measureRef };
-}
+type PromoState    = 'url-step' | 'code-entry' | 'code-valid';
 
 // ── Particles ──────────────────────────────────────────────────────────────
 
@@ -99,6 +23,8 @@ function Particles() {
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
+    // Disable on mobile — saves CPU and avoids visual noise on small screens
+    if (window.matchMedia('(max-width: 767px)').matches) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const fragments: HTMLDivElement[] = [];
@@ -230,11 +156,6 @@ function FaqItem({ id, question, answer, openId, onToggle, revealDelay }: FaqIte
 
 // ── Tracking wrappers ──────────────────────────────────────────────────────
 
-function PromoGateTracker({ children }: { children: React.ReactNode }) {
-  useEffect(() => { trackEvent('PromoGateViewed'); }, []);
-  return <>{children}</>;
-}
-
 function URLStepTracker({ children }: { children: React.ReactNode }) {
   useEffect(() => { trackEvent('URLInputViewed'); }, []);
   return <>{children}</>;
@@ -243,28 +164,27 @@ function URLStepTracker({ children }: { children: React.ReactNode }) {
 // ── Main Component ─────────────────────────────────────────────────────────
 
 export default function AnalyzeClient() {
-  // Decode animation
-  const { displayed: decodeDisplayed, decoded: decodeFinished, fixedWidth: decodeWidth, measureRef: decodeRef } = useDecodeAnimation('Sees');
-
-  // Promo gate state machine
+  // Promo state machine — starts at url-step (no gate)
   const searchParams = useSearchParams();
-  const [promoState,   setPromoState]   = useState<PromoState>('gate');
+  const [promoState,   setPromoState]   = useState<PromoState>('url-step');
   const [appliedCode,  setAppliedCode]  = useState<string | null>(null);
+
+  // Ref for top URL input (used by bottom CTA scroll)
+  const topInputRef = useRef<HTMLInputElement>(null);
 
   // Check URL param on mount — e.g. /analyze?code=DIVE
   // Also auto-skip gate for Facebook traffic (fbclid or referrer)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
 
-    // 1. Explicit code in URL
+    // 1. Explicit code in URL — store silently
     const codeParam = params.get('code');
     if (codeParam && isValidPromoCode(codeParam)) {
       setAppliedCode(codeParam.toUpperCase().trim());
-      setPromoState('url-step');
       return;
     }
 
-    // 2. Facebook traffic (fbclid present OR referrer is Facebook)
+    // 2. Facebook traffic — track but stay on url-step (already the default)
     const fbclid = params.get('fbclid');
     const referrer = document.referrer.toLowerCase();
     const isFromFacebook =
@@ -274,9 +194,7 @@ export default function AnalyzeClient() {
       referrer.includes('l.facebook.com');
 
     if (isFromFacebook) {
-      setPromoState('url-step');
       trackEvent('PromoGateSkipped', { reason: 'facebook_traffic' });
-      return;
     }
   }, [searchParams]);
 
@@ -287,14 +205,7 @@ export default function AnalyzeClient() {
   const [urlLocked,     setUrlLocked]     = useState(false);
   const qualifyPanelRef = useRef<HTMLDivElement>(null);
 
-  // Qualification state
-  const [selectedGoal,   setSelectedGoal]   = useState<GoalValue>(null);
-  const [selectedFreq,   setSelectedFreq]   = useState<FreqValue>(null);
-  const [selectedProd,   setSelectedProd]   = useState<ProdValue>(null);
-  const [selectedRegion, setSelectedRegion] = useState<RegionValue>(null);
-
   // Contact fields
-  const [name,  setName]  = useState('');
   const [email, setEmail] = useState('');
 
   // Honeypot — filled only by bots (visually hidden from humans)
@@ -303,6 +214,7 @@ export default function AnalyzeClient() {
   // Submit state
   const [submitState, setSubmitState] = useState<SubmitState>('idle');
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [emailError,  setEmailError]  = useState(false);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
@@ -314,15 +226,12 @@ export default function AnalyzeClient() {
   useParallax();
 
   // ── URL validation ──────────────────────────────────────────────────────
-  // Generous validation — accept anything that might be a YouTube reference.
-  // Let the server handle the actual resolution.
   const handleUrlChange = useCallback((val: string) => {
     setUrlValue(val);
     if (!val.trim()) { setUrlValid('idle'); return; }
 
     const trimmed = val.trim().toLowerCase();
 
-    // Reject obviously non-YouTube input (plain words with spaces that aren't @handles or channel IDs)
     const looksLikeJunk = trimmed.includes(' ') && !trimmed.startsWith('@');
     if (looksLikeJunk) {
       setUrlValid('error');
@@ -331,15 +240,10 @@ export default function AnalyzeClient() {
     }
 
     const isYt =
-      // Full URLs — http or https, with or without www/m
       /^https?:\/\/(www\.|m\.)?youtube\.com/.test(trimmed) ||
-      // Without protocol
       /^(www\.|m\.)?youtube\.com/.test(trimmed) ||
-      // @handle
       trimmed.startsWith('@') ||
-      // Channel ID (UCxxxxxxxxxx)
       /^uc[a-z0-9_-]{20,}$/i.test(trimmed) ||
-      // Bare channel name — single word, no spaces (treated as @name on server)
       /^[a-z0-9._-]+$/i.test(trimmed);
 
     if (!isYt) {
@@ -348,7 +252,7 @@ export default function AnalyzeClient() {
     setUrlValid(isYt ? 'valid' : 'error');
   }, []);
 
-  // ── Step 2 expand ───────────────────────────────────────────────────────
+  // ── Step 1: lock URL and show email field ───────────────────────────────
   const handleStep1 = useCallback(() => {
     const val = urlValue.trim();
     if (!val) { setUrlValid('error'); return; }
@@ -364,24 +268,32 @@ export default function AnalyzeClient() {
     }, 200);
   }, [urlValue]);
 
+  // ── URL edit ────────────────────────────────────────────────────────────
+  const handleEditUrl = useCallback(() => {
+    setUrlLocked(false);
+    setStep2Open(false);
+    setTimeout(() => {
+      topInputRef.current?.focus();
+    }, 50);
+  }, []);
+
   // ── Submit ──────────────────────────────────────────────────────────────
   const handleSubmit = useCallback(() => {
-    if (!name.trim()) return;
-    if (!email.trim() || !email.includes('@')) return;
-    if (!selectedGoal) return;
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail || !trimmedEmail.includes('@')) {
+      setEmailError(true);
+      setSubmitError('Please enter a valid email address');
+      return;
+    }
 
+    setEmailError(false);
     setSubmitState('loading');
     setSubmitError(null);
 
     startTransition(async () => {
       const result = await submitAnalysis({
         channel_url: urlValue.trim(),
-        goal: selectedGoal,
-        publishing_frequency: selectedFreq || undefined,
-        production_level: selectedProd || undefined,
-        region: selectedRegion || undefined,
-        name: name.trim(),
-        email: email.trim(),
+        email: trimmedEmail,
         promo_code: appliedCode || undefined,
         website_url: honeypot || undefined,
       });
@@ -389,7 +301,6 @@ export default function AnalyzeClient() {
       if (result.success && result.publicId) {
         trackEvent('CompleteRegistration');
         setSubmitState('success');
-        // Redirect to waiting room after brief success animation
         setTimeout(() => {
           router.push(`/analyze/status/${result.publicId}`);
         }, 1500);
@@ -398,11 +309,17 @@ export default function AnalyzeClient() {
         setSubmitError(result.error || 'Something went wrong. Please try again.');
       }
     });
-  }, [name, email, urlValue, selectedGoal, selectedFreq, selectedProd, selectedRegion, appliedCode, honeypot, router, startTransition]);
+  }, [email, urlValue, appliedCode, honeypot, router, startTransition]);
 
   // ── FAQ toggle ──────────────────────────────────────────────────────────
   const handleFaqToggle = useCallback((id: string) => {
     setOpenFaqId(prev => (prev === id ? null : id));
+  }, []);
+
+  // ── Bottom CTA scroll ───────────────────────────────────────────────────
+  const handleBottomCta = useCallback(() => {
+    topInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setTimeout(() => { topInputRef.current?.focus(); }, 400);
   }, []);
 
   // ── URL input class ─────────────────────────────────────────────────────
@@ -424,259 +341,158 @@ export default function AnalyzeClient() {
         <div className={styles.heroContent}>
           <div className={styles.heroEyebrow}>
             <span className={styles.heroEyebrowDot} aria-hidden="true" />
-            Expert Channel Analysis
+            Free YouTube Audit
           </div>
 
           <h1 className={styles.heroHeadline}>
-            See What YouTube<br />
+            Your YouTube Channel,<br />
             <em className={styles.heroHeadlineAccent}>
-              <span
-                ref={decodeRef}
-                className={`${styles.decodeWord} ${decodeFinished ? styles.decodeWordDecoded : ''}`}
-                style={decodeWidth ? { minWidth: `${decodeWidth}px` } : undefined}
-              >
-                {decodeDisplayed}
-              </span>
-              <br className={styles.decodeBrMobile} />
-              <span className={styles.decodeRestDesktop}>{' '}</span>
-              in Your Channel
+              Scored and Fixed
             </em>
           </h1>
 
           <p className={styles.heroSub}>
-            In-depth channel analysis by the team behind 5B+ YouTube views.<br />
-            No OAuth. No credit card. Just paste your URL.
+            Paste your channel URL. Get a free expert audit scoring your content, titles, growth, and monetization — by the team behind 5 billion YouTube views.
           </p>
 
-          {/* PROMO GATE STATE MACHINE */}
-          {promoState === 'gate' && (
-            <PromoGateTracker>
-              <PromoGate
-                onYes={() => setPromoState('code-entry')}
-                onNo={() => setPromoState('pricing')}
-              />
-            </PromoGateTracker>
-          )}
-          {promoState === 'code-entry' && (
-            <PromoInput
-              onValid={(code) => { setAppliedCode(code); setPromoState('url-step'); }}
-              onBack={() => setPromoState('gate')}
-            />
-          )}
-          {promoState === 'pricing' && (
-            <PricingPanel onSwitchToCode={() => setPromoState('code-entry')} />
-          )}
-
-          {/* STEP 1: URL Input — only shown once access is granted */}
-          {(promoState === 'url-step' || promoState === 'paid') && (
-            <URLStepTracker>
-            <div id="analyze">
-              {/* Promo badge */}
-              {appliedCode && (
-                <div style={{ textAlign: 'center' }}>
-                  <span className={promoStyles.promoBadge}>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                      <path d="M2 6L5 9L10 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    FREE with code {appliedCode}
-                  </span>
-                </div>
-              )}
-              {promoState === 'paid' && !appliedCode && (
-                <div style={{ textAlign: 'center' }}>
-                  <span className={promoStyles.promoBadge}>
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-                      <path d="M2 6L5 9L10 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                    Paid audit — $200
-                  </span>
-                </div>
-              )}
-
-              <div className={styles.inputRow}>
-                <input
-                  type="url"
-                  className={urlInputClass}
-                  value={urlValue}
-                  onChange={e => handleUrlChange(e.target.value)}
-                  onFocus={() => trackEvent('URLInputFocused')}
-                  placeholder="youtube.com/@yourchannel"
-                  autoComplete="off"
-                  spellCheck={false}
-                  readOnly={urlLocked}
-                  style={urlLocked ? { opacity: 0.6 } : undefined}
-                  aria-label="YouTube channel URL"
-                />
-                <button
-                  className={styles.analyzeBtn}
-                  onClick={handleStep1}
-                  type="button"
-                  disabled={urlLocked}
-                  style={urlLocked ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
-                  aria-label="Analyze my channel"
-                >
-                  {urlLocked ? (
-                    <>
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                        <path d="M3 8L6.5 11.5L13 4" stroke="#0A0A0C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      Channel URL saved
-                    </>
-                  ) : (
-                    <>
-                      <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" aria-hidden="true">
-                        <circle cx="7" cy="7" r="4.5" stroke="#0A0A0C" strokeWidth="1.8"/>
-                        <path d="M10.5 10.5L13.5 13.5" stroke="#0A0A0C" strokeWidth="1.8" strokeLinecap="round"/>
-                      </svg>
-                      Analyze My Channel
-                    </>
-                  )}
-                </button>
+          {/* STEP 1: URL Input */}
+          <URLStepTracker>
+          <div id="analyze">
+            {/* Promo badge (if code applied via URL param or inline entry) */}
+            {appliedCode && (
+              <div style={{ textAlign: 'center', marginBottom: 12 }}>
+                <span className={promoStyles.promoBadge}>
+                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+                    <path d="M2 6L5 9L10 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                  FREE with code {appliedCode}
+                </span>
               </div>
-            </div>
-            </URLStepTracker>
-          )}
+            )}
 
-          {/* STEP 2: Qualification Panel — only when access granted */}
-          {(promoState === 'url-step' || promoState === 'paid') && (
+            <div className={styles.inputRow}>
+              <input
+                ref={topInputRef}
+                type="url"
+                className={urlInputClass}
+                value={urlValue}
+                onChange={e => handleUrlChange(e.target.value)}
+                onFocus={() => trackEvent('URLInputFocused')}
+                placeholder="youtube.com/@yourchannel"
+                autoComplete="off"
+                spellCheck={false}
+                readOnly={urlLocked}
+                style={urlLocked ? { opacity: 0.6 } : undefined}
+                aria-label="YouTube channel URL"
+              />
+              <button
+                className={styles.analyzeBtn}
+                onClick={handleStep1}
+                type="button"
+                disabled={urlLocked}
+                style={urlLocked ? { opacity: 0.5, pointerEvents: 'none' } : undefined}
+                aria-label="Analyze my channel"
+              >
+                {urlLocked ? (
+                  <>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                      <path d="M3 8L6.5 11.5L13 4" stroke="#0A0A0C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Channel URL saved
+                  </>
+                ) : (
+                  <>
+                    <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" aria-hidden="true">
+                      <circle cx="7" cy="7" r="4.5" stroke="#0A0A0C" strokeWidth="1.8"/>
+                      <path d="M10.5 10.5L13.5 13.5" stroke="#0A0A0C" strokeWidth="1.8" strokeLinecap="round"/>
+                    </svg>
+                    Analyze My Channel
+                  </>
+                )}
+              </button>
+            </div>
+
+            {/* Promo code link (only when not locked, no code applied, not in code-entry) */}
+            {!urlLocked && !appliedCode && promoState === 'url-step' && (
+              <p className={styles.promoLink}>
+                Have a promo code?{' '}
+                <button
+                  type="button"
+                  onClick={() => setPromoState('code-entry')}
+                  className={styles.promoLinkBtn}
+                >
+                  Apply it here
+                </button>
+              </p>
+            )}
+
+            {/* Inline promo code entry */}
+            {promoState === 'code-entry' && !appliedCode && (
+              <div style={{ marginTop: 16, maxWidth: 600, margin: '16px auto 0' }}>
+                <PromoInput
+                  onValid={(code) => { setAppliedCode(code); setPromoState('url-step'); }}
+                  onBack={() => setPromoState('url-step')}
+                />
+              </div>
+            )}
+          </div>
+          </URLStepTracker>
+
+          {/* STEP 2: Email field — shown after URL is locked */}
           <div
             ref={qualifyPanelRef}
             className={`${styles.qualifyPanel} ${step2Open ? styles.qualifyPanelOpen : ''}`}
             aria-hidden={!step2Open}
           >
             <div className={styles.qualifyHeader}>
-              <span className={styles.qualifyStepBadge}>Customize your analysis</span>
-            </div>
-
-            {/* Q1: Goal */}
-            <div className={styles.qualifyQuestion}>
-              <label className={styles.qualifyLabel}>What&apos;s the #1 thing you want from YouTube?</label>
-              <div className={styles.qualifyCards}>
-                {([
-                  { value: 'leads',     icon: '🎯', title: 'Generate Leads',   desc: 'Turn viewers into clients' },
-                  { value: 'audience',  icon: '📈', title: 'Grow Audience',    desc: 'More subscribers & reach' },
-                  { value: 'authority', icon: '🏛️', title: 'Build Authority',  desc: 'Become THE expert' },
-                  { value: 'revenue',   icon: '💰', title: 'Drive Revenue',    desc: 'Earn more from YouTube' },
-                  { value: 'brand',     icon: '🏢', title: 'Strengthen Brand', desc: 'Support company marketing' },
-                ] as { value: GoalValue; icon: string; title: string; desc: string }[]).map(({ value, icon, title, desc }) => (
-                  <button
-                    key={value}
-                    className={`${styles.qCard} ${selectedGoal === value ? styles.qCardSelected : ''}`}
-                    onClick={() => setSelectedGoal(value)}
-                    type="button"
-                    aria-pressed={selectedGoal === value}
-                  >
-                    <span className={styles.qIcon}>{icon}</span>
-                    <span className={`${styles.qTitle} ${selectedGoal === value ? 'qTitleActive' : ''}`}
-                          style={selectedGoal === value ? { color: '#c8ff2e' } : undefined}>
-                      {title}
+              <span className={styles.qualifyStepBadge}>
+                {urlLocked && (
+                  <>
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: 6 }}>
+                      <path d="M2 6L5 9L10 3" stroke="#c8ff2e" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    Channel URL saved:{' '}
+                    <span style={{ color: 'rgba(240,240,236,0.7)', fontFamily: 'var(--font-mono)', fontSize: '10px' }}>
+                      {urlValue.length > 36 ? urlValue.slice(0, 36) + '…' : urlValue}
                     </span>
-                    <span className={styles.qDesc}>{desc}</span>
-                  </button>
-                ))}
-              </div>
+                    {' '}
+                    <button
+                      type="button"
+                      className={styles.editUrlBtn}
+                      onClick={handleEditUrl}
+                    >
+                      Edit
+                    </button>
+                  </>
+                )}
+              </span>
             </div>
 
-            {/* Q2: Frequency */}
+            {/* Email field */}
             <div className={styles.qualifyQuestion}>
-              <label className={styles.qualifyLabel}>How often do you currently publish?</label>
-              <div className={styles.qualifyPills}>
-                {([
-                  { value: 'rare',    label: 'Less than monthly' },
-                  { value: 'monthly', label: '1-2x / month' },
-                  { value: 'weekly',  label: 'Weekly' },
-                  { value: 'daily',   label: 'Multiple / week' },
-                ] as { value: FreqValue; label: string }[]).map(({ value, label }) => (
-                  <button
-                    key={value}
-                    className={`${styles.qPill} ${selectedFreq === value ? styles.qPillSelected : ''}`}
-                    onClick={() => setSelectedFreq(value)}
-                    type="button"
-                    aria-pressed={selectedFreq === value}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Q3: Production */}
-            <div className={styles.qualifyQuestion}>
-              <label className={styles.qualifyLabel}>How do you currently make your videos?</label>
-              <div className={`${styles.qualifyCards} ${styles.prodGrid}`}>
-                {([
-                  { value: 'phone',  icon: '📱', title: 'Phone',           desc: 'Minimal editing' },
-                  { value: 'decent', icon: '📷', title: 'Decent Camera',   desc: 'I edit myself' },
-                  { value: 'pro',    icon: '🎬', title: 'Professional',    desc: 'Work with an editor' },
-                  { value: 'full',   icon: '🎥', title: 'Full Production', desc: 'Scripts, crew, post' },
-                ] as { value: ProdValue; icon: string; title: string; desc: string }[]).map(({ value, icon, title, desc }) => (
-                  <button
-                    key={value}
-                    className={`${styles.qCard} ${styles.qCardCompact} ${selectedProd === value ? styles.qCardSelected : ''}`}
-                    onClick={() => setSelectedProd(value)}
-                    type="button"
-                    aria-pressed={selectedProd === value}
-                  >
-                    <span className={styles.qIcon}>{icon}</span>
-                    <span className={styles.qTitle}
-                          style={selectedProd === value ? { color: '#c8ff2e' } : undefined}>
-                      {title}
-                    </span>
-                    <span className={styles.qDesc}>{desc}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Q4: Region */}
-            <div className={styles.qualifyQuestion}>
-              <label className={styles.qualifyLabel}>Your target audience region</label>
-              <div className={`${styles.qualifyPills} ${styles.regionPills}`}>
-                {([
-                  { value: 'mena',       label: '🌍 Middle East & N. Africa' },
-                  { value: 'europe',     label: '🇪🇺 Europe' },
-                  { value: 'na',         label: '🇺🇸 North America' },
-                  { value: 'latam',      label: '🌎 Latin America' },
-                  { value: 'south_asia', label: '🇮🇳 South Asia' },
-                  { value: 'apac_south', label: '🌏 SE Asia & Oceania' },
-                  { value: 'east_asia',  label: '🇯🇵 East Asia' },
-                  { value: 'africa',     label: '🌍 Sub-Saharan Africa' },
-                ] as { value: RegionValue; label: string }[]).map(({ value, label }) => (
-                  <button
-                    key={value}
-                    className={`${styles.qPill} ${selectedRegion === value ? styles.qPillSelected : ''}`}
-                    onClick={() => setSelectedRegion(value)}
-                    type="button"
-                    aria-pressed={selectedRegion === value}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Contact info */}
-            <div className={styles.qualifyQuestion}>
-              <label className={styles.qualifyLabel}>Where should we send your audit?</label>
+              <label className={styles.qualifyLabel} htmlFor="audit-email">
+                Where should we send your audit?
+              </label>
               <div className={styles.contactFields}>
                 <input
-                  type="text"
-                  className={styles.qEmail}
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="Your first name"
-                  autoComplete="given-name"
-                  aria-label="First name"
-                />
-                <input
+                  id="audit-email"
                   type="email"
-                  className={styles.qEmail}
+                  className={`${styles.qEmail} ${emailError ? styles.qEmailError : ''}`}
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={e => {
+                    setEmail(e.target.value);
+                    if (emailError) { setEmailError(false); setSubmitError(null); }
+                  }}
                   placeholder="you@company.com"
                   autoComplete="email"
                   aria-label="Email address"
+                  aria-describedby={emailError ? 'email-error-msg' : undefined}
                 />
+                {emailError && (
+                  <p id="email-error-msg" className={styles.emailErrorMsg}>
+                    Please enter a valid email address
+                  </p>
+                )}
               </div>
             </div>
 
@@ -700,7 +516,7 @@ export default function AnalyzeClient() {
               disabled={submitState !== 'idle' || isPending}
               style={submitState !== 'idle' || isPending ? { opacity: 0.7, pointerEvents: 'none' } : undefined}
             >
-              {submitState === 'idle' && 'Get My Analysis — Free'}
+              {submitState === 'idle' && 'Send My Free Audit'}
               {submitState === 'loading' && (
                 <>
                   <svg
@@ -711,23 +527,22 @@ export default function AnalyzeClient() {
                   >
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeDasharray="30 70" strokeLinecap="round"/>
                   </svg>
-                  Preparing your analysis...
+                  Sending your audit request...
                 </>
               )}
               {submitState === 'success' && (
                 <span style={{ color: '#0A0A0C' }}>
-                  ✓ Analysis queued — check your email{name ? `, ${name}` : ''}!
+                  ✓ Audit queued — check your inbox!
                 </span>
               )}
             </button>
-            {submitError && (
+            {submitError && !emailError && (
               <p style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
                 {submitError}
               </p>
             )}
             <p className={styles.qualifyFine}>No spam. No selling your data. Just your channel audit.</p>
           </div>
-          )}
 
           {/* Trust strip */}
           <div className={styles.trustStrip}>
@@ -735,20 +550,20 @@ export default function AnalyzeClient() {
               <svg viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" width="13" height="13" style={{ color: '#c8ff2e', flexShrink: 0 }} aria-hidden="true">
                 <path d="M6.5 1L7.94 4.55L11.5 4.88L8.88 7.16L9.73 10.5L6.5 8.5L3.27 10.5L4.12 7.16L1.5 4.88L5.06 4.55L6.5 1Z" fill="currentColor"/>
               </svg>
-              5B+ views analyzed
+              5 Billion+ views managed
             </div>
             <div className={styles.trustItem}>
               <svg viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" width="13" height="13" style={{ color: '#c8ff2e', flexShrink: 0 }} aria-hidden="true">
                 <rect x="1.5" y="3" width="10" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.5"/>
                 <path d="M4.5 3V2a2 2 0 014 0v1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
               </svg>
-              50+ channels managed
+              50+ channels grown
             </div>
             <div className={styles.trustItem}>
               <svg viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg" width="13" height="13" style={{ color: '#c8ff2e', flexShrink: 0 }} aria-hidden="true">
                 <path d="M6.5 1.5C3.74 1.5 1.5 3.74 1.5 6.5S3.74 11.5 6.5 11.5 11.5 9.26 11.5 6.5 9.26 1.5 6.5 1.5zM6.5 4v3l2 1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
-              10+ years experience
+              Trusted in 15+ countries
             </div>
           </div>
         </div>
@@ -956,7 +771,7 @@ export default function AnalyzeClient() {
               <FaqItem
                 id="faq-2"
                 question="What data do you need from me?"
-                answer="Just your channel URL. No OAuth, no permissions, no access to your Studio, no credit card. Everything we analyze is public data — the same data your viewers and competitors see. That's the point."
+                answer="Just your channel URL and an email to send the report. No OAuth, no permissions, no access to your Studio, no credit card. Everything we analyze is public data — the same data your viewers and competitors see. That's the point."
                 openId={openFaqId}
                 onToggle={handleFaqToggle}
                 revealDelay={styles.revealDelay2}
@@ -995,8 +810,14 @@ export default function AnalyzeClient() {
                 autoComplete="off"
                 spellCheck={false}
                 aria-label="YouTube channel URL (bottom form)"
+                onFocus={handleBottomCta}
               />
-              <button className={styles.analyzeBtn} type="button" aria-label="Analyze my channel">
+              <button
+                className={styles.analyzeBtn}
+                type="button"
+                aria-label="Analyze my channel"
+                onClick={handleBottomCta}
+              >
                 <svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" width="16" height="16" aria-hidden="true">
                   <circle cx="7" cy="7" r="4.5" stroke="#0A0A0C" strokeWidth="1.8"/>
                   <path d="M10.5 10.5L13.5 13.5" stroke="#0A0A0C" strokeWidth="1.8" strokeLinecap="round"/>
