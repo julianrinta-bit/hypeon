@@ -160,6 +160,45 @@
   line-height: 1.4;
 }
 
+/* ─── Loading indicator before insights ─────────────────────────── */
+.insightsLoading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-family: var(--font-body, 'Outfit', sans-serif);
+  font-size: 13px;
+  color: rgba(240, 240, 236, 0.4);
+  animation: insightPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes insightPulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.8; }
+}
+
+.insightsSpinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(240, 240, 236, 0.15);
+  border-top-color: rgba(240, 240, 236, 0.5);
+  border-radius: 50%;
+  animation: insightSpin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes insightSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .insightsLoading { animation: none; opacity: 0.6; }
+  .insightsSpinner { animation: none; }
+}
+
 /* ─── Expert insights block ─────────────────────────────────────── */
 .insightsBlock {
   margin-top: 24px;
