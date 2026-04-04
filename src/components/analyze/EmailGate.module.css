@@ -1,0 +1,359 @@
+/* EmailGate.module.css */
+
+/* ─── Gate card ───────────────────────────────────── */
+.gate {
+  background: rgba(10, 10, 14, 0.82);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 32px 28px;
+  max-width: 640px;
+  margin: 0 auto;
+  animation: gateEnter 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes gateEnter {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Email state ─────────────────────────────────── */
+.headline {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(20px, 3vw, 26px);
+  line-height: 1.15;
+  color: #f0f0ec;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.subtext {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: rgba(240, 240, 236, 0.55);
+  text-align: center;
+  line-height: 1.55;
+  margin-bottom: 22px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Checklist */
+.checklist {
+  list-style: none;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.checkItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: rgba(240, 240, 236, 0.6);
+  line-height: 1.4;
+}
+
+.checkMark {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: #c8ff2e;
+  margin-top: 1px;
+}
+
+/* Delivery note */
+.deliveryNote {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(240, 240, 236, 0.35);
+  text-align: center;
+  letter-spacing: 0.04em;
+  margin-bottom: 22px;
+}
+
+/* Email input row */
+.inputRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.emailInput {
+  width: 100%;
+  height: 52px;
+  background: rgba(22, 22, 25, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 10px;
+  padding: 0 16px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: #f0f0ec;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.emailInput::placeholder {
+  color: rgba(240, 240, 236, 0.28);
+}
+
+.emailInput:focus {
+  border-color: #c8ff2e;
+  box-shadow: 0 0 0 3px rgba(200, 255, 46, 0.10);
+}
+
+.emailInputError {
+  border-color: rgba(248, 113, 113, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.08) !important;
+}
+
+/* Primary CTA button */
+.ctaBtn {
+  width: 100%;
+  height: 52px;
+  background: #c8ff2e;
+  color: #0A0A0C;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 15px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  position: relative;
+  overflow: visible;
+}
+
+.ctaBtn:hover:not(:disabled) {
+  background: #b8ee20;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(200, 255, 46, 0.28);
+}
+
+.ctaBtn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.ctaBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  border: 2px solid #c8ff2e;
+  animation: ctaRingGate 3s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes ctaRingGate {
+  0%   { opacity: 0.5; transform: scale(1); }
+  70%  { opacity: 0;   transform: scale(1.08); }
+  100% { opacity: 0;   transform: scale(1.08); }
+}
+
+/* Promo code link */
+.promoLink {
+  text-align: center;
+  font-size: 12px;
+  color: rgba(240, 240, 236, 0.35);
+  margin-top: 12px;
+}
+
+.promoLinkBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: rgba(240, 240, 236, 0.5);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.promoLinkBtn:hover {
+  color: rgba(240, 240, 236, 0.75);
+}
+
+/* Promo badge */
+.promoBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: #c8ff2e;
+  background: rgba(200, 255, 46, 0.10);
+  border: 1px solid rgba(200, 255, 46, 0.25);
+  border-radius: 999px;
+  padding: 4px 12px;
+  margin-top: 10px;
+}
+
+/* Error message */
+.errorMsg {
+  font-size: 12px;
+  color: #F87171;
+  text-align: center;
+  margin-top: 6px;
+}
+
+/* ─── Code state ──────────────────────────────────── */
+.codeSection {
+  text-align: center;
+}
+
+.codeHeadline {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  color: #f0f0ec;
+  margin-bottom: 8px;
+}
+
+.codeSubtext {
+  font-size: 13px;
+  color: rgba(240, 240, 236, 0.5);
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+.maskedEmail {
+  color: rgba(240, 240, 236, 0.75);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+/* 6-digit OTP row */
+.otpRow {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.otpInput {
+  width: 44px;
+  height: 54px;
+  background: rgba(22, 22, 25, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  color: #f0f0ec;
+  text-align: center;
+  outline: none;
+  caret-color: #c8ff2e;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.otpInput::-webkit-outer-spin-button,
+.otpInput::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.otpInput:focus {
+  border-color: #c8ff2e;
+  box-shadow: 0 0 0 3px rgba(200, 255, 46, 0.12);
+}
+
+.otpInputFilled {
+  border-color: rgba(200, 255, 46, 0.35);
+}
+
+.otpInputError {
+  border-color: rgba(248, 113, 113, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.08) !important;
+  animation: shake 0.35s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-4px); }
+  40%       { transform: translateX(4px); }
+  60%       { transform: translateX(-3px); }
+  80%       { transform: translateX(3px); }
+}
+
+/* Resend link */
+.resendRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+  color: rgba(240, 240, 236, 0.35);
+  margin-top: 12px;
+}
+
+.resendBtn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: rgba(240, 240, 236, 0.55);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s ease;
+}
+
+.resendBtn:hover {
+  color: rgba(240, 240, 236, 0.80);
+}
+
+.resendBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+
+/* Loading spinner (inline) */
+.spinner {
+  width: 16px;
+  height: 16px;
+  animation: spin 0.9s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ─── Mobile adjustments ──────────────────────────── */
+@media (max-width: 480px) {
+  .gate {
+    padding: 24px 16px;
+  }
+
+  .otpInput {
+    width: 38px;
+    height: 48px;
+    font-size: 18px;
+  }
+
+  .otpRow {
+    gap: 6px;
+  }
+}

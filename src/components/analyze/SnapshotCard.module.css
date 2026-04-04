@@ -1,0 +1,139 @@
+/* SnapshotCard.module.css */
+
+/* ─── Card wrapper ─────────────────────────────────── */
+.card {
+  background: rgba(10, 10, 14, 0.82);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top-color: rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 640px;
+  margin: 0 auto 28px;
+  animation: slideUpFade 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Top row: avatar + name + handle + subs ──────── */
+.topRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.channelInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.channelName {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: #f0f0ec;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.channelHandle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: rgba(240, 240, 236, 0.45);
+  margin-top: 2px;
+}
+
+.subCount {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: #c8ff2e;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ─── Metric grid 2×2 ────────────────────────────── */
+.metricGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.metricCell {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.metricLabel {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(240, 240, 236, 0.35);
+  margin-bottom: 6px;
+}
+
+.metricValue {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 600;
+  color: #f0f0ec;
+  line-height: 1.2;
+}
+
+.metricSub {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: rgba(240, 240, 236, 0.45);
+  margin-top: 3px;
+}
+
+/* Pace / recency pill */
+.pacePill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  border-radius: 999px;
+  padding: 2px 8px;
+  margin-top: 4px;
+}
+
+.pacePill.active  { color: #34D399; background: rgba(52, 211, 153, 0.10); }
+.pacePill.slowing { color: #FBBF24; background: rgba(251, 191, 36, 0.10); }
+.pacePill.inactive{ color: #F87171; background: rgba(248, 113, 113, 0.10); }
+.pacePill.prolific { color: #c8ff2e; background: rgba(200, 255, 46, 0.10); }
+.pacePill.steady   { color: #34D399; background: rgba(52, 211, 153, 0.10); }
+.pacePill.sporadic { color: #FBBF24; background: rgba(251, 191, 36, 0.10); }
+.pacePill.dormant  { color: #F87171; background: rgba(248, 113, 113, 0.10); }
+
+/* ─── Footer note ─────────────────────────────────── */
+.footerNote {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: rgba(240, 240, 236, 0.28);
+  text-align: center;
+  line-height: 1.5;
+}
