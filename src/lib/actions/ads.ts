@@ -258,14 +258,13 @@ export async function updateBudget(
   try {
     const token = getToken();
 
-    // Meta expects budget in the account's currency's smallest unit.
-    // For KRW (no subdivisions) that means the integer value × 100 per Meta's convention.
-    const budgetCents = Math.round(dailyBudgetKRW * 100);
+    // KRW has no fractional units — pass the value directly (no * 100).
+    const budgetValue = Math.round(dailyBudgetKRW);
 
     const res = await fetch(`${META_API_BASE}/${adsetId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ daily_budget: budgetCents, access_token: token }),
+      body: JSON.stringify({ daily_budget: budgetValue, access_token: token }),
       cache: 'no-store',
     });
 
@@ -420,8 +419,8 @@ export async function createFullCampaign(data: CreateCampaignData): Promise<{ re
 
     for (const geo of geos) {
       const countries = geo === 'MENA' ? MENA_COUNTRIES : EU_COUNTRIES;
-      const budgetKRW = data.dailyBudgetUSD * KRW_TO_USD;
-      const budgetCents = Math.round(budgetKRW * 100);
+      // KRW has no fractional units — pass whole KRW value directly
+      const budgetKRW = Math.round(data.dailyBudgetUSD * KRW_TO_USD);
 
       const targeting = {
         geo_locations: { countries },
@@ -441,7 +440,7 @@ export async function createFullCampaign(data: CreateCampaignData): Promise<{ re
         campaign_id: newCampaignId,
         name: `${data.campaignName} — ${geo}`,
         status: 'PAUSED',
-        daily_budget: budgetCents.toString(),
+        daily_budget: budgetKRW.toString(),
         billing_event: 'IMPRESSIONS',
         optimization_goal: 'LINK_CLICKS',
         targeting: JSON.stringify(targeting),
