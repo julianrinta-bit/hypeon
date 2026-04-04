@@ -347,12 +347,12 @@ export default function AnalyzeClient() {
           <h1 className={styles.heroHeadline}>
             Your YouTube Channel,<br />
             <em className={styles.heroHeadlineAccent}>
-              Scored and Fixed
+              Scored and Mapped
             </em>
           </h1>
 
           <p className={styles.heroSub}>
-            Paste your channel URL. Get a free expert audit scoring your content, titles, growth, and monetization — by the team behind 5 billion YouTube views.
+            Paste your channel URL. Get a free 6-axis audit scoring your content, titles, growth, and monetization — by the team behind 5 billion YouTube views.
           </p>
 
           {/* STEP 1: URL Input */}
@@ -516,7 +516,7 @@ export default function AnalyzeClient() {
               disabled={submitState !== 'idle' || isPending}
               style={submitState !== 'idle' || isPending ? { opacity: 0.7, pointerEvents: 'none' } : undefined}
             >
-              {submitState === 'idle' && 'Send My Free Audit'}
+              {submitState === 'idle' && 'Run My Free Audit'}
               {submitState === 'loading' && (
                 <>
                   <svg
@@ -566,6 +566,11 @@ export default function AnalyzeClient() {
               Trusted in 15+ countries
             </div>
           </div>
+
+          {/* Proof callout */}
+          <p className={styles.proofCallout}>
+            &ldquo;We helped a finance channel increase their CTR by 340% in 90 days using insights from this exact audit.&rdquo;
+          </p>
         </div>
       </section>
 
@@ -582,6 +587,7 @@ export default function AnalyzeClient() {
               data-reveal
               data-parallax="radar"
             >
+              <span className={styles.sampleBadge}>Sample report</span>
               <div className={styles.radarGradeRow}>
                 <div className={styles.radarGrade}>B+</div>
                 <div className={styles.radarGradeMeta}>
@@ -763,7 +769,7 @@ export default function AnalyzeClient() {
               <FaqItem
                 id="faq-1"
                 question="How long does the analysis take?"
-                answer="Around 1 hour. We analyze your channel deeply — not superficially. We pull historical data, cross-reference competitors, and run the six-axis scoring model before writing a single line of the report. Speed would mean noise."
+                answer="Around 1 hour. We analyze your channel deeply — not superficially. We pull historical data, cross-reference competitors, and run the six-axis scoring model before writing a single line of the report."
                 openId={openFaqId}
                 onToggle={handleFaqToggle}
                 revealDelay={styles.revealDelay1}
