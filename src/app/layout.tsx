@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, IBM_Plex_Mono } from 'next/font/google';
+import { Plus_Jakarta_Sans, IBM_Plex_Mono, Outfit } from 'next/font/google';
 import Script from 'next/script';
 import './globals.css';
 import ScrollProgress from '@/components/layout/ScrollProgress';
@@ -24,9 +24,12 @@ const ibmPlexMono = IBM_Plex_Mono({
   display: 'swap',
 });
 
-// Outfit from Fontshare — download woff2 files to public/fonts/
-// and reference them here. If not yet downloaded, use Fontshare link
-// as fallback in <head> (task 1.2 will finalize).
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  variable: '--font-outfit',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Hype On Media — YouTube. Engineered.',
@@ -53,15 +56,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${plusJakarta.variable} ${ibmPlexMono.variable}`}
+      className={`${plusJakarta.variable} ${ibmPlexMono.variable} ${outfit.variable}`}
     >
       <head>
-        {/* Fontshare Outfit — will be replaced with next/font/local once woff2 downloaded */}
-        <link rel="preconnect" href="https://api.fontshare.com" />
-        <link
-          href="https://api.fontshare.com/v2/css?f[]=outfit@300,400,500,600&display=swap"
-          rel="stylesheet"
-        />
         <meta name="theme-color" content="#0A0A0C" />
       </head>
       <body>
