@@ -37,7 +37,7 @@
   --white-06: rgba(240, 240, 236, 0.06);
 
   --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
-  --font-body: 'Outfit', system-ui, sans-serif;
+  --font-body: var(--font-outfit), 'Outfit', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
 
   --radius: 0px;
