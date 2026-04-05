@@ -252,6 +252,18 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 
 **Never say "AI will let you do it yourself."** Always say "Hype On already does this." See `.claude/skills/hypeon-blog-writer/SKILL.md` for the full brand voice guide.
 
+### Performance (Landing Pages)
+
+**NEVER use `<Suspense fallback={null}>` on any page that receives paid traffic.** The hero (headline, subtitle, CTA, trust signals) MUST server-render. Use a static `<HeroShell />` as the Suspense fallback so users see content immediately while JS hydrates.
+
+**NEVER load fonts from external CDNs (Fontshare, Google Fonts `<link>`).** Always use `next/font/google` or `next/font/local` — Next.js self-hosts them at build time. External CDNs add 300-500ms on Facebook in-app browser.
+
+**Code-split any component the user doesn't see on first load.** Use `next/dynamic` with `{ ssr: false }`. If it requires an action (click, scroll, submit) before appearing, it should be lazy-loaded.
+
+**Defer `useEffect` hooks that create observers, listeners, or DOM nodes.** Use `requestIdleCallback` to avoid competing with first paint.
+
+**Incident (April 2026):** 501 Facebook visitors saw 8.3s blank page, 0 conversions, $204 wasted. Root cause: entire page client-rendered + external font CDN. See `01_FRAMEWORKS/Web_Design/Landing_Page_Performance_Checklist.md`.
+
 ### Deployment
 
 **Server port 3400** for Hype On website (Orbit uses 3000, 3100 was taken by PM2 daemon, 3200/3202/3300 by other Orbit processes).
