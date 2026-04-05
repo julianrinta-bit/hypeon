@@ -171,8 +171,7 @@ function FaqItem({ id, question, answer, openId, onToggle, revealDelay }: FaqIte
 
   return (
     <div
-      className={`${styles.faqItem} ${isOpen ? styles.faqItemOpen : ''} ${styles.reveal} ${revealDelay || ''}`}
-      data-reveal
+      className={`${styles.faqItem} ${isOpen ? styles.faqItemOpen : ''}`}
     >
       <button
         className={styles.faqQuestion}
