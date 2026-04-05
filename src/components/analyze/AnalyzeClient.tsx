@@ -1,18 +1,21 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useCallback, useTransition } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import RadarChart from './RadarChart';
+import dynamic from 'next/dynamic';
+import { useSearchParams } from 'next/navigation';
 import { submitAnalysis } from '@/lib/actions/analyze';
 import { fetchChannelSnapshot, type ChannelSnapshot } from '@/lib/actions/snapshot';
 import { trackEvent } from '@/lib/pixel';
 import { isValidPromoCode } from '@/config/promoCodes';
 import PromoInput from './PromoInput';
-import ScanningAnimation from './ScanningAnimation';
-import SnapshotCard from './SnapshotCard';
-import EmailGate from './EmailGate';
 import promoStyles from './promoGate.module.css';
 import styles from '@/app/analyze/analyze.module.css';
+
+// ── Code-split heavy components (only needed after scan / below fold) ────
+const RadarChart = dynamic(() => import('./RadarChart'), { ssr: false });
+const ScanningAnimation = dynamic(() => import('./ScanningAnimation'), { ssr: false });
+const SnapshotCard = dynamic(() => import('./SnapshotCard'), { ssr: false });
+const EmailGate = dynamic(() => import('./EmailGate'), { ssr: false });
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -25,12 +28,25 @@ type FlowState =
 
 type PromoState = 'url-step' | 'code-entry' | 'code-valid';
 
-// ── Particles ──────────────────────────────────────────────────────────────
+// ── Particles (deferred after LCP) ────────────────────────────────────────
 
 function Particles() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
+
+  // Defer particle creation until after LCP (2s idle delay)
+  useEffect(() => {
+    const schedule = typeof requestIdleCallback === 'function'
+      ? requestIdleCallback
+      : (cb: () => void) => setTimeout(cb, 2000);
+    const id = schedule(() => setReady(true));
+    return () => {
+      if (typeof cancelIdleCallback === 'function') cancelIdleCallback(id as number);
+    };
+  }, []);
 
   useEffect(() => {
+    if (!ready) return;
     const container = containerRef.current;
     if (!container) return;
     if (window.matchMedia('(max-width: 767px)').matches) return;
@@ -58,64 +74,84 @@ function Particles() {
       fragments.push(p);
     }
     return () => fragments.forEach(p => p.remove());
-  }, []);
+  }, [ready]);
 
   return <div ref={containerRef} className={styles.particles} aria-hidden="true" />;
 }
 
-// ── Scroll reveal hook ─────────────────────────────────────────────────────
+// ── Scroll reveal hook (deferred to avoid blocking first paint) ────────────
 
 function useScrollReveal() {
   useEffect(() => {
-    const els = document.querySelectorAll('[data-reveal]');
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
-    );
-    els.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
+    const init = () => {
+      const els = document.querySelectorAll('[data-reveal]');
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      );
+      els.forEach(el => observer.observe(el));
+      return () => observer.disconnect();
+    };
+
+    if (typeof requestIdleCallback === 'function') {
+      const id = requestIdleCallback(init);
+      return () => cancelIdleCallback(id);
+    }
+    const t = setTimeout(init, 200);
+    return () => clearTimeout(t);
   }, []);
 }
 
-// ── Parallax hook ──────────────────────────────────────────────────────────
+// ── Parallax hook (deferred to avoid blocking first paint) ────────────────
 
 function useParallax() {
+  const scrollCleanup = useRef<(() => void) | null>(null);
+
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const init = () => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-    const handleScroll = () => {
-      const vh = window.innerHeight;
-      const radarCard = document.querySelector('[data-parallax="radar"]') as HTMLElement | null;
-      const bentoCards = document.querySelectorAll('[data-parallax="bento"]');
+      const handleScroll = () => {
+        const vh = window.innerHeight;
+        const radarCard = document.querySelector('[data-parallax="radar"]') as HTMLElement | null;
+        const bentoCards = document.querySelectorAll('[data-parallax="bento"]');
 
-      if (radarCard) {
-        const rect = radarCard.getBoundingClientRect();
-        if (rect.top < vh && rect.bottom > 0) {
-          const progress = (vh - rect.top) / (vh + rect.height);
-          radarCard.style.transform = `translateY(${(0.5 - progress) * 15}px)`;
+        if (radarCard) {
+          const rect = radarCard.getBoundingClientRect();
+          if (rect.top < vh && rect.bottom > 0) {
+            const progress = (vh - rect.top) / (vh + rect.height);
+            radarCard.style.transform = `translateY(${(0.5 - progress) * 15}px)`;
+          }
         }
-      }
 
-      bentoCards.forEach((card, i) => {
-        const el = card as HTMLElement;
-        const rect = el.getBoundingClientRect();
-        if (rect.top < vh && rect.bottom > 0) {
-          const progress = (vh - rect.top) / (vh + rect.height);
-          const offset = (0.5 - progress) * (8 + i * 2);
-          el.style.transform = `translateY(${offset}px)`;
-        }
-      });
+        bentoCards.forEach((card, i) => {
+          const el = card as HTMLElement;
+          const rect = el.getBoundingClientRect();
+          if (rect.top < vh && rect.bottom > 0) {
+            const progress = (vh - rect.top) / (vh + rect.height);
+            const offset = (0.5 - progress) * (8 + i * 2);
+            el.style.transform = `translateY(${offset}px)`;
+          }
+        });
+      };
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      scrollCleanup.current = () => window.removeEventListener('scroll', handleScroll);
     };
 
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (typeof requestIdleCallback === 'function') {
+      const id = requestIdleCallback(init);
+      return () => { cancelIdleCallback(id); scrollCleanup.current?.(); };
+    }
+    const t = setTimeout(init, 200);
+    return () => { clearTimeout(t); scrollCleanup.current?.(); };
   }, []);
 }
 
@@ -174,7 +210,6 @@ function URLStepTracker({ children }: { children: React.ReactNode }) {
 
 export default function AnalyzeClient() {
   const searchParams = useSearchParams();
-  const router = useRouter();
 
   // ── Flow state ──────────────────────────────────────────────────────────
   const [flowState, setFlowState] = useState<FlowState>('url-input');
