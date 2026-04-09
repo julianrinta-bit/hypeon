@@ -2,7 +2,7 @@
  * GET /api/track/open?id=meetkevin&c=audit-v2
  *
  * Email open tracking pixel endpoint.
- * Logs the open event and returns a 1x1 transparent PNG.
+ * Persists to Supabase email_tracking_events table, returns a 1x1 transparent PNG.
  *
  * Query params:
  *   id — prospect identifier (handle or email hash)
@@ -10,11 +10,17 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 // 1x1 transparent PNG (68 bytes)
 const PIXEL = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
   "base64",
+);
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
 export async function GET(request: NextRequest) {
@@ -23,18 +29,19 @@ export async function GET(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown";
   const ua = request.headers.get("user-agent") ?? "unknown";
 
-  // Log the open event
-  // TODO: Replace with Supabase insert or SQLite write for production
-  console.log(
-    JSON.stringify({
-      event: "email_open",
-      prospect: id,
+  // Persist to Supabase (fire and forget — don't block the pixel response)
+  supabase
+    .from("email_tracking_events")
+    .insert({
+      event_type: "open",
+      prospect_id: id,
       campaign,
-      ip,
-      ua: ua.slice(0, 100),
-      ts: new Date().toISOString(),
-    }),
-  );
+      ip_address: ip,
+      user_agent: ua.slice(0, 200),
+    })
+    .then(({ error }) => {
+      if (error) console.error("[track/open] Supabase insert failed:", error.message);
+    });
 
   return new NextResponse(PIXEL, {
     status: 200,

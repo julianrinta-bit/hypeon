@@ -2,7 +2,7 @@
  * GET /api/track/click?id=meetkevin&cta=cta2-realignment-plan&dest=/call
  *
  * Email CTA click tracking endpoint.
- * Logs the click event and redirects to the destination.
+ * Persists to Supabase email_tracking_events table, then redirects.
  *
  * Query params:
  *   id   — prospect identifier
@@ -11,6 +11,12 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
 
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get("id") ?? "unknown";
@@ -19,18 +25,20 @@ export async function GET(request: NextRequest) {
   const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown";
   const ua = request.headers.get("user-agent") ?? "unknown";
 
-  // Log the click event
-  // TODO: Replace with Supabase insert for production
-  console.log(
-    JSON.stringify({
-      event: "email_click",
-      prospect: id,
+  // Persist to Supabase (await this one — redirect can wait 50ms)
+  await supabase
+    .from("email_tracking_events")
+    .insert({
+      event_type: "click",
+      prospect_id: id,
+      campaign: "audit",
       cta,
-      ip,
-      ua: ua.slice(0, 100),
-      ts: new Date().toISOString(),
-    }),
-  );
+      ip_address: ip,
+      user_agent: ua.slice(0, 200),
+    })
+    .then(({ error }) => {
+      if (error) console.error("[track/click] Supabase insert failed:", error.message);
+    });
 
   // Build the redirect URL with UTM params preserved
   const redirectUrl = new URL(dest, request.nextUrl.origin);
