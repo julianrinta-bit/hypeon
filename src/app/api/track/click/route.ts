@@ -1,46 +1,62 @@
 /**
- * GET /api/track/click?id=meetkevin&cta=cta2-realignment-plan&dest=/call
+ * GET /api/track/click?id=meetkevin&cta=cta2-realignment-plan&dest=/call&eid=uuid
  *
  * Email CTA click tracking endpoint.
- * Persists to Supabase email_tracking_events table, then redirects.
+ * Writes to BOTH Supabase projects, then redirects.
  *
  * Query params:
  *   id   — prospect identifier
- *   cta  — CTA identifier (matches utm_content value)
+ *   cta  — CTA identifier
  *   dest — destination path (default: /call)
+ *   eid  — prospector_emails.id (optional, for Units FK)
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabase = createClient(
+const supabaseHypeon = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
+
+const unitsUrl = process.env.UNITS_SUPABASE_URL;
+const unitsKey = process.env.UNITS_SUPABASE_SERVICE_KEY;
+const supabaseUnits = unitsUrl && unitsKey ? createClient(unitsUrl, unitsKey) : null;
 
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get("id") ?? "unknown";
   const cta = request.nextUrl.searchParams.get("cta") ?? "unknown";
   const dest = request.nextUrl.searchParams.get("dest") ?? "/call";
+  const emailId = request.nextUrl.searchParams.get("eid") ?? null;
   const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown";
   const ua = request.headers.get("user-agent") ?? "unknown";
 
-  // Persist to Supabase (await this one — redirect can wait 50ms)
-  await supabase
-    .from("email_tracking_events")
-    .insert({
-      event_type: "click",
-      prospect_id: id,
-      campaign: "audit",
-      cta,
-      ip_address: ip,
-      user_agent: ua.slice(0, 200),
-    })
-    .then(({ error }) => {
-      if (error) console.error("[track/click] Supabase insert failed:", error.message);
-    });
+  const row = {
+    event_type: "click",
+    prospect_id: id,
+    campaign: "audit",
+    cta,
+    email_id: emailId,
+    ip_address: ip,
+    user_agent: ua.slice(0, 200),
+  };
 
-  // Build the redirect URL with UTM params preserved
+  // Write to both — await at least one for reliability
+  const writes = [
+    supabaseHypeon.from("email_tracking_events").insert(row),
+  ];
+
+  if (supabaseUnits) {
+    writes.push(
+      supabaseUnits.from("email_tracking_events").insert({
+        ...row,
+        tenant_id: process.env.UNITS_TENANT_ID ?? null,
+      }),
+    );
+  }
+
+  await Promise.allSettled(writes);
+
   const redirectUrl = new URL(dest, request.nextUrl.origin);
   redirectUrl.searchParams.set("utm_source", "audit");
   redirectUrl.searchParams.set("utm_medium", "email");
