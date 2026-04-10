@@ -1,47 +1,68 @@
 /**
- * GET /api/track/open?id=meetkevin&c=audit-v2
+ * GET /api/track/open?id=meetkevin&c=audit-v2&eid=uuid
  *
  * Email open tracking pixel endpoint.
- * Persists to Supabase email_tracking_events table, returns a 1x1 transparent PNG.
+ * Writes to BOTH Supabase projects:
+ *   1. Hypeon website (email_tracking_events — legacy)
+ *   2. Units CRM (email_tracking_events — production, linked to prospector_emails)
  *
  * Query params:
- *   id — prospect identifier (handle or email hash)
- *   c  — campaign identifier (e.g. "audit-v2", "followup-1")
+ *   id  — prospect identifier (handle)
+ *   c   — campaign identifier
+ *   eid — prospector_emails.id (optional, for Units FK)
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// 1x1 transparent PNG (68 bytes)
 const PIXEL = Buffer.from(
   "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==",
   "base64",
 );
 
-const supabase = createClient(
+// Hypeon website Supabase (legacy)
+const supabaseHypeon = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY!,
 );
 
+// Units CRM Supabase (production — where prospector lives)
+const unitsUrl = process.env.UNITS_SUPABASE_URL;
+const unitsKey = process.env.UNITS_SUPABASE_SERVICE_KEY;
+const supabaseUnits = unitsUrl && unitsKey ? createClient(unitsUrl, unitsKey) : null;
+
 export async function GET(request: NextRequest) {
   const id = request.nextUrl.searchParams.get("id") ?? "unknown";
   const campaign = request.nextUrl.searchParams.get("c") ?? "unknown";
+  const emailId = request.nextUrl.searchParams.get("eid") ?? null;
   const ip = request.headers.get("x-forwarded-for") ?? request.headers.get("x-real-ip") ?? "unknown";
   const ua = request.headers.get("user-agent") ?? "unknown";
 
-  // Persist to Supabase (fire and forget — don't block the pixel response)
-  supabase
+  const row = {
+    event_type: "open",
+    prospect_id: id,
+    campaign,
+    email_id: emailId,
+    ip_address: ip,
+    user_agent: ua.slice(0, 200),
+  };
+
+  // Fire-and-forget to both databases
+  supabaseHypeon
     .from("email_tracking_events")
-    .insert({
-      event_type: "open",
-      prospect_id: id,
-      campaign,
-      ip_address: ip,
-      user_agent: ua.slice(0, 200),
-    })
+    .insert(row)
     .then(({ error }) => {
-      if (error) console.error("[track/open] Supabase insert failed:", error.message);
+      if (error) console.error("[track/open] Hypeon insert failed:", error.message);
     });
+
+  if (supabaseUnits) {
+    supabaseUnits
+      .from("email_tracking_events")
+      .insert({ ...row, tenant_id: process.env.UNITS_TENANT_ID ?? null })
+      .then(({ error }) => {
+        if (error) console.error("[track/open] Units insert failed:", error.message);
+      });
+  }
 
   return new NextResponse(PIXEL, {
     status: 200,
