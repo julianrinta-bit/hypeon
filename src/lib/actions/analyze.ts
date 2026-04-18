@@ -141,11 +141,12 @@ export async function submitAnalysis(data: {
     userId = newUser.user.id;
   } else if (signupError?.message?.toLowerCase().includes('already')) {
     // User exists — find them via profiles table (mirrors auth.users)
-    const { data: existingProfile } = await getSupabase()
+    const profileResult = await getSupabase()
       .from('profiles')
       .select('id')
       .eq('email', email)
-      .maybeSingle() as { data: { id: string } | null; error: unknown };
+      .maybeSingle() as unknown as { data: { id: string } | null; error: unknown };
+    const existingProfile = profileResult.data;
 
     if (!existingProfile) {
       console.error('User exists in auth but not in profiles:', email);
@@ -158,12 +159,13 @@ export async function submitAnalysis(data: {
   }
 
   // 4. Check for existing active job (one per user)
-  const { data: activeJob } = await getSupabase()
+  const activeJobResult = await getSupabase()
     .from('analysis_jobs')
     .select('public_id, status')
     .eq('user_id', userId)
     .not('status', 'in', '("complete","failed")')
-    .maybeSingle();
+    .maybeSingle() as unknown as { data: { public_id: string; status: string } | null; error: unknown };
+  const activeJob = activeJobResult.data;
 
   if (activeJob) {
     // Return existing job — don't create a duplicate
@@ -173,26 +175,27 @@ export async function submitAnalysis(data: {
   // 5. Upsert channel placeholder (real data resolved during channel_ingesting stage)
   let channelId: string;
 
-  const { data: existingChannel } = await getSupabase()
+  const existingChannelResult = await getSupabase()
     .from('channels')
     .select('id')
     .eq('youtube_channel_id', channelUrl)
-    .maybeSingle();
+    .maybeSingle() as unknown as { data: { id: string } | null; error: unknown };
+  const existingChannel = existingChannelResult.data;
 
   if (existingChannel) {
     channelId = existingChannel.id;
   } else {
-    const { data: newChannel, error: channelError } = await getSupabase()
+    const newChannelResult = await getSupabase()
       .from('channels')
       .insert({ youtube_channel_id: channelUrl, name: 'Pending resolution', is_verified: false })
       .select('id')
-      .single();
+      .single() as unknown as { data: { id: string } | null; error: { message: string } | null };
 
-    if (channelError || !newChannel) {
-      console.error('Channel insert error:', channelError);
+    if (newChannelResult.error || !newChannelResult.data) {
+      console.error('Channel insert error:', newChannelResult.error);
       return { success: false, error: 'Failed to initialize analysis. Please try again.' };
     }
-    channelId = newChannel.id;
+    channelId = newChannelResult.data.id;
   }
 
   // 6. Link user to channel
@@ -220,16 +223,18 @@ export async function submitAnalysis(data: {
   if (goal) jobPayload.goal = goal;
   if (validatedPromoCode) jobPayload.promo_code = validatedPromoCode;
 
-  const { data: job, error: jobError } = await getSupabase()
+  const jobResult = await getSupabase()
     .from('analysis_jobs')
     .insert(jobPayload)
     .select('id, public_id')
-    .single();
+    .single() as unknown as { data: { id: string; public_id: string } | null; error: { message: string } | null };
 
-  if (jobError || !job) {
-    console.error('Job insert error:', jobError);
+  if (jobResult.error || !jobResult.data) {
+    console.error('Job insert error:', jobResult.error);
     return { success: false, error: 'Failed to queue analysis. Please try again.' };
   }
+
+  const job = jobResult.data;
 
   // 9. Enqueue in pgmq (non-fatal — cron picks up DB rows anyway)
   const { error: enqueueError } = await getSupabase().rpc('pgmq_send', {
