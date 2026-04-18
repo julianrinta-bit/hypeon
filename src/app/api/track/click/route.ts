@@ -14,16 +14,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseHypeon = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
-
-const unitsUrl = process.env.UNITS_SUPABASE_URL;
-const unitsKey = process.env.UNITS_SUPABASE_SERVICE_KEY;
-const supabaseUnits = unitsUrl && unitsKey ? createClient(unitsUrl, unitsKey) : null;
-
 export async function GET(request: NextRequest) {
+  // Lazy-initialize clients inside the handler so env vars are always available
+  // at runtime. Top-level createClient() calls fail during Vercel static analysis.
+  const supabaseHypeon = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  );
+
+  const unitsUrl = process.env.UNITS_SUPABASE_URL;
+  const unitsKey = process.env.UNITS_SUPABASE_SERVICE_KEY;
+  const supabaseUnits = unitsUrl && unitsKey ? createClient(unitsUrl, unitsKey) : null;
+
   const id = request.nextUrl.searchParams.get("id") ?? "unknown";
   const cta = request.nextUrl.searchParams.get("cta") ?? "unknown";
   const dest = request.nextUrl.searchParams.get("dest") ?? "/call";
