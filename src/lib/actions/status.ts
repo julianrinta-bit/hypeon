@@ -24,13 +24,15 @@ export type StatusResult =
   | { found: false };
 
 export async function fetchJobStatus(publicId: string): Promise<StatusResult> {
-  const { data, error } = await getSupabase()
+  const result = await getSupabase()
     .from('analysis_jobs')
     .select('status, error_message')
     .eq('public_id', publicId)
-    .maybeSingle();
+    .maybeSingle() as unknown as { data: { status: string; error_message: string | null } | null; error: unknown };
 
-  if (error || !data) {
+  const data = result.data;
+
+  if (!data) {
     return { found: false };
   }
 

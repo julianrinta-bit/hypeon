@@ -128,15 +128,36 @@ const SCORE_META: Record<string, string> = {
   score_outlier_detection: 'Outlier Detection',
 };
 
+// ── Row types (untyped Supabase client returns 'never' without DB generics) ──
+
+type JobRow = { id: string; status: string; channel_id: string; completed_at: string | null; user_id: string | null };
+type AnalysisRow = {
+  id: string;
+  overall_grade: string;
+  score_content_consistency: number;
+  score_title_quality: number;
+  score_thumbnail_patterns: number;
+  score_engagement_health: number;
+  score_growth_trajectory: number;
+  score_outlier_detection: number;
+  recommendation: string;
+  weighted_scores: unknown;
+  outliers: unknown;
+  created_at: string;
+};
+type ChannelRow = { name: string; thumbnail_url: string | null };
+type DeepDiveRow = { module_type: string; content: unknown };
+
 // ── Fetch teaser data ───────────────────────────────────────────────────────
 
 export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   // First check if the job exists and is complete
-  const { data: job } = await getSupabase()
+  const jobResult = await getSupabase()
     .from('analysis_jobs')
     .select('id, status, channel_id, completed_at, user_id')
     .eq('public_id', publicId)
-    .maybeSingle();
+    .maybeSingle() as unknown as { data: JobRow | null; error: unknown };
+  const job = jobResult.data;
 
   if (!job) {
     return { found: false, reason: 'not_found' };
@@ -148,7 +169,7 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
 
   // 24-hour expiry check
   if (job.completed_at) {
-    const completedAt = new Date(job.completed_at as string);
+    const completedAt = new Date(job.completed_at);
     const expiresAt = new Date(completedAt.getTime() + 24 * 60 * 60 * 1000);
     if (new Date() > expiresAt) {
       return { found: false, reason: 'expired' };
@@ -156,7 +177,7 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   }
 
   // Fetch the analysis results (including new fields)
-  const { data: analysis } = await getSupabase()
+  const analysisResult = await getSupabase()
     .from('analyses')
     .select(`
       id,
@@ -175,33 +196,34 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
     .eq('job_id', job.id)
     .order('created_at', { ascending: false })
     .limit(1)
-    .maybeSingle();
+    .maybeSingle() as unknown as { data: AnalysisRow | null; error: unknown };
+  const analysis = analysisResult.data;
 
   if (!analysis) {
     return { found: false, reason: 'not_ready' };
   }
 
   // Fetch channel info
-  const { data: channel } = await getSupabase()
+  const channelResult = await getSupabase()
     .from('channels')
     .select('name, thumbnail_url')
     .eq('id', job.channel_id)
-    .single();
+    .single() as unknown as { data: ChannelRow | null; error: unknown };
+  const channel = channelResult.data;
 
   // Fetch user email for watermark (from auth.users via service role)
   let userEmail: string | null = null;
   if (job.user_id) {
-    const { data: authUser } = await getSupabase().auth.admin.getUserById(
-      job.user_id as string
-    );
+    const { data: authUser } = await getSupabase().auth.admin.getUserById(job.user_id);
     userEmail = authUser?.user?.email ?? null;
   }
 
   // Fetch deep dives (4 module types)
-  const { data: deepDiveRows } = await getSupabase()
+  const deepDivesResult = await getSupabase()
     .from('deep_dives')
     .select('module_type, content')
-    .eq('analysis_id', analysis.id);
+    .eq('analysis_id', analysis.id) as unknown as { data: DeepDiveRow[] | null; error: unknown };
+  const deepDiveRows = deepDivesResult.data;
 
   // Parse deep dive modules
   const deepDives: DeepDives = {
