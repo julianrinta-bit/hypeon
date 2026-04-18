@@ -22,6 +22,13 @@ function getSupabase() {
   }
   return _supabase;
 }
+// Untyped accessor — Supabase client has no generated DB schema, so all table
+// rows resolve to 'never'. Casting to any here lets callers add their own
+// row-level types via 'as unknown as T' on the result, which is the pattern
+// used throughout this file for reads. Writes (insert/update/upsert/rpc) use
+// this helper to avoid the 'never' argument errors.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function db(): any { return getSupabase(); }
 
 // ── pgmq client (separate schema) ──────────────────────────────────────────
 
@@ -185,11 +192,11 @@ export async function submitAnalysis(data: {
   if (existingChannel) {
     channelId = existingChannel.id;
   } else {
-    const newChannelResult = await getSupabase()
+    const newChannelResult = await db()
       .from('channels')
       .insert({ youtube_channel_id: channelUrl, name: 'Pending resolution', is_verified: false })
       .select('id')
-      .single() as unknown as { data: { id: string } | null; error: { message: string } | null };
+      .single() as { data: { id: string } | null; error: { message: string } | null };
 
     if (newChannelResult.error || !newChannelResult.data) {
       console.error('Channel insert error:', newChannelResult.error);
@@ -199,7 +206,7 @@ export async function submitAnalysis(data: {
   }
 
   // 6. Link user to channel
-  await getSupabase()
+  await db()
     .from('user_channels')
     .upsert(
       { user_id: userId, channel_id: channelId, is_active: true },
@@ -216,18 +223,18 @@ export async function submitAnalysis(data: {
   if (production_level) profileUpdate.production_level = production_level;
   if (region) profileUpdate.region = region;
 
-  await getSupabase().from('profiles').update(profileUpdate).eq('id', userId);
+  await db().from('profiles').update(profileUpdate).eq('id', userId);
 
   // 8. Create analysis job
   const jobPayload: Record<string, unknown> = { user_id: userId, channel_id: channelId, status: 'queued' };
   if (goal) jobPayload.goal = goal;
   if (validatedPromoCode) jobPayload.promo_code = validatedPromoCode;
 
-  const jobResult = await getSupabase()
+  const jobResult = await db()
     .from('analysis_jobs')
     .insert(jobPayload)
     .select('id, public_id')
-    .single() as unknown as { data: { id: string; public_id: string } | null; error: { message: string } | null };
+    .single() as { data: { id: string; public_id: string } | null; error: { message: string } | null };
 
   if (jobResult.error || !jobResult.data) {
     console.error('Job insert error:', jobResult.error);
@@ -237,10 +244,10 @@ export async function submitAnalysis(data: {
   const job = jobResult.data;
 
   // 9. Enqueue in pgmq (non-fatal — cron picks up DB rows anyway)
-  const { error: enqueueError } = await getSupabase().rpc('pgmq_send', {
+  const { error: enqueueError } = await db().rpc('pgmq_send', {
     queue_name: 'analysis_jobs',
     message: { job_id: job.id },
-  });
+  }) as { error: { message: string } | null };
 
   if (enqueueError) {
     console.warn('pgmq enqueue failed (cron will pick it up):', enqueueError);
