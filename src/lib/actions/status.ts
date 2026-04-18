@@ -2,11 +2,17 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
+let _supabase: ReturnType<typeof createClient> | null = null;
+function getSupabase() {
+  if (!_supabase) {
+    _supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+  }
+  return _supabase;
+}
 
 export interface JobStatus {
   status: string;
@@ -18,7 +24,7 @@ export type StatusResult =
   | { found: false };
 
 export async function fetchJobStatus(publicId: string): Promise<StatusResult> {
-  const { data, error } = await supabase
+  const { data, error } = await getSupabase()
     .from('analysis_jobs')
     .select('status, error_message')
     .eq('public_id', publicId)

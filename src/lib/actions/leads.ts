@@ -4,10 +4,16 @@ import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { headers } from 'next/headers';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+let _supabase: ReturnType<typeof createClient> | null = null;
+function getSupabase() {
+  if (!_supabase) {
+    _supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+  }
+  return _supabase;
+}
 
 const LeadSchema = z.object({
   service_interest: z.enum(['youtube', 'creative', 'products', 'unsure']),
@@ -55,7 +61,7 @@ export async function submitLead(formData: FormData): Promise<LeadResult> {
     return { success: false, error: 'Too many submissions. Please try again later.' };
   }
 
-  const { error } = await supabase.from('leads').insert({
+  const { error } = await getSupabase().from('leads').insert({
     service_interest: parsed.data.service_interest,
     channel_url: parsed.data.channel_url || null,
     name: parsed.data.name,
