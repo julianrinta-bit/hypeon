@@ -2,11 +2,17 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
+let _supabase: ReturnType<typeof createClient> | null = null;
+function getSupabase() {
+  if (!_supabase) {
+    _supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+  }
+  return _supabase;
+}
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -126,7 +132,7 @@ const SCORE_META: Record<string, string> = {
 
 export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   // First check if the job exists and is complete
-  const { data: job } = await supabase
+  const { data: job } = await getSupabase()
     .from('analysis_jobs')
     .select('id, status, channel_id, completed_at, user_id')
     .eq('public_id', publicId)
@@ -150,7 +156,7 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   }
 
   // Fetch the analysis results (including new fields)
-  const { data: analysis } = await supabase
+  const { data: analysis } = await getSupabase()
     .from('analyses')
     .select(`
       id,
@@ -176,7 +182,7 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   }
 
   // Fetch channel info
-  const { data: channel } = await supabase
+  const { data: channel } = await getSupabase()
     .from('channels')
     .select('name, thumbnail_url')
     .eq('id', job.channel_id)
@@ -185,14 +191,14 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   // Fetch user email for watermark (from auth.users via service role)
   let userEmail: string | null = null;
   if (job.user_id) {
-    const { data: authUser } = await supabase.auth.admin.getUserById(
+    const { data: authUser } = await getSupabase().auth.admin.getUserById(
       job.user_id as string
     );
     userEmail = authUser?.user?.email ?? null;
   }
 
   // Fetch deep dives (4 module types)
-  const { data: deepDiveRows } = await supabase
+  const { data: deepDiveRows } = await getSupabase()
     .from('deep_dives')
     .select('module_type, content')
     .eq('analysis_id', analysis.id);

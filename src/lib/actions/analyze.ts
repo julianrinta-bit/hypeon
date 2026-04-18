@@ -8,12 +8,20 @@ import { validatePromoCode } from '@/lib/promo-codes';
 import { checkRateLimit } from '@/lib/rate-limit';
 
 // ── Admin client (service role — bypasses RLS) ──────────────────────────────
+// Lazy getter: avoids top-level createClient() which fails during Vercel
+// static analysis when env vars are not yet available at module evaluation time.
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
+let _supabase: ReturnType<typeof createClient> | null = null;
+function getSupabase() {
+  if (!_supabase) {
+    _supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { autoRefreshToken: false, persistSession: false } }
+    );
+  }
+  return _supabase;
+}
 
 // ── pgmq client (separate schema) ──────────────────────────────────────────
 
@@ -114,7 +122,7 @@ export async function submitAnalysis(data: {
   // Server-side re-validation of promo code (anti-tamper)
   // Checks local valid_promo_codes cache first, falls back to Units DB directly.
   const validatedPromoCode = rawPromoCode
-    ? await validatePromoCode(rawPromoCode, supabase)
+    ? await validatePromoCode(rawPromoCode, getSupabase())
     : undefined;
 
   // 3. Find or create user (admin API — auto-confirmed, no verification email)
@@ -122,7 +130,7 @@ export async function submitAnalysis(data: {
   let userId: string;
 
   const password = randomBytes(32).toString('base64url');
-  const { data: newUser, error: signupError } = await supabase.auth.admin.createUser({
+  const { data: newUser, error: signupError } = await getSupabase().auth.admin.createUser({
     email,
     password,
     email_confirm: true,
@@ -133,7 +141,7 @@ export async function submitAnalysis(data: {
     userId = newUser.user.id;
   } else if (signupError?.message?.toLowerCase().includes('already')) {
     // User exists — find them via profiles table (mirrors auth.users)
-    const { data: existingProfile } = await supabase
+    const { data: existingProfile } = await getSupabase()
       .from('profiles')
       .select('id')
       .eq('email', email)
@@ -150,7 +158,7 @@ export async function submitAnalysis(data: {
   }
 
   // 4. Check for existing active job (one per user)
-  const { data: activeJob } = await supabase
+  const { data: activeJob } = await getSupabase()
     .from('analysis_jobs')
     .select('public_id, status')
     .eq('user_id', userId)
@@ -165,7 +173,7 @@ export async function submitAnalysis(data: {
   // 5. Upsert channel placeholder (real data resolved during channel_ingesting stage)
   let channelId: string;
 
-  const { data: existingChannel } = await supabase
+  const { data: existingChannel } = await getSupabase()
     .from('channels')
     .select('id')
     .eq('youtube_channel_id', channelUrl)
@@ -174,7 +182,7 @@ export async function submitAnalysis(data: {
   if (existingChannel) {
     channelId = existingChannel.id;
   } else {
-    const { data: newChannel, error: channelError } = await supabase
+    const { data: newChannel, error: channelError } = await getSupabase()
       .from('channels')
       .insert({ youtube_channel_id: channelUrl, name: 'Pending resolution', is_verified: false })
       .select('id')
@@ -188,7 +196,7 @@ export async function submitAnalysis(data: {
   }
 
   // 6. Link user to channel
-  await supabase
+  await getSupabase()
     .from('user_channels')
     .upsert(
       { user_id: userId, channel_id: channelId, is_active: true },
@@ -205,14 +213,14 @@ export async function submitAnalysis(data: {
   if (production_level) profileUpdate.production_level = production_level;
   if (region) profileUpdate.region = region;
 
-  await supabase.from('profiles').update(profileUpdate).eq('id', userId);
+  await getSupabase().from('profiles').update(profileUpdate).eq('id', userId);
 
   // 8. Create analysis job
   const jobPayload: Record<string, unknown> = { user_id: userId, channel_id: channelId, status: 'queued' };
   if (goal) jobPayload.goal = goal;
   if (validatedPromoCode) jobPayload.promo_code = validatedPromoCode;
 
-  const { data: job, error: jobError } = await supabase
+  const { data: job, error: jobError } = await getSupabase()
     .from('analysis_jobs')
     .insert(jobPayload)
     .select('id, public_id')
@@ -224,7 +232,7 @@ export async function submitAnalysis(data: {
   }
 
   // 9. Enqueue in pgmq (non-fatal — cron picks up DB rows anyway)
-  const { error: enqueueError } = await supabase.rpc('pgmq_send', {
+  const { error: enqueueError } = await getSupabase().rpc('pgmq_send', {
     queue_name: 'analysis_jobs',
     message: { job_id: job.id },
   });
