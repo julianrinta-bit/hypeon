@@ -145,7 +145,7 @@ export async function submitAnalysis(data: {
       .from('profiles')
       .select('id')
       .eq('email', email)
-      .maybeSingle();
+      .maybeSingle() as { data: { id: string } | null; error: unknown };
 
     if (!existingProfile) {
       console.error('User exists in auth but not in profiles:', email);
