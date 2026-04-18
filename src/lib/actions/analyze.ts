@@ -4,7 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { headers } from 'next/headers';
 import { randomBytes } from 'crypto';
-import { isValidPromoCode } from '@/config/promoCodes';
+import { validatePromoCode } from '@/lib/promo-codes';
 import { checkRateLimit } from '@/lib/rate-limit';
 
 // ── Admin client (service role — bypasses RLS) ──────────────────────────────
@@ -112,7 +112,10 @@ export async function submitAnalysis(data: {
   const channelUrl = normalizeChannelUrl(rawUrl);
 
   // Server-side re-validation of promo code (anti-tamper)
-  const validatedPromoCode = rawPromoCode && isValidPromoCode(rawPromoCode) ? rawPromoCode.toUpperCase().trim() : undefined;
+  // Checks local valid_promo_codes cache first, falls back to Units DB directly.
+  const validatedPromoCode = rawPromoCode
+    ? await validatePromoCode(rawPromoCode, supabase)
+    : undefined;
 
   // 3. Find or create user (admin API — auto-confirmed, no verification email)
   //    Try to create first. If email already exists, look up the existing user.
