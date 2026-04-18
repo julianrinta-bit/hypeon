@@ -14,6 +14,11 @@ function getSupabase() {
   }
   return _supabase;
 }
+// Untyped accessor — Supabase client has no generated DB schema so table rows
+// resolve to 'never'. This typed-as-any wrapper lets write operations (.insert,
+// .update, .upsert) pass arguments without TS rejecting them as 'never'.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function db(): any { return getSupabase(); }
 
 const LeadSchema = z.object({
   service_interest: z.enum(['youtube', 'creative', 'products', 'unsure']),
@@ -61,14 +66,14 @@ export async function submitLead(formData: FormData): Promise<LeadResult> {
     return { success: false, error: 'Too many submissions. Please try again later.' };
   }
 
-  const { error } = await getSupabase().from('leads').insert({
+  const { error } = await db().from('leads').insert({
     service_interest: parsed.data.service_interest,
     channel_url: parsed.data.channel_url || null,
     name: parsed.data.name,
     email: parsed.data.email,
     message: parsed.data.message || null,
     ip_address: ip !== 'unknown' ? ip : null,
-  });
+  }) as { error: { message: string } | null };
 
   if (error) {
     console.error('Lead insert error:', error);
