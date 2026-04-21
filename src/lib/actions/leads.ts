@@ -1,24 +1,14 @@
 'use server';
 
-import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { headers } from 'next/headers';
+import { getSupabaseAdmin } from '@/lib/supabase';
 
-let _supabase: ReturnType<typeof createClient> | null = null;
-function getSupabase() {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
-  }
-  return _supabase;
-}
-// Untyped accessor — Supabase client has no generated DB schema so table rows
-// resolve to 'never'. This typed-as-any wrapper lets write operations (.insert,
-// .update, .upsert) pass arguments without TS rejecting them as 'never'.
+// The 'leads' table is not yet in the generated DB schema (database.types.ts).
+// Until it's added via a migration and schema regeneration, we cast the client
+// to any for this specific table to allow insert operations.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function db(): any { return getSupabase(); }
+function db(): any { return getSupabaseAdmin(); }
 
 const LeadSchema = z.object({
   service_interest: z.enum(['youtube', 'creative', 'products', 'unsure']),

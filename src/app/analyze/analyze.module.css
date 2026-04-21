@@ -234,12 +234,13 @@
   gap: 8px;
   flex-shrink: 0;
   text-align: center;
+  box-shadow: 0 0 20px rgba(200, 255, 46, 0.25), 0 0 40px rgba(200, 255, 46, 0.10);
 }
 
 .analyzeBtn:hover {
   background: var(--az-accent-hover);
   transform: translateY(-2px);
-  box-shadow: 0 8px 32px rgba(200, 255, 46, 0.32);
+  box-shadow: 0 8px 32px rgba(200, 255, 46, 0.4), 0 0 50px rgba(200, 255, 46, 0.15);
 }
 
 .analyzeBtn:active {

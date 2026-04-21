@@ -1,34 +1,11 @@
 'use server';
 
-import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
 import { headers } from 'next/headers';
 import { randomBytes } from 'crypto';
 import { validatePromoCode } from '@/lib/promo-codes';
 import { checkRateLimit } from '@/lib/rate-limit';
-
-// ── Admin client (service role — bypasses RLS) ──────────────────────────────
-// Lazy getter: avoids top-level createClient() which fails during Vercel
-// static analysis when env vars are not yet available at module evaluation time.
-
-let _supabase: ReturnType<typeof createClient> | null = null;
-function getSupabase() {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
-  }
-  return _supabase;
-}
-// Untyped accessor — Supabase client has no generated DB schema, so all table
-// rows resolve to 'never'. Casting to any here lets callers add their own
-// row-level types via 'as unknown as T' on the result, which is the pattern
-// used throughout this file for reads. Writes (insert/update/upsert/rpc) use
-// this helper to avoid the 'never' argument errors.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function db(): any { return getSupabase(); }
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 // ── pgmq client (separate schema) ──────────────────────────────────────────
 
@@ -129,7 +106,7 @@ export async function submitAnalysis(data: {
   // Server-side re-validation of promo code (anti-tamper)
   // Checks local valid_promo_codes cache first, falls back to Units DB directly.
   const validatedPromoCode = rawPromoCode
-    ? await validatePromoCode(rawPromoCode, getSupabase())
+    ? await validatePromoCode(rawPromoCode, getSupabaseAdmin())
     : undefined;
 
   // 3. Find or create user (admin API — auto-confirmed, no verification email)
@@ -137,7 +114,7 @@ export async function submitAnalysis(data: {
   let userId: string;
 
   const password = randomBytes(32).toString('base64url');
-  const { data: newUser, error: signupError } = await getSupabase().auth.admin.createUser({
+  const { data: newUser, error: signupError } = await getSupabaseAdmin().auth.admin.createUser({
     email,
     password,
     email_confirm: true,
@@ -148,12 +125,11 @@ export async function submitAnalysis(data: {
     userId = newUser.user.id;
   } else if (signupError?.message?.toLowerCase().includes('already')) {
     // User exists — find them via profiles table (mirrors auth.users)
-    const profileResult = await getSupabase()
+    const { data: existingProfile } = await getSupabaseAdmin()
       .from('profiles')
       .select('id')
       .eq('email', email)
-      .maybeSingle() as unknown as { data: { id: string } | null; error: unknown };
-    const existingProfile = profileResult.data;
+      .maybeSingle();
 
     if (!existingProfile) {
       console.error('User exists in auth but not in profiles:', email);
@@ -166,47 +142,45 @@ export async function submitAnalysis(data: {
   }
 
   // 4. Check for existing active job (one per user)
-  const activeJobResult = await getSupabase()
+  const { data: activeJob } = await getSupabaseAdmin()
     .from('analysis_jobs')
     .select('public_id, status')
     .eq('user_id', userId)
     .not('status', 'in', '("complete","failed")')
-    .maybeSingle() as unknown as { data: { public_id: string; status: string } | null; error: unknown };
-  const activeJob = activeJobResult.data;
+    .maybeSingle();
 
   if (activeJob) {
     // Return existing job — don't create a duplicate
-    return { success: true, publicId: activeJob.public_id };
+    return { success: true, publicId: activeJob.public_id ?? '' };
   }
 
   // 5. Upsert channel placeholder (real data resolved during channel_ingesting stage)
   let channelId: string;
 
-  const existingChannelResult = await getSupabase()
+  const { data: existingChannel } = await getSupabaseAdmin()
     .from('channels')
     .select('id')
     .eq('youtube_channel_id', channelUrl)
-    .maybeSingle() as unknown as { data: { id: string } | null; error: unknown };
-  const existingChannel = existingChannelResult.data;
+    .maybeSingle();
 
   if (existingChannel) {
     channelId = existingChannel.id;
   } else {
-    const newChannelResult = await db()
+    const { data: newChannel, error: channelInsertError } = await getSupabaseAdmin()
       .from('channels')
       .insert({ youtube_channel_id: channelUrl, name: 'Pending resolution', is_verified: false })
       .select('id')
-      .single() as { data: { id: string } | null; error: { message: string } | null };
+      .single();
 
-    if (newChannelResult.error || !newChannelResult.data) {
-      console.error('Channel insert error:', newChannelResult.error);
+    if (channelInsertError || !newChannel) {
+      console.error('Channel insert error:', channelInsertError);
       return { success: false, error: 'Failed to initialize analysis. Please try again.' };
     }
-    channelId = newChannelResult.data.id;
+    channelId = newChannel.id;
   }
 
   // 6. Link user to channel
-  await db()
+  await getSupabaseAdmin()
     .from('user_channels')
     .upsert(
       { user_id: userId, channel_id: channelId, is_active: true },
@@ -214,45 +188,46 @@ export async function submitAnalysis(data: {
     );
 
   // 7. Update profile with declared signals
-  const profileUpdate: Record<string, unknown> = {
-    channel_url: channelUrl,
-    last_active_at: new Date().toISOString(),
-  };
-  if (goal) profileUpdate.goal = goal;
-  if (publishing_frequency) profileUpdate.publishing_frequency = publishing_frequency;
-  if (production_level) profileUpdate.production_level = production_level;
-  if (region) profileUpdate.region = region;
-
-  await db().from('profiles').update(profileUpdate).eq('id', userId);
+  await getSupabaseAdmin()
+    .from('profiles')
+    .update({
+      channel_url: channelUrl,
+      last_active_at: new Date().toISOString(),
+      ...(goal ? { goal } : {}),
+      ...(publishing_frequency ? { publishing_frequency } : {}),
+      ...(production_level ? { production_level } : {}),
+      ...(region ? { region } : {}),
+    })
+    .eq('id', userId);
 
   // 8. Create analysis job
-  const jobPayload: Record<string, unknown> = { user_id: userId, channel_id: channelId, status: 'queued' };
-  if (goal) jobPayload.goal = goal;
-  if (validatedPromoCode) jobPayload.promo_code = validatedPromoCode;
-
-  const jobResult = await db()
+  const { data: job, error: jobInsertError } = await getSupabaseAdmin()
     .from('analysis_jobs')
-    .insert(jobPayload)
+    .insert({
+      user_id: userId,
+      channel_id: channelId,
+      status: 'queued',
+      goal: goal ?? 'audience',
+      ...(validatedPromoCode ? { promo_code: validatedPromoCode } : {}),
+    })
     .select('id, public_id')
-    .single() as { data: { id: string; public_id: string } | null; error: { message: string } | null };
+    .single();
 
-  if (jobResult.error || !jobResult.data) {
-    console.error('Job insert error:', jobResult.error);
+  if (jobInsertError || !job) {
+    console.error('Job insert error:', jobInsertError);
     return { success: false, error: 'Failed to queue analysis. Please try again.' };
   }
 
-  const job = jobResult.data;
-
   // 9. Enqueue in pgmq (non-fatal — cron picks up DB rows anyway)
-  const { error: enqueueError } = await db().rpc('pgmq_send', {
+  const { error: enqueueError } = await getSupabaseAdmin().rpc('pgmq_send', {
     queue_name: 'analysis_jobs',
     message: { job_id: job.id },
-  }) as { error: { message: string } | null };
+  });
 
   if (enqueueError) {
     console.warn('pgmq enqueue failed (cron will pick it up):', enqueueError);
   }
 
   // 10. Return public_id for redirect to waiting room
-  return { success: true, publicId: job.public_id };
+  return { success: true, publicId: job.public_id ?? '' };
 }

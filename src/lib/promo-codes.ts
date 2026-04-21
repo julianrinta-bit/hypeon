@@ -15,6 +15,7 @@
 // or undefined if the code is invalid, inactive, or expired.
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import type { Database } from './database.types'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -56,7 +57,7 @@ function createUnitsClient(): SupabaseClient | null {
  */
 export async function validatePromoCode(
   code: string,
-  supabase: SupabaseClient,
+  supabase: SupabaseClient<Database>,
 ): Promise<string | undefined> {
   if (!code) return undefined
 
