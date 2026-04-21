@@ -242,6 +242,9 @@ export default function AnalyzeClient() {
   // ── Honeypot ────────────────────────────────────────────────────────────
   const [honeypot, setHoneypot] = useState('');
 
+  // ── Email gate visibility (animated reveal) ──────────────────────────────
+  const [emailGateVisible, setEmailGateVisible] = useState(false);
+
   // ── FAQ ─────────────────────────────────────────────────────────────────
   const [openFaqId, setOpenFaqId] = useState<string | null>(null);
 
@@ -324,11 +327,6 @@ export default function AnalyzeClient() {
       trackEvent('ChannelScanned');
       trackEvent('SnapshotViewed');
       trackEvent('EmailGateViewed');
-
-      // Scroll to email gate (now first, above snapshot)
-      setTimeout(() => {
-        emailGateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 1800);
     });
   }, [urlValue]);
 
@@ -338,6 +336,7 @@ export default function AnalyzeClient() {
     setFlowState('url-input');
     setSnapshot(null);
     setScanError(null);
+    setEmailGateVisible(false);
     setTimeout(() => { topInputRef.current?.focus(); }, 50);
   }, []);
 
@@ -366,6 +365,33 @@ export default function AnalyzeClient() {
       }
     });
   }, [urlValue, appliedCode, honeypot]);
+
+  // ── Animation sequence when snapshot loads ───────────────────────────────
+  useEffect(() => {
+    if (flowState !== 'snapshot') return;
+
+    // Respect reduced motion
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setEmailGateVisible(true);
+      return;
+    }
+
+    // T+0ms: scroll to SnapshotCard
+    snapshotRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+
+    // T+2200ms: reveal EmailGate (animate max-height from 0)
+    const revealTimer = setTimeout(() => setEmailGateVisible(true), 2200);
+
+    // T+2400ms: scroll up to EmailGate
+    const scrollTimer = setTimeout(() => {
+      emailGateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+    }, 2400);
+
+    return () => {
+      clearTimeout(revealTimer);
+      clearTimeout(scrollTimer);
+    };
+  }, [flowState]);
 
   // ── FAQ toggle ───────────────────────────────────────────────────────────
   const handleFaqToggle = useCallback((id: string) => {
@@ -617,22 +643,29 @@ export default function AnalyzeClient() {
 
       {/* ── SNAPSHOT + EMAIL GATE ────────────────────── */}
       {(flowState === 'snapshot' || flowState === 'submitting') && snapshot && (
-        <section
-          style={{ padding: '32px 24px 40px', maxWidth: 720, margin: '0 auto' }}
-        >
-          {/* Honeypot — invisible to bots */}
-          <input
-            type="text"
-            name="website_url"
-            value={honeypot}
-            onChange={e => setHoneypot(e.target.value)}
-            style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
-            tabIndex={-1}
-            autoComplete="off"
-            aria-hidden="true"
-          />
+        <section style={{ padding: '32px 24px 40px', maxWidth: 720, margin: '0 auto' }}>
 
-          {flowState === 'submitting' ? (
+          {/* EmailGate — hidden initially, revealed after 2.2s */}
+          {flowState !== 'submitting' && (
+            <div
+              ref={emailGateRef}
+              className={`${styles.emailGateWrapper} ${emailGateVisible ? styles.emailGateVisible : ''}`}
+            >
+              <EmailGate
+                onVerified={handleVerified}
+                appliedCode={appliedCode}
+                onApplyCode={() => setPromoState('code-entry')}
+              />
+              {submitError && (
+                <p style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
+                  {submitError}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Submitting spinner */}
+          {flowState === 'submitting' && (
             <div style={{ textAlign: 'center', padding: '32px 24px', color: 'rgba(240,240,236,0.6)', fontFamily: 'var(--font-mono)', fontSize: 13 }}>
               <svg
                 style={{ width: 18, height: 18, animation: 'spin 1s linear infinite', display: 'inline-block', marginRight: 8, verticalAlign: 'middle' }}
@@ -644,33 +677,34 @@ export default function AnalyzeClient() {
               </svg>
               Submitting your audit request...
             </div>
-          ) : (
-            <>
-              <div ref={emailGateRef} style={{ animation: 'delayedReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.5s both' }}>
-                <EmailGate
-                  onVerified={handleVerified}
-                  appliedCode={appliedCode}
-                  onApplyCode={() => setPromoState('code-entry')}
-                />
-              </div>
-              {submitError && (
-                <p style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
-                  {submitError}
-                </p>
-              )}
-            </>
           )}
 
-          {/* Arrow indicator pointing down to SnapshotCard */}
-          <div style={{ textAlign: 'center', margin: '16px 0 8px', opacity: 0.4 }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 5v14M5 12l7 7 7-7" stroke="#c8ff2e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
+          {/* Honeypot */}
+          <input
+            type="text"
+            name="website_url"
+            value={honeypot}
+            onChange={e => setHoneypot(e.target.value)}
+            style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+          />
 
-          <div ref={snapshotRef} style={{ animation: 'delayedReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both' }}>
+          {/* SnapshotCard — always visible, serves as the anchor point */}
+          <div ref={snapshotRef} className={styles.snapshotWrapper}>
             <SnapshotCard snapshot={snapshot} />
           </div>
+
+          {/* Promo code link below gate */}
+          {!appliedCode && flowState === 'snapshot' && (
+            <p className={styles.promoLink} style={{ marginTop: 16 }}>
+              Have a complimentary access code?{' '}
+              <button type="button" className={styles.promoLinkBtn} onClick={() => setPromoState('code-entry')}>
+                Apply it here
+              </button>
+            </p>
+          )}
         </section>
       )}
 
