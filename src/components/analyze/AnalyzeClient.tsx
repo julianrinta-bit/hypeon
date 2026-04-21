@@ -328,7 +328,7 @@ export default function AnalyzeClient() {
       // Scroll to email gate (now first, above snapshot)
       setTimeout(() => {
         emailGateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 200);
+      }, 1800);
     });
   }, [urlValue]);
 
@@ -646,7 +646,7 @@ export default function AnalyzeClient() {
             </div>
           ) : (
             <>
-              <div ref={emailGateRef}>
+              <div ref={emailGateRef} style={{ animation: 'delayedReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.5s both' }}>
                 <EmailGate
                   onVerified={handleVerified}
                   appliedCode={appliedCode}
