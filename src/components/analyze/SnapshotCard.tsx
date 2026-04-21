@@ -23,9 +23,10 @@ function formatSubscribers(n: number): string {
 
 interface SnapshotCardProps {
   snapshot: ChannelSnapshot;
+  onInsightsReady?: () => void;
 }
 
-export default function SnapshotCard({ snapshot }: SnapshotCardProps) {
+export default function SnapshotCard({ snapshot, onInsightsReady }: SnapshotCardProps) {
   const {
     name,
     handle,
@@ -51,9 +52,14 @@ export default function SnapshotCard({ snapshot }: SnapshotCardProps) {
   // Delayed reveal — creates the perception of analysis
   const [showInsights, setShowInsights] = useState(false);
   useEffect(() => {
-    const timer = setTimeout(() => setShowInsights(true), 6000);
-    return () => clearTimeout(timer);
-  }, []);
+    const revealTimer = setTimeout(() => setShowInsights(true), 6000);
+    // Notify parent 1.5s after insights appear (so user reads the "Quick take" first)
+    const notifyTimer = setTimeout(() => onInsightsReady?.(), 7500);
+    return () => {
+      clearTimeout(revealTimer);
+      clearTimeout(notifyTimer);
+    };
+  }, [onInsightsReady]);
 
   return (
     <div className={styles.card}>

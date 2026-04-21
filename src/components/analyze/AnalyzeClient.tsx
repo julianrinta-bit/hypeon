@@ -327,6 +327,10 @@ export default function AnalyzeClient() {
       trackEvent('ChannelScanned');
       trackEvent('SnapshotViewed');
       trackEvent('EmailGateViewed');
+      // Scroll to snapshot section
+      setTimeout(() => {
+        snapshotRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 200);
     });
   }, [urlValue]);
 
@@ -366,32 +370,20 @@ export default function AnalyzeClient() {
     });
   }, [urlValue, appliedCode, honeypot]);
 
-  // ── Animation sequence when snapshot loads ───────────────────────────────
-  useEffect(() => {
-    if (flowState !== 'snapshot') return;
-
+  // ── Callback: SnapshotCard calls this when insights are fully visible ────
+  const handleInsightsReady = useCallback(() => {
     // Respect reduced motion
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       setEmailGateVisible(true);
       return;
     }
-
-    // T+0ms: scroll to SnapshotCard
-    snapshotRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-
-    // T+2200ms: reveal EmailGate (animate max-height from 0)
-    const revealTimer = setTimeout(() => setEmailGateVisible(true), 2200);
-
-    // T+2400ms: scroll up to EmailGate
-    const scrollTimer = setTimeout(() => {
+    // Reveal EmailGate
+    setEmailGateVisible(true);
+    // Scroll up to EmailGate 200ms later (let max-height transition start first)
+    setTimeout(() => {
       emailGateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
-    }, 2400);
-
-    return () => {
-      clearTimeout(revealTimer);
-      clearTimeout(scrollTimer);
-    };
-  }, [flowState]);
+    }, 200);
+  }, []);
 
   // ── FAQ toggle ───────────────────────────────────────────────────────────
   const handleFaqToggle = useCallback((id: string) => {
@@ -693,7 +685,7 @@ export default function AnalyzeClient() {
 
           {/* SnapshotCard — always visible, serves as the anchor point */}
           <div ref={snapshotRef} className={styles.snapshotWrapper}>
-            <SnapshotCard snapshot={snapshot} />
+            <SnapshotCard snapshot={snapshot} onInsightsReady={handleInsightsReady} />
           </div>
 
           {/* Promo code link below gate */}
