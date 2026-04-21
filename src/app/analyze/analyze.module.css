@@ -184,35 +184,36 @@
 .urlInput {
   flex: 1;
   height: 56px;
-  background: rgba(22, 22, 25, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid rgba(200, 255, 46, 0.3);
   border-radius: 10px;
   padding: 0 18px;
   font-family: var(--font-body);
   font-size: 15px;
-  color: var(--az-text-bright);
+  color: #0A0A0C;
   outline: none;
   transition: border-color 0.2s var(--az-ease), box-shadow 0.2s var(--az-ease);
   backdrop-filter: blur(8px);
+  box-shadow: 0 0 16px rgba(200, 255, 46, 0.08);
 }
 
 .urlInput::placeholder {
-  color: var(--az-text-dim);
+  color: rgba(10, 10, 14, 0.4);
 }
 
 .urlInput:focus {
-  border-color: var(--az-accent);
-  box-shadow: 0 0 0 3px rgba(200, 255, 46, 0.12), 0 0 20px rgba(200, 255, 46, 0.06);
+  border-color: #c8ff2e;
+  box-shadow: 0 0 0 4px rgba(200, 255, 46, 0.15), 0 0 20px rgba(200, 255, 46, 0.08);
 }
 
 .urlInputError {
-  border-color: rgba(248, 113, 113, 0.45) !important;
-  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.08) !important;
+  border-color: rgba(248, 113, 113, 0.6) !important;
+  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.12) !important;
 }
 
 .urlInputValid {
-  border-color: rgba(200, 255, 46, 0.35) !important;
-  box-shadow: 0 0 0 3px rgba(200, 255, 46, 0.08) !important;
+  border-color: rgba(200, 255, 46, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(200, 255, 46, 0.12) !important;
 }
 
 .analyzeBtn {
