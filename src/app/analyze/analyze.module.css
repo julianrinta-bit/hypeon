@@ -1255,6 +1255,30 @@
 .bentoCard:nth-child(5) .scoreBadge { animation-delay: 0.7s; }
 .bentoCard:nth-child(6) .scoreBadge { animation-delay: 0.8s; }
 
+/* ─── SCAN RESULT ANIMATION ──────────────────────── */
+
+/* EmailGate hidden state — takes NO layout space */
+.emailGateWrapper {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+}
+
+/* EmailGate visible state — animates into existence */
+.emailGateVisible {
+  max-height: 600px;
+  opacity: 1;
+  transition:
+    max-height 600ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  margin-bottom: 24px;
+}
+
+/* SnapshotCard wrapper — fade in on mount */
+.snapshotWrapper {
+  animation: delayedReveal 400ms cubic-bezier(0.16, 1, 0.3, 1) 100ms both;
+}
+
 /* ─────────────────────────────────────────────────
    RESPONSIVE
 ───────────────────────────────────────────────── */
@@ -1357,5 +1381,15 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .emailGateWrapper,
+  .emailGateWrapper.emailGateVisible {
+    transition: none !important;
+    max-height: none !important;
+    opacity: 1 !important;
+  }
+  .snapshotWrapper {
+    animation: none !important;
   }
 }
