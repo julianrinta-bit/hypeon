@@ -325,13 +325,10 @@ export default function AnalyzeClient() {
       trackEvent('SnapshotViewed');
       trackEvent('EmailGateViewed');
 
-      // Scroll to snapshot section, then email gate
+      // Scroll to email gate (now first, above snapshot)
       setTimeout(() => {
-        snapshotRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        emailGateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 200);
-      setTimeout(() => {
-        emailGateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 1200);
     });
   }, [urlValue]);
 
@@ -621,18 +618,8 @@ export default function AnalyzeClient() {
       {/* ── SNAPSHOT + EMAIL GATE ────────────────────── */}
       {(flowState === 'snapshot' || flowState === 'submitting') && snapshot && (
         <section
-          ref={snapshotRef}
           style={{ padding: '32px 24px 40px', maxWidth: 720, margin: '0 auto' }}
         >
-          <SnapshotCard snapshot={snapshot} />
-
-          {/* Arrow indicator between SnapshotCard and EmailGate */}
-          <div style={{ textAlign: 'center', margin: '16px 0 8px', opacity: 0.4 }}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M12 5v14M5 12l7 7 7-7" stroke="#c8ff2e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </div>
-
           {/* Honeypot — invisible to bots */}
           <input
             type="text"
@@ -673,6 +660,17 @@ export default function AnalyzeClient() {
               )}
             </>
           )}
+
+          {/* Arrow indicator pointing down to SnapshotCard */}
+          <div style={{ textAlign: 'center', margin: '16px 0 8px', opacity: 0.4 }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5v14M5 12l7 7 7-7" stroke="#c8ff2e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+
+          <div ref={snapshotRef} style={{ animation: 'delayedReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both' }}>
+            <SnapshotCard snapshot={snapshot} />
+          </div>
         </section>
       )}
 
@@ -967,6 +965,10 @@ export default function AnalyzeClient() {
         @keyframes drawRadar {
           from { stroke-dashoffset: 600; opacity: 0.3; }
           to   { stroke-dashoffset: 0; opacity: 1; }
+        }
+        @keyframes delayedReveal {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
         [data-reveal] {
           opacity: 0;
