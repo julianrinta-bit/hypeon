@@ -1,18 +1,6 @@
 'use server';
 
-import { createClient } from '@supabase/supabase-js';
-
-let _supabase: ReturnType<typeof createClient> | null = null;
-function getSupabase() {
-  if (!_supabase) {
-    _supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { autoRefreshToken: false, persistSession: false } }
-    );
-  }
-  return _supabase;
-}
+import { getSupabaseAdmin } from '@/lib/supabase';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -128,36 +116,16 @@ const SCORE_META: Record<string, string> = {
   score_outlier_detection: 'Outlier Detection',
 };
 
-// ── Row types (untyped Supabase client returns 'never' without DB generics) ──
-
-type JobRow = { id: string; status: string; channel_id: string; completed_at: string | null; user_id: string | null };
-type AnalysisRow = {
-  id: string;
-  overall_grade: string;
-  score_content_consistency: number;
-  score_title_quality: number;
-  score_thumbnail_patterns: number;
-  score_engagement_health: number;
-  score_growth_trajectory: number;
-  score_outlier_detection: number;
-  recommendation: string;
-  weighted_scores: unknown;
-  outliers: unknown;
-  created_at: string;
-};
-type ChannelRow = { name: string; thumbnail_url: string | null };
-type DeepDiveRow = { module_type: string; content: unknown };
 
 // ── Fetch teaser data ───────────────────────────────────────────────────────
 
 export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   // First check if the job exists and is complete
-  const jobResult = await getSupabase()
+  const { data: job } = await getSupabaseAdmin()
     .from('analysis_jobs')
     .select('id, status, channel_id, completed_at, user_id')
     .eq('public_id', publicId)
-    .maybeSingle() as unknown as { data: JobRow | null; error: unknown };
-  const job = jobResult.data;
+    .maybeSingle();
 
   if (!job) {
     return { found: false, reason: 'not_found' };
@@ -177,7 +145,7 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
   }
 
   // Fetch the analysis results (including new fields)
-  const analysisResult = await getSupabase()
+  const { data: analysis } = await getSupabaseAdmin()
     .from('analyses')
     .select(`
       id,
@@ -196,34 +164,31 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
     .eq('job_id', job.id)
     .order('created_at', { ascending: false })
     .limit(1)
-    .maybeSingle() as unknown as { data: AnalysisRow | null; error: unknown };
-  const analysis = analysisResult.data;
+    .maybeSingle();
 
   if (!analysis) {
     return { found: false, reason: 'not_ready' };
   }
 
   // Fetch channel info
-  const channelResult = await getSupabase()
+  const { data: channel } = await getSupabaseAdmin()
     .from('channels')
     .select('name, thumbnail_url')
     .eq('id', job.channel_id)
-    .single() as unknown as { data: ChannelRow | null; error: unknown };
-  const channel = channelResult.data;
+    .single();
 
   // Fetch user email for watermark (from auth.users via service role)
   let userEmail: string | null = null;
   if (job.user_id) {
-    const { data: authUser } = await getSupabase().auth.admin.getUserById(job.user_id);
+    const { data: authUser } = await getSupabaseAdmin().auth.admin.getUserById(job.user_id);
     userEmail = authUser?.user?.email ?? null;
   }
 
   // Fetch deep dives (4 module types)
-  const deepDivesResult = await getSupabase()
+  const { data: deepDiveRows } = await getSupabaseAdmin()
     .from('deep_dives')
     .select('module_type, content')
-    .eq('analysis_id', analysis.id) as unknown as { data: DeepDiveRow[] | null; error: unknown };
-  const deepDiveRows = deepDivesResult.data;
+    .eq('analysis_id', analysis.id);
 
   // Parse deep dive modules
   const deepDives: DeepDives = {
@@ -306,7 +271,7 @@ export async function fetchTeaserData(publicId: string): Promise<TeaserResult> {
       scores: scoreEntries,
       insight: firstSentence,
       fullRecommendationLength: recSentences,
-      analyzedAt: analysis.created_at,
+      analyzedAt: analysis.created_at ?? '',
       recommendation: fullRec,
       weightedScores,
       outliers,

@@ -13,17 +13,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getSupabaseAdmin } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
-  // Lazy-initialize clients inside the handler so env vars are always available
-  // at runtime. Top-level createClient() calls fail during Vercel static analysis.
-  const supabaseHypeon = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  );
+  const supabaseHypeon = getSupabaseAdmin();
 
   const unitsUrl = process.env.UNITS_SUPABASE_URL;
   const unitsKey = process.env.UNITS_SUPABASE_SERVICE_KEY;
+  // Units DB uses a different project — untyped client is acceptable here
+  // since Units has its own schema and we're only writing a simple tracking row
   const supabaseUnits = unitsUrl && unitsKey ? createClient(unitsUrl, unitsKey) : null;
 
   const id = request.nextUrl.searchParams.get("id") ?? "unknown";

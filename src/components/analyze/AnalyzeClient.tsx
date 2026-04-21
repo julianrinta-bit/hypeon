@@ -220,6 +220,7 @@ export default function AnalyzeClient() {
   // ── Refs ────────────────────────────────────────────────────────────────
   const topInputRef   = useRef<HTMLInputElement>(null);
   const snapshotRef   = useRef<HTMLDivElement>(null);
+  const emailGateRef  = useRef<HTMLDivElement>(null);
 
   // ── URL ─────────────────────────────────────────────────────────────────
   const [urlValue, setUrlValue] = useState('');
@@ -324,10 +325,13 @@ export default function AnalyzeClient() {
       trackEvent('SnapshotViewed');
       trackEvent('EmailGateViewed');
 
-      // Scroll to snapshot section
+      // Scroll to snapshot section, then email gate
       setTimeout(() => {
         snapshotRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 200);
+      setTimeout(() => {
+        emailGateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 1200);
     });
   }, [urlValue]);
 
@@ -618,9 +622,16 @@ export default function AnalyzeClient() {
       {(flowState === 'snapshot' || flowState === 'submitting') && snapshot && (
         <section
           ref={snapshotRef}
-          style={{ padding: '60px 24px 40px', maxWidth: 720, margin: '0 auto' }}
+          style={{ padding: '32px 24px 40px', maxWidth: 720, margin: '0 auto' }}
         >
           <SnapshotCard snapshot={snapshot} />
+
+          {/* Arrow indicator between SnapshotCard and EmailGate */}
+          <div style={{ textAlign: 'center', margin: '16px 0 8px', opacity: 0.4 }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5v14M5 12l7 7 7-7" stroke="#c8ff2e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
 
           {/* Honeypot — invisible to bots */}
           <input
@@ -648,11 +659,13 @@ export default function AnalyzeClient() {
             </div>
           ) : (
             <>
-              <EmailGate
-                onVerified={handleVerified}
-                appliedCode={appliedCode}
-                onApplyCode={() => setPromoState('code-entry')}
-              />
+              <div ref={emailGateRef}>
+                <EmailGate
+                  onVerified={handleVerified}
+                  appliedCode={appliedCode}
+                  onApplyCode={() => setPromoState('code-entry')}
+                />
+              </div>
               {submitError && (
                 <p style={{ color: '#ff6b6b', fontSize: '0.85rem', marginTop: '0.5rem', textAlign: 'center' }}>
                   {submitError}
