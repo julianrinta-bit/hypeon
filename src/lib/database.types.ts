@@ -274,6 +274,7 @@ export type Database = {
           qualification_sent_at: string | null
           qualification_token: string | null
           retry_count: number | null
+          session_id: string | null
           started_at: string | null
           status: string
           transcript_success_count: number | null
@@ -306,6 +307,7 @@ export type Database = {
           qualification_sent_at?: string | null
           qualification_token?: string | null
           retry_count?: number | null
+          session_id?: string | null
           started_at?: string | null
           status?: string
           transcript_success_count?: number | null
@@ -338,6 +340,7 @@ export type Database = {
           qualification_sent_at?: string | null
           qualification_token?: string | null
           retry_count?: number | null
+          session_id?: string | null
           started_at?: string | null
           status?: string
           transcript_success_count?: number | null
@@ -351,6 +354,13 @@ export type Database = {
             columns: ["channel_id"]
             isOneToOne: false
             referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "analysis_jobs_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "visitor_sessions"
             referencedColumns: ["id"]
           },
           {
@@ -1086,6 +1096,14 @@ export type Database = {
           channel_url: string | null
           created_at: string | null
           email: string
+          first_country: string | null
+          first_device_type: string | null
+          first_language: string | null
+          first_referrer: string | null
+          first_utm_campaign: string | null
+          first_utm_content: string | null
+          first_utm_medium: string | null
+          first_utm_source: string | null
           goal: string | null
           id: string
           last_active_at: string | null
@@ -1097,6 +1115,14 @@ export type Database = {
           channel_url?: string | null
           created_at?: string | null
           email: string
+          first_country?: string | null
+          first_device_type?: string | null
+          first_language?: string | null
+          first_referrer?: string | null
+          first_utm_campaign?: string | null
+          first_utm_content?: string | null
+          first_utm_medium?: string | null
+          first_utm_source?: string | null
           goal?: string | null
           id: string
           last_active_at?: string | null
@@ -1108,6 +1134,14 @@ export type Database = {
           channel_url?: string | null
           created_at?: string | null
           email?: string
+          first_country?: string | null
+          first_device_type?: string | null
+          first_language?: string | null
+          first_referrer?: string | null
+          first_utm_campaign?: string | null
+          first_utm_content?: string | null
+          first_utm_medium?: string | null
+          first_utm_source?: string | null
           goal?: string | null
           id?: string
           last_active_at?: string | null
@@ -1300,6 +1334,148 @@ export type Database = {
             columns: ["channel_id"]
             isOneToOne: false
             referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visitor_events: {
+        Row: {
+          created_at: string
+          event_data: Json | null
+          event_type: string
+          id: number
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json | null
+          event_type: string
+          id?: never
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json | null
+          event_type?: string
+          id?: never
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitor_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "visitor_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visitor_sessions: {
+        Row: {
+          browser: string | null
+          city: string | null
+          converted: boolean
+          converted_at: string | null
+          country_code: string | null
+          created_at: string
+          device_type: string | null
+          fbclid: string | null
+          gclid: string | null
+          id: string
+          is_returning: boolean
+          landing_page: string | null
+          language: string | null
+          max_scroll_pct: number
+          os: string | null
+          page_views: number
+          promo_code: string | null
+          referrer: string | null
+          region: string | null
+          screen_height: number | null
+          screen_width: number | null
+          time_on_site_s: number
+          timezone: string | null
+          updated_at: string
+          user_id: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
+          visitor_id: string
+        }
+        Insert: {
+          browser?: string | null
+          city?: string | null
+          converted?: boolean
+          converted_at?: string | null
+          country_code?: string | null
+          created_at?: string
+          device_type?: string | null
+          fbclid?: string | null
+          gclid?: string | null
+          id?: string
+          is_returning?: boolean
+          landing_page?: string | null
+          language?: string | null
+          max_scroll_pct?: number
+          os?: string | null
+          page_views?: number
+          promo_code?: string | null
+          referrer?: string | null
+          region?: string | null
+          screen_height?: number | null
+          screen_width?: number | null
+          time_on_site_s?: number
+          timezone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          visitor_id: string
+        }
+        Update: {
+          browser?: string | null
+          city?: string | null
+          converted?: boolean
+          converted_at?: string | null
+          country_code?: string | null
+          created_at?: string
+          device_type?: string | null
+          fbclid?: string | null
+          gclid?: string | null
+          id?: string
+          is_returning?: boolean
+          landing_page?: string | null
+          language?: string | null
+          max_scroll_pct?: number
+          os?: string | null
+          page_views?: number
+          promo_code?: string | null
+          referrer?: string | null
+          region?: string | null
+          screen_height?: number | null
+          screen_width?: number | null
+          time_on_site_s?: number
+          timezone?: string | null
+          updated_at?: string
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
+          visitor_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitor_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
