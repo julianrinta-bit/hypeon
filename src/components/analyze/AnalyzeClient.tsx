@@ -7,6 +7,8 @@ import { submitAnalysis } from '@/lib/actions/analyze';
 import { fetchChannelSnapshot, type ChannelSnapshot } from '@/lib/actions/snapshot';
 import { trackEvent } from '@/lib/pixel';
 import { isValidPromoCode } from '@/config/promoCodes';
+import { captureAttribution, setSessionId, getSessionId } from '@/lib/attribution';
+import { createVisitorSession } from '@/lib/actions/session';
 import PromoInput from './PromoInput';
 import promoStyles from './promoGate.module.css';
 import styles from '@/app/analyze/analyze.module.css';
@@ -221,6 +223,7 @@ export default function AnalyzeClient() {
   const topInputRef   = useRef<HTMLInputElement>(null);
   const snapshotRef   = useRef<HTMLDivElement>(null);
   const emailGateRef  = useRef<HTMLDivElement>(null);
+  const sessionIdRef  = useRef<string | null>(null);
 
   // ── URL ─────────────────────────────────────────────────────────────────
   const [urlValue, setUrlValue] = useState('');
@@ -272,6 +275,36 @@ export default function AnalyzeClient() {
 
     if (isFromFacebook) {
       trackEvent('PromoGateSkipped', { reason: 'facebook_traffic' });
+    }
+
+    // Attribution capture — non-blocking
+    const existingSession = getSessionId();
+    if (!existingSession) {
+      const attribution = captureAttribution();
+      createVisitorSession({
+        visitor_id: attribution.visitorId,
+        utm_source: attribution.utmSource,
+        utm_medium: attribution.utmMedium,
+        utm_campaign: attribution.utmCampaign,
+        utm_content: attribution.utmContent,
+        utm_term: attribution.utmTerm,
+        fbclid: attribution.fbclid,
+        gclid: attribution.gclid,
+        referrer: attribution.referrer,
+        landing_page: window.location.pathname + window.location.search,
+        screen_width: attribution.screenWidth ?? 0,
+        screen_height: attribution.screenHeight ?? 0,
+        language: attribution.language ?? 'unknown',
+        timezone: attribution.timezone ?? 'unknown',
+        is_returning: attribution.isReturning,
+      }).then((result) => {
+        if ('session_id' in result) {
+          setSessionId(result.session_id);
+          sessionIdRef.current = result.session_id;
+        }
+      });
+    } else {
+      sessionIdRef.current = existingSession;
     }
   }, [searchParams]);
 
@@ -358,6 +391,7 @@ export default function AnalyzeClient() {
         promo_code: appliedCode || undefined,
         verified: true,
         website_url: honeypot || undefined,
+        session_id: sessionIdRef.current || undefined,
       });
 
       if (result.success && result.publicId) {
@@ -394,6 +428,53 @@ export default function AnalyzeClient() {
   const handleBottomCta = useCallback(() => {
     topInputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     setTimeout(() => { topInputRef.current?.focus(); }, 400);
+  }, []);
+
+  // Scroll depth + time on site tracking
+  useEffect(() => {
+    const startTime = performance.now();
+    let maxScroll = 0;
+
+    const handleScroll = () => {
+      const scrollPct = Math.round(
+        (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100
+      );
+      if (scrollPct > maxScroll) maxScroll = scrollPct;
+    };
+
+    const flush = () => {
+      const sid = sessionIdRef.current;
+      if (!sid) return;
+      const timeOnSite = Math.round((performance.now() - startTime) / 1000);
+      navigator.sendBeacon(
+        '/api/track/session',
+        JSON.stringify({
+          session_id: sid,
+          max_scroll_pct: maxScroll,
+          time_on_site_s: timeOnSite,
+        })
+      );
+    };
+
+    // Defer listener attachment
+    const id = typeof requestIdleCallback === 'function'
+      ? requestIdleCallback(() => {
+          window.addEventListener('scroll', handleScroll, { passive: true });
+        })
+      : setTimeout(() => {
+          window.addEventListener('scroll', handleScroll, { passive: true });
+        }, 2000);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') flush();
+    });
+    window.addEventListener('beforeunload', flush);
+
+    return () => {
+      if (typeof cancelIdleCallback === 'function') cancelIdleCallback(id as number);
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('beforeunload', flush);
+    };
   }, []);
 
   // ── URL input class ──────────────────────────────────────────────────────

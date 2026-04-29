@@ -70,6 +70,8 @@ export async function submitAnalysis(data: {
   verified?: boolean;
   /** Honeypot field — must be empty; bots fill it automatically */
   website_url?: string;
+  /** Session ID from the attribution system — not user input, not validated by Zod */
+  session_id?: string;
 }): Promise<AnalyzeResult> {
   // 0. Honeypot — bots fill hidden fields; silently accept and return fake success
   if (data.website_url) {
@@ -200,6 +202,51 @@ export async function submitAnalysis(data: {
     })
     .eq('id', userId);
 
+  // 7b. Write first-touch attribution from session (if session_id provided)
+  if (data.session_id) {
+    // Read the session's attribution data
+    const { data: session } = await getSupabaseAdmin()
+      .from('visitor_sessions')
+      .select('utm_source, utm_medium, utm_campaign, utm_content, referrer, country_code, device_type, language')
+      .eq('id', data.session_id)
+      .single();
+
+    if (session) {
+      // Only write first-touch if not already set (don't overwrite returning users)
+      const { data: existingProfile } = await getSupabaseAdmin()
+        .from('profiles')
+        .select('first_utm_source')
+        .eq('id', userId)
+        .single();
+
+      if (existingProfile && !existingProfile.first_utm_source) {
+        await getSupabaseAdmin()
+          .from('profiles')
+          .update({
+            first_utm_source: session.utm_source,
+            first_utm_medium: session.utm_medium,
+            first_utm_campaign: session.utm_campaign,
+            first_utm_content: session.utm_content,
+            first_referrer: session.referrer,
+            first_country: session.country_code,
+            first_device_type: session.device_type,
+            first_language: session.language,
+          })
+          .eq('id', userId);
+      }
+
+      // Mark session as converted
+      await getSupabaseAdmin()
+        .from('visitor_sessions')
+        .update({
+          converted: true,
+          converted_at: new Date().toISOString(),
+          user_id: userId,
+        })
+        .eq('id', data.session_id);
+    }
+  }
+
   // 8. Create analysis job
   const { data: job, error: jobInsertError } = await getSupabaseAdmin()
     .from('analysis_jobs')
@@ -209,6 +256,7 @@ export async function submitAnalysis(data: {
       status: 'queued',
       goal: goal ?? 'audience',
       ...(validatedPromoCode ? { promo_code: validatedPromoCode } : {}),
+      ...(data.session_id ? { session_id: data.session_id } : {}),
     })
     .select('id, public_id')
     .single();
