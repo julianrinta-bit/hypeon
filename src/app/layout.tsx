@@ -7,7 +7,6 @@ import CustomCursor from '@/components/layout/CustomCursor';
 import Nav from '@/components/layout/Nav';
 import ConditionalShell from '@/components/layout/ConditionalShell';
 import ExitIntentModal from '@/components/landing/ExitIntentModal';
-import CookieConsent from '@/components/layout/CookieConsent';
 import ScrollToTop from '@/components/ui/ScrollToTop';
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -98,7 +97,6 @@ export default function RootLayout({
         <ConditionalShell />
         <ScrollToTop />
         <ExitIntentModal />
-        <CookieConsent />
       </body>
     </html>
   );
