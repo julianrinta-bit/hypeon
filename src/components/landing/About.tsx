@@ -12,8 +12,8 @@ export default function About() {
         <div className="about-layout">
           <RevealOnScroll className="about-left reveal">
             <div className="about-fact">
-              <div className="about-fact-value">Dubai, UAE</div>
-              <div className="about-fact-label">Headquarters</div>
+              <div className="about-fact-value">US & Dubai</div>
+              <div className="about-fact-label">Based in</div>
             </div>
             <div className="about-fact">
               <div className="about-fact-value">6 countries</div>

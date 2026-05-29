@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Privacy Policy — Hype On Media',
-  description: 'How Hype On Media FZCO collects, uses, and protects your personal data.',
+  description: 'How Hype On Media collects, uses, and protects your personal data.',
   alternates: { canonical: '/privacy' },
 }
 
@@ -16,8 +16,8 @@ export default function PrivacyPage() {
 
       <h2>1. Who We Are</h2>
       <p>
-        This website is operated by <strong>Hype On Media FZCO</strong>, a company registered in
-        Dubai, United Arab Emirates. We are a YouTube management agency that helps brands and
+        This website is operated by <strong>Outright Publishing LLC</strong>, doing business as <strong>Hype On Media</strong>, a company registered in
+        Delaware, USA. We are a YouTube management agency that helps brands and
         creators scale their channels through data-driven strategy, production, and optimization.
       </p>
       <p>
@@ -125,7 +125,7 @@ export default function PrivacyPage() {
 
       <h2>10. International Transfers</h2>
       <p>
-        Your data may be processed outside the UAE, including in regions where our cloud
+        Your data may be processed outside the US, including in regions where our cloud
         infrastructure providers operate. We ensure that any transfers are protected by
         appropriate safeguards, including standard contractual clauses where applicable.
       </p>
@@ -145,8 +145,8 @@ export default function PrivacyPage() {
 
       <h2>13. Contact</h2>
       <p>
-        Hype On Media FZCO<br />
-        Dubai, United Arab Emirates<br />
+        Outright Publishing LLC dba Hype On Media<br />
+        Delaware, USA<br />
         <a href="mailto:hello@hypeon.media">hello@hypeon.media</a>
       </p>
 

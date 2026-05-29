@@ -17,8 +17,8 @@ export default function TermsPage() {
       <h2>1. Introduction</h2>
       <p>
         These Terms of Service ("Terms") govern your use of the website at hypeon.media and any
-        services provided by <strong>Hype On Media FZCO</strong> ("Company," "we," "us," or "our"),
-        a company registered in Dubai, United Arab Emirates.
+        services provided by <strong>Outright Publishing LLC</strong>, doing business as <strong>Hype On Media</strong> ("Company," "we," "us," or "our"),
+        a company registered in Delaware, USA.
       </p>
       <p>
         By accessing this website or engaging our services, you agree to be bound by these Terms.
@@ -59,7 +59,7 @@ export default function TermsPage() {
       <h2>6. Intellectual Property</h2>
       <p>
         All content on this website — including text, graphics, logos, images, videos, and
-        software — is the property of Hype On Media FZCO or its licensors and is protected by
+        software — is the property of Outright Publishing LLC (dba Hype On Media) or its licensors and is protected by
         applicable intellectual property laws.
       </p>
       <p>
@@ -85,7 +85,7 @@ export default function TermsPage() {
 
       <h2>9. Limitation of Liability</h2>
       <p>
-        To the maximum extent permitted by applicable law, Hype On Media FZCO shall not be
+        To the maximum extent permitted by applicable law, Outright Publishing LLC (dba Hype On Media) shall not be
         liable for any indirect, incidental, special, consequential, or punitive damages arising
         from your use of this website or our services.
       </p>
@@ -124,9 +124,9 @@ export default function TermsPage() {
 
       <h2>13. Governing Law and Jurisdiction</h2>
       <p>
-        These Terms are governed by and construed in accordance with the laws of the United Arab
-        Emirates. Any disputes arising from these Terms shall be subject to the exclusive
-        jurisdiction of the courts of Dubai, UAE.
+        These Terms are governed by and construed in accordance with the laws of the State of
+        Delaware, USA. Any disputes arising from these Terms shall be subject to the exclusive
+        jurisdiction of the courts of Delaware.
       </p>
 
       <h2>14. Severability</h2>
@@ -138,8 +138,8 @@ export default function TermsPage() {
       <h2>15. Contact</h2>
       <p>
         For questions about these Terms, contact us at:<br />
-        Hype On Media FZCO<br />
-        Dubai, United Arab Emirates<br />
+        Outright Publishing LLC dba Hype On Media<br />
+        Delaware, USA<br />
         <a href="mailto:hello@hypeon.media">hello@hypeon.media</a>
       </p>
 

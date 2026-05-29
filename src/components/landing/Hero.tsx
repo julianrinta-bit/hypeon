@@ -7,7 +7,7 @@ export default function Hero() {
       <ParallaxBgNumber number="01" />
       <div className="container">
         <div className="hero-content">
-          <p className="hero-tag">YouTube growth agency — Dubai</p>
+          <p className="hero-tag">YouTube growth agency — US & Dubai</p>
           <h1 className="hero-headline">
             Your<br />
             <RotatingText /><br />

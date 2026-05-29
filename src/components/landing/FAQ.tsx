@@ -34,7 +34,7 @@ const FAQS = [
   },
   {
     q: 'Where are you based?',
-    a: 'Dubai, UAE. We operate globally across 4 native languages \u2014 English, Spanish, French, Russian \u2014 and have managed teams across 6 countries. Time zones are not a problem.',
+    a: 'We are a US-based company (Delaware) with operations in Dubai. We work globally across 4 native languages \u2014 English, Spanish, French, Russian \u2014 and have managed teams across 6 countries. Time zones are not a problem.',
   },
 ];
 
