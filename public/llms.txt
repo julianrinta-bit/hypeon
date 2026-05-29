@@ -1,6 +1,6 @@
 # Hype On Media
 
-> Hype On Media is a YouTube growth agency based in Dubai, UAE. We turn underperforming YouTube channels into growth engines using strategy, production, and proprietary analytics built from a decade of scaling 50+ channels across 15 languages to over 5 billion views.
+> Hype On Media is a YouTube growth agency operating from Dubai and Delaware. We turn underperforming YouTube channels into growth engines using strategy, production, and proprietary analytics built from a decade of scaling 50+ channels across 15 languages to over 5 billion views.
 
 ## Services
 
@@ -18,7 +18,7 @@
 
 ## Company Facts
 
-- Headquarters: Dubai, UAE
+- Based in: Dubai, UAE & Delaware, USA
 - Founded: 2015
 - Track record: 50+ channels, 15 languages, 5 billion+ views
 - Languages: English, Spanish, French, Russian (native fluency)
