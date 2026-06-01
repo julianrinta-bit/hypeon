@@ -101,8 +101,9 @@ export default function Nav() {
         }}
       >
         <a href="/" className="nav-logo" aria-label="Hype On Media home" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-          <span className="nav-logo-mark">H</span>
-          <span className="nav-logo-text">Hype<span style={{ color: 'var(--accent)' }}>On</span> Media</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/images/hypeon-logo.png" alt="" width={32} height={32} style={{ borderRadius: 6 }} />
+          <span className="nav-logo-text">Hype On Media</span>
         </a>
 
         <ul className="nav-links" style={{ fontFamily: 'var(--font-mono)', listStyle: 'none' }}>

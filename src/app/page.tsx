@@ -10,6 +10,7 @@ import Different from '@/components/landing/Different';
 import Guarantee from '@/components/landing/Guarantee';
 import Testimonials from '@/components/landing/Testimonials';
 import ContentProduction from '@/components/landing/ContentProduction';
+import LatestInsight from '@/components/landing/LatestInsight';
 import ContactForm from '@/components/landing/ContactForm';
 
 export default function LandingPage() {
@@ -26,6 +27,7 @@ export default function LandingPage() {
       <Guarantee />
       <Testimonials />
       <ContentProduction />
+      <LatestInsight />
       <ContactForm />
     </main>
   );

@@ -10,17 +10,19 @@ interface ChannelSeed {
 }
 
 // Known channel IDs — pre-resolved to avoid extra search.list calls
+// Order: FireSpike first, then alternate colors so no two yellow banners are adjacent
 const CHANNEL_SEEDS: ChannelSeed[] = [
+  { name: 'Fire Spike!', handle: '@firespikeoriginal', channelId: 'UCkIrwXDtY_BSkqBKXCG_uSw', fallbackSubs: '1.14M' },
   { name: 'BRIGHT SIDE', handle: '@BrightSideOfficial', channelId: 'UC4rlAVgAK0SGk-yTfe48Qpw', fallbackSubs: '44.6M' },
-  { name: 'GENIAL', handle: '@genial.guru', channelId: 'UCddiUEpeqJcYeBxX1IVBKvQ', fallbackSubs: '32M' },
-  { name: 'Crafty Panda', handle: '@CraftyPandaOfficial', channelId: 'UCWCGf-G0oTxnb-MWE4LBHYA', fallbackSubs: '19M' },
-  { name: 'INCRÍVEL', handle: '@Incrivel', channelId: 'UCZpD3btCfWy-fXhZrOkSJfg', fallbackSubs: '18.4M' },
-  { name: 'IDEAS EN 5 MINUTOS', handle: '@Ideasen5minutos', channelId: 'UCqdK-5wGOB2yU3KuGHi5HMw', fallbackSubs: '16.6M' },
-  { name: 'SYMPA', handle: '@symaborni', channelId: 'UCDqKkMlAzX7FzTDpDxdoFsA', fallbackSubs: '7.55M' },
-  { name: 'BRICO SYMPA', handle: '@BricoSympa', channelId: 'UCTjHIfOxBF0e-pMOEuABjnQ', fallbackSubs: '5.68M' },
-  { name: 'Gotcha!', handle: '@Gotcha_official', channelId: 'UCa_aQvkIwEXBNSjyZLJWJow', fallbackSubs: '4.24M' },
-  { name: 'FireSpike', handle: '@FireSpikeOfficial', channelId: 'UCUV5LCJB-jk2bQJO2UMaWFQ', fallbackSubs: '1.14M' },
-  { name: 'Bamboo!', handle: '@bamboo.adventures', channelId: 'UCLTdlCIVGEd0GXKBehJgDRg', fallbackSubs: '340K' },
+  { name: 'Crafty Panda', handle: '@CraftyPandaOfficial', channelId: 'UC03RvJoIhm_fMwlUpm9ZvFw', fallbackSubs: '19M' },
+  { name: 'GENIAL', handle: '@genialbrightsidespanish', channelId: 'UCbrd1vu4_7qIE6IPV_dA-OA', fallbackSubs: '32M' },
+  { name: 'Blippi', handle: '@blippi', channelId: 'UC5PYHgAzJ1wLEidB58SK6Xw', fallbackSubs: '27.2M' },
+  { name: 'INCRÍVEL', handle: '@Incrivel', channelId: 'UCIQPHl1WKKTt9KkWyo_JNig', fallbackSubs: '18.4M' },
+  { name: 'IDEAS EN 5 MINUTOS', handle: '@Ideasen5minutos', channelId: 'UC_OLtzRJdg0MJfiqGWAAIHw', fallbackSubs: '16.6M' },
+  { name: 'Gotcha!', handle: '@Gotcha_official', channelId: 'UCtxqQnLgj-1rAVtjpSgPS5A', fallbackSubs: '4.24M' },
+  { name: 'SYMPA', handle: '@symaborni', channelId: 'UCt6IQpsggvn6zmalhPglSEA', fallbackSubs: '7.55M' },
+  { name: 'BRICO SYMPA', handle: '@BricoSympa', channelId: 'UC9TJezP2M1ADmUYVl8hrQ2A', fallbackSubs: '5.68M' },
+  { name: 'Bamboo!', handle: '@bamboo.adventures', channelId: 'UCumQ4bX4wm-JtH9BM9MBjlA', fallbackSubs: '340K' },
 ];
 
 function formatSubs(count: string | number): string {
@@ -91,7 +93,7 @@ export async function GET() {
         channelId: seed.channelId,
         avatar: item.snippet?.thumbnails?.high?.url ?? '',
         banner: item.brandingSettings?.image?.bannerExternalUrl
-          ? `${item.brandingSettings.image.bannerExternalUrl}=w1060`
+          ? `${item.brandingSettings.image.bannerExternalUrl}=w2120-fcrop64=1,00005a57ffffa5a8-k-c0xffffffff-no-nd-v1`
           : '',
         subs: rawSubs ? formatSubs(rawSubs) : seed.fallbackSubs,
         fallback: false,
