@@ -12,3 +12,4 @@ next-env.d.ts
 .env.local
 .env.production
 .vercel
+.backup-pre-migration/

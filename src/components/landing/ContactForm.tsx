@@ -5,20 +5,14 @@ import { submitLead } from '@/lib/actions/leads';
 import ParallaxBgNumber from '@/components/ui/ParallaxBgNumber';
 import RevealOnScroll from '@/components/ui/RevealOnScroll';
 
-type ServiceKey = 'youtube' | 'creative' | 'products' | 'unsure';
+type ServiceKey = 'youtube';
 
 const serviceConfig = {
-  youtube:  { btn: 'Get Started',                showYT: true,  delivery: 'Response within 48 hours' },
-  creative: { btn: 'Get Started',                showYT: false, delivery: 'Response within 48 hours' },
-  products: { btn: 'Start the Conversation',     showYT: false, delivery: 'Response within 24 hours' },
-  unsure:   { btn: 'Get Started',                showYT: false, delivery: 'Response within 48 hours' },
+  youtube: { btn: 'Get a Free Channel Audit', showYT: true, delivery: 'Response within 48 hours' },
 };
 
 const placeholders: Record<ServiceKey, string> = {
   youtube: 'We run a YouTube channel with 500k subs and want to...',
-  creative: "We're spending $50k/mo on Meta ads and need better creative...",
-  products: 'We need a tool that automates our content workflow...',
-  unsure: "Here's what we're working on...",
 };
 
 function validateYouTubeUrl(value: string): boolean | null {
@@ -30,7 +24,7 @@ function validateYouTubeUrl(value: string): boolean | null {
 }
 
 export default function ContactForm() {
-  const [service, setService] = useState<ServiceKey>('youtube');
+  const [service] = useState<ServiceKey>('youtube');
   const [channelUrl, setChannelUrl] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -107,7 +101,6 @@ export default function ContactForm() {
         setSubmitted(true);
         resetTimerRef.current = setTimeout(() => {
           setSubmitted(false);
-          setService('youtube');
           setChannelUrl('');
           setName('');
           setEmail('');
@@ -131,12 +124,25 @@ export default function ContactForm() {
           <RevealOnScroll>
             <div>
               <h2 className="contact-title">
-                Find out what<br />you{"'"}re <em>leaving<br />on the table.</em>
+                Find out what you&rsquo;re <em>leaving on the table.</em>
               </h2>
               <p className="contact-sub">
                 No pitch deck. Just a breakdown of where you are, where you could be, and the gap between the two.
               </p>
-              <a href="mailto:hello@hypeon.media" className="contact-email-link">
+              {/* Book a Call card */}
+              <a href="#contact" className="book-call">
+                <span className="book-call-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" />
+                  </svg>
+                </span>
+                <span className="book-call-text">
+                  <span className="book-call-title">Rather talk it through?</span>
+                  <span className="book-call-sub">Book a free 20-min strategy call</span>
+                </span>
+                <span className="book-call-arrow">&rarr;</span>
+              </a>
+              <a href="mailto:hello@hypeon.media" className="contact-email">
                 Or email us at hello@hypeon.media
               </a>
             </div>
@@ -149,53 +155,16 @@ export default function ContactForm() {
               onSubmit={handleSubmit}
             >
               {/* Urgency line */}
-              <div className="contact-urgency" id="contact-urgency">
-                <span className="urgency-pulse" aria-hidden="true" />
-                <span>
-                  We take on 3 new audits per week. Currently{' '}
-                  <span className="urgency-number">2</span> spots available.
-                </span>
+              <div className="urgency-line">
+                <span className="urgency-dot" aria-hidden="true" />
+                <span>3 audit slots remaining this week</span>
               </div>
 
-              {/* Service pills */}
-              <div className="form-group">
-                <label className="form-label">I{"'"}m interested in</label>
-                <input
-                  type="hidden"
-                  id="service-interest"
-                  name="service_interest"
-                  value={service}
-                />
-                <div className="service-pills" id="service-pills">
-                  {(['youtube', 'creative', 'products', 'unsure'] as ServiceKey[]).map((key) => (
-                    <button
-                      key={key}
-                      type="button"
-                      className={`service-pill${service === key ? ' active' : ''}`}
-                      data-value={key}
-                      onClick={() => {
-                        setService(key);
-                        if (key !== 'youtube') setChannelUrl('');
-                      }}
-                    >
-                      {key === 'youtube'
-                        ? 'YouTube Performance'
-                        : key === 'creative'
-                          ? 'Creative Strategy'
-                          : key === 'products'
-                            ? 'Digital Products'
-                            : 'Not sure yet'}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              {/* Hidden service_interest field — always youtube */}
+              <input type="hidden" name="service_interest" value="youtube" />
 
-              {/* YouTube URL field (conditional) */}
-              <div
-                className="form-group form-group-prominent"
-                id="field-youtube"
-                style={{ display: config.showYT ? '' : 'none' }}
-              >
+              {/* YouTube URL field */}
+              <div className="form-group form-group-prominent" id="field-youtube">
                 <label className="form-label" htmlFor="channel-url">
                   YouTube Channel URL{' '}
                   <span style={{ color: 'var(--white-30)', fontWeight: 400 }}>(optional)</span>
@@ -322,15 +291,9 @@ export default function ContactForm() {
 
               {/* Friction reducers */}
               <div className="friction-reducers" id="friction-reducers">
-                <span>
-                  <span className="check">&#10003;</span> No commitment required
-                </span>
-                <span>
-                  <span className="check">&#10003;</span> {config.delivery}
-                </span>
-                <span>
-                  <span className="check">&#10003;</span> No pitch decks, just data
-                </span>
+                <span><span className="check">&#10003;</span> No commitment required</span>
+                <span><span className="check">&#10003;</span> Response within 48 hours</span>
+                <span><span className="check">&#10003;</span> No pitch decks, just data</span>
               </div>
             </form>
           </RevealOnScroll>

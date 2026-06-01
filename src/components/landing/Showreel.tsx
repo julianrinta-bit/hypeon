@@ -294,21 +294,19 @@ export default function Showreel() {
   const bufferedPct = duration > 0 ? (buffered / duration) * 100 : 0;
 
   return (
-    <section className="showreel section" id="showreel">
+    <section className="vsl-section section" id="showreel">
       <div className="container">
         <RevealOnScroll>
-          <p className="section-number"><span>—</span> Watch how we think</p>
-        </RevealOnScroll>
-        <RevealOnScroll>
-          <div className="showreel-wrapper">
+          <div className="vsl-full">
             <div
               ref={containerRef}
-              className={`showreel-player${isPlaying && !showControls ? ' showreel-player--hide-cursor' : ''}${isFullscreen ? ' showreel-player--fullscreen' : ''}`}
+              className={`showreel-player vsl-poster${isPlaying && !showControls ? ' showreel-player--hide-cursor' : ''}${isFullscreen ? ' showreel-player--fullscreen' : ''}`}
               onMouseMove={resetHideTimer}
               onMouseLeave={() => { if (isPlaying) setShowControls(false); }}
               tabIndex={0}
               role="application"
               aria-label="Video player"
+              style={{ position: 'relative', aspectRatio: '16/9', borderRadius: 'var(--radius-card)', overflow: 'hidden' }}
             >
               {/* Video element */}
               {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
@@ -323,19 +321,23 @@ export default function Showreel() {
                 aria-label="Hype On Media — strategy breakdown with Chris"
               />
 
-              {/* Big play button overlay (before first play) */}
+              {/* VSL overlay content (before first play) */}
               {!hasStarted && (
-                <button
-                  className="showreel-play-overlay"
-                  onClick={togglePlay}
-                  aria-label="Play video"
-                >
-                  <span className="showreel-play-icon">
-                    <svg width="28" height="32" viewBox="0 0 28 32" fill="none" aria-hidden="true">
-                      <path d="M2 1.5L26 16L2 30.5V1.5Z" fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+                <>
+                  <div className="vsl-overlay">
+                    <h3 className="vsl-headline">Meet our strategy team</h3>
+                    <p className="vsl-sub">4 min — how we think about YouTube growth</p>
+                  </div>
+                  <button
+                    className="vsl-play-btn"
+                    onClick={togglePlay}
+                    aria-label="Play video"
+                  >
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M6 3L20 12L6 21V3Z" fill="white" />
                     </svg>
-                  </span>
-                </button>
+                  </button>
+                </>
               )}
 
               {/* Paused overlay (after first play, when paused) */}
@@ -465,7 +467,7 @@ export default function Showreel() {
                 </div>
               </div>
             </div>
-            <p className="showreel-caption">Meet Chris from our strategy team — 4 min</p>
+            <p className="vsl-caption">Meet Chris from our strategy team — a 4-minute breakdown of how we approach YouTube growth.</p>
           </div>
         </RevealOnScroll>
       </div>
