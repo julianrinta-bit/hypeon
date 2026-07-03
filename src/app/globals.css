@@ -7296,7 +7296,8 @@ select:focus-visible,
   font-size: 0.52rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--sp-accent, var(--fg-dark-muted));
+  /* eyebrow text always neutral — never accent/teal/amber/violet on white (WCAG) */
+  color: #444;
 }
 
 /* Number — uses CountUp; #111 over white */
@@ -7322,7 +7323,8 @@ select:focus-visible,
   font-size: 0.52rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--fg-dark-muted);
+  /* #888 over white = 3.54:1 (fail) → #444 over white = 9.7:1 (WCAG AA pass) */
+  color: #444;
   margin-bottom: 0.3rem;
 }
 
@@ -8381,13 +8383,13 @@ select:focus-visible,
 
 .hero-v2__headline-youtube {
   display: block;
-  animation: heroWord 700ms var(--ease-out-expo) 250ms both;
+  animation: heroFadeIn 700ms var(--ease-out-expo) 250ms both;
 }
 
 .hero-v2__headline-engineered {
   display: block;
   color: var(--accent);
-  animation: heroWord 700ms var(--ease-out-expo) 500ms both,
+  animation: heroFadeIn 700ms var(--ease-out-expo) 500ms both,
              engineerGlow 3.5s ease-in-out 1.4s infinite;
 }
 
@@ -8621,7 +8623,7 @@ select:focus-visible,
   z-index: 1;
 }
 
-.chat-widget__input::placeholder { color: #bbb; }
+.chat-widget__input::placeholder { color: #595959; /* was #bbb (1.92:1, fail) → #595959 (7.2:1, WCAG AA pass) */ }
 
 .chat-widget__placeholder {
   position: absolute;
@@ -8633,7 +8635,8 @@ select:focus-visible,
   pointer-events: none;
   font-family: var(--font-body);
   font-size: 1rem;
-  color: #bbb;
+  /* was #bbb (1.92:1, fail) → #595959 (7.2:1, WCAG AA pass) */
+  color: #595959;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -8646,7 +8649,8 @@ select:focus-visible,
   display: inline-block;
   width: 1.5px;
   height: 1.1em;
-  background: #bbb;
+  /* was #bbb → match placeholder */
+  background: #595959;
   margin-left: 1px;
   vertical-align: middle;
   animation: cursor 1s step-start infinite;
@@ -8705,7 +8709,8 @@ select:focus-visible,
   font-size: 0.6rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: #aaa;
+  /* was #aaa (2.32:1, fail) → #595959 (7.2:1, WCAG AA pass) */
+  color: #595959;
   text-align: center;
   padding-top: 0.4rem;
 }
