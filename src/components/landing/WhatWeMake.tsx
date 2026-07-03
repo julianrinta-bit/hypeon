@@ -1,24 +1,19 @@
 'use client';
 
 /**
- * WhatWeMake.tsx — Fase 2.3
- * Replaces ContentProduction.tsx (file kept intact).
- * .section--cream. Horizontal-scroll 6-card carousel.
- * Reuses useDragScroll + useAutoScroll from ContentProduction.
- * Cards: image-bg + hover→silent video (same pattern as ContentProduction).
+ * WhatWeMake.tsx — SESSION 2026-07-03 FIX 2
+ * dc.html calco: fondo #111, grid fijo 3×2 (6 cards, 280px height), SIN carrusel.
+ * Fuente de verdad: "CONTENT TYPES — dark, hover-alive cards" en dc.html línea 633.
  *
  * WCAG:
- *  - Cards have dark overlay → white text on dark = ~10:1+ ✓
- *  - Section headline: --fg-dark over --bg-cream → ~14:1 ✓
+ *  - Cards: dark overlay → white text sobre dark bg → ~10:1+ ✓
+ *  - Eyebrow verde rgba(200,255,46,.6) sobre #111 → suficiente contraste para decorative label ✓
  *
- * Placeholders: gradient backgrounds used for all 6 categories
- * since Webflow CDN images are not available.
- * TODO: reemplazar gradientes por assets reales en /public/images/whatwemake/
+ * Placeholders: gradient backgrounds (dc.html card 3 es gradient; resto usan imgs de Webflow CDN
+ * que no disponemos → gradientes oscuros + TODO). Hover→tag se vuelve verde, body sube.
  */
 
 import { useRef, useCallback } from 'react';
-import { useDragScroll } from '@/hooks/useDragScroll';
-import { useAutoScroll } from '@/hooks/useAutoScroll';
 
 interface ContentCard {
   category: string;
@@ -70,11 +65,11 @@ const CATEGORIES: ContentCard[] = [
     // TODO: reemplazar por asset real en /public/images/whatwemake/live-action.jpg
   },
   {
-    category: 'Brand Content',
+    category: 'Multi-Language',
     headline: 'Content for global audiences in 15 languages',
     body: 'Dubbing, localization, and market-specific production — built to scale internationally.',
     gradient: 'linear-gradient(135deg, #1a1a0a, #2a2a14)',
-    // TODO: reemplazar por asset real en /public/images/whatwemake/brand.jpg
+    // TODO: reemplazar por asset real en /public/images/whatwemake/multi-language.jpg
   },
 ];
 
@@ -102,7 +97,7 @@ function ContentCard({ card }: { card: ContentCard }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Background: gradient placeholder (+ video on hover if available) */}
+      {/* Background: gradient placeholder */}
       <div
         className="wmm-card__bg"
         style={{ background: card.gradient }}
@@ -158,24 +153,8 @@ function ContentCard({ card }: { card: ContentCard }) {
 }
 
 export default function WhatWeMake() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  useDragScroll(trackRef);
-  useAutoScroll(trackRef, 0.4);
-
-  const scrollLeft = useCallback(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.scrollBy({ left: -320, behavior: 'smooth' });
-  }, []);
-
-  const scrollRight = useCallback(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.scrollBy({ left: 320, behavior: 'smooth' });
-  }, []);
-
   return (
-    <section className="section section--cream wmm-section" id="work">
+    <section className="wmm-section wmm-section--dark" id="work">
       <div className="container wmm-header-container">
         <div className="wmm-header">
           <div>
@@ -186,36 +165,17 @@ export default function WhatWeMake() {
               from kids to podcasts to live action.
             </p>
           </div>
-
-          {/* Scroll arrows */}
-          <div className="wmm-arrows">
-            <button
-              className="wmm-arrow"
-              onClick={scrollLeft}
-              aria-label="Scroll left"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <button
-              className="wmm-arrow"
-              onClick={scrollRight}
-              aria-label="Scroll right"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
+          <a href="/#contact" className="wmm-cta-link">Work with us →</a>
         </div>
       </div>
 
-      {/* Carousel track — full-bleed horizontal scroll */}
-      <div className="wmm-track" ref={trackRef}>
-        {CATEGORIES.map((card, i) => (
-          <ContentCard key={i} card={card} />
-        ))}
+      {/* Fixed 3×2 grid — no carousel, no arrows */}
+      <div className="container">
+        <div className="wmm-grid">
+          {CATEGORIES.map((card, i) => (
+            <ContentCard key={i} card={card} />
+          ))}
+        </div>
       </div>
     </section>
   );

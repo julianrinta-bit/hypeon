@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import RevealOnScroll from '@/components/ui/RevealOnScroll';
+/**
+ * Team.tsx — SESSION 2026-07-03 FIX 3
+ * dc.html calco: sección TEAM DNA, background:#0A0A0C.
+ * Headline exacto del dc.html línea 786:
+ *   "Distilled from the best. Deployed at scale." (acento verde en "at scale.")
+ * Stat estático (NO rotante): 4 cells en right panel (6 Countries, 4 Continents,
+ *   4 Languages, 10+ Years) — dc.html líneas 800-815.
+ */
 
-const ROTATING_STATS = [
-  { value: '10+', label: 'Years' },
-  { value: '6', label: 'Countries' },
-  { value: '4', label: 'Languages' },
-];
+import RevealOnScroll from '@/components/ui/RevealOnScroll';
 
 const AI_CANT_REPLACE = [
   {
@@ -24,18 +26,14 @@ const AI_CANT_REPLACE = [
   },
 ];
 
+const PRESENCE_STATS = [
+  { value: '6',   label: 'Countries' },
+  { value: '4',   label: 'Continents' },
+  { value: '4',   label: 'Languages' },
+  { value: '10+', label: 'Years' },
+];
+
 export default function Team() {
-  const [statIdx, setStatIdx] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStatIdx((i) => (i + 1) % ROTATING_STATS.length);
-    }, 3200);
-    return () => clearInterval(interval);
-  }, []);
-
-  const current = ROTATING_STATS[statIdx];
-
   return (
     <section className="team-section" id="team">
       <div className="team-container">
@@ -44,15 +42,10 @@ export default function Team() {
           <div className="team-left">
             <p className="team-eyebrow">About us</p>
 
-            {/* Rotating big stat */}
-            <div className="team-stat-block" aria-live="polite" aria-atomic="true">
-              <span className="team-stat-value">{current.value}</span>
-              <span className="team-stat-label">{current.label}</span>
-            </div>
-
             <h2 className="team-headline">
-              Built inside<br />the industry.<br />
-              <span className="team-headline-accent">Not outside it.</span>
+              Distilled from<br />
+              the best. Deployed<br />
+              <span className="team-headline-accent">at scale.</span>
             </h2>
 
             <p className="team-body">
@@ -75,20 +68,16 @@ export default function Team() {
         {/* Right column */}
         <RevealOnScroll className="reveal reveal-delay-1">
           <div className="team-right">
-            {/* Global presence card */}
+            {/* Global presence card — static stats */}
             <div className="team-card">
               <p className="team-card-eyebrow">Global presence</p>
               <div className="team-presence-grid">
-                {ROTATING_STATS.map((s) => (
+                {PRESENCE_STATS.map((s) => (
                   <div key={s.label} className="team-presence-cell">
                     <span className="team-presence-value">{s.value}</span>
                     <span className="team-presence-label">{s.label}</span>
                   </div>
                 ))}
-                <div className="team-presence-cell">
-                  <span className="team-presence-value">4</span>
-                  <span className="team-presence-label">Continents</span>
-                </div>
               </div>
               <p className="team-locations">US · UAE · EUROPE · LATAM · E.EUROPE · ASIA</p>
             </div>
