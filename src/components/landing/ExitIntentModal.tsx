@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 export default function ExitIntentModal() {
   const [active, setActive] = useState(false);
   const emailRef = useRef<HTMLInputElement>(null);
+  const channelUrlRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -83,10 +84,13 @@ export default function ExitIntentModal() {
 
     setActive(false);
 
-    // Navigate to contact section with email as URL parameter.
+    // Navigate to contact section with email (and optional channel_url) as URL parameters.
     // ContactForm reads `prefill_email` from the URL on mount via useEffect
     // and populates the email field. This avoids direct DOM writes that bypass React state.
-    window.location.href = `/#contact?prefill_email=${encodeURIComponent(email)}`;
+    const channelUrl = channelUrlRef.current?.value ?? '';
+    const params = new URLSearchParams({ prefill_email: email });
+    if (channelUrl) params.set('prefill_channel_url', channelUrl);
+    window.location.href = `/#contact?${params.toString()}`;
   };
 
   return (
@@ -115,6 +119,14 @@ export default function ExitIntentModal() {
             required
             aria-label="Your email"
             ref={emailRef}
+          />
+          <input
+            className="exit-modal-input"
+            type="text"
+            name="channel_url"
+            placeholder="YouTube channel URL (optional)"
+            aria-label="YouTube channel URL"
+            ref={channelUrlRef}
           />
           <button className="exit-modal-submit" type="submit">
             Get My Free Audit &rarr;

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import styles from '@/app/analyze/analyze.module.css';
+import styles from '@/app/(marketing)/analyze/analyze.module.css';
 
 const AnalyzeClient = dynamic(() => import('@/components/analyze/AnalyzeClient'), {
   loading: () => null,

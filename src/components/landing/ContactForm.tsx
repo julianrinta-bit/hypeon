@@ -46,12 +46,17 @@ export default function ContactForm() {
     };
   }, []);
 
-  // Prefill email from exit modal URL parameter
+  // Prefill email and channel_url from exit modal URL parameters
   useEffect(() => {
     const hash = window.location.hash;
-    const match = hash.match(/prefill_email=([^&]+)/);
-    if (match) {
-      setEmail(decodeURIComponent(match[1]));
+    // hash format: #contact?prefill_email=...&prefill_channel_url=...
+    const qIdx = hash.indexOf('?');
+    if (qIdx !== -1) {
+      const params = new URLSearchParams(hash.slice(qIdx + 1));
+      const emailVal = params.get('prefill_email');
+      const channelVal = params.get('prefill_channel_url');
+      if (emailVal) setEmail(decodeURIComponent(emailVal));
+      if (channelVal) setChannelUrl(decodeURIComponent(channelVal));
       // Clean up the URL
       window.history.replaceState(null, '', '#contact');
     }

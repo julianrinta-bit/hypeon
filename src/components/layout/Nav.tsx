@@ -1,6 +1,11 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
 
+/* === Nav v2 ===
+   Design: white bg (always), 64px height, dark text, green CTA, blur/border on scroll.
+   Links: #services, #proof, #blog, #contact (eliminadas: #channels, #guarantee, #work, #use-cases)
+*/
+
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -9,7 +14,7 @@ export default function Nav() {
   const scrollY = useRef(0);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
@@ -42,7 +47,6 @@ export default function Nav() {
     hamburgerRef.current?.focus();
   }, []);
 
-  // Prevent touchmove on overlay (iOS Safari scroll-through fix)
   useEffect(() => {
     if (!menuOpen) return;
     const overlay = overlayRef.current;
@@ -52,7 +56,6 @@ export default function Nav() {
     return () => overlay.removeEventListener('touchmove', preventTouch);
   }, [menuOpen]);
 
-  // Escape + focus trap
   useEffect(() => {
     if (!menuOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -77,7 +80,6 @@ export default function Nav() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [menuOpen, close]);
 
-  // Cleanup on unmount
   useEffect(() => () => {
     document.documentElement.style.overflow = '';
     document.body.style.position = '';
@@ -91,37 +93,33 @@ export default function Nav() {
   return (
     <>
       <nav
-        className={`nav${scrolled ? ' nav--scrolled' : ''}`}
+        className={`nav-v2${scrolled ? ' nav-v2--scrolled' : ''}`}
         aria-label="Main navigation"
-        style={{
-          background: 'rgba(10,10,12,.8)',
-          backdropFilter: 'blur(20px) saturate(160%)',
-          WebkitBackdropFilter: 'blur(20px) saturate(160%)',
-          borderBottom: scrolled ? '1px solid rgba(200,255,46,0.25)' : '1px solid rgba(240,240,236,0.06)',
-        }}
       >
-        <a href="/" className="nav-logo" aria-label="Hype On Media home" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+        {/* Logo */}
+        <a href="/" className="nav-v2-logo" aria-label="Hype On Media home">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/hypeon-logo.png" alt="" width={32} height={32} style={{ borderRadius: 6 }} />
-          <span className="nav-logo-text">Hype On Media</span>
+          <img src="/images/hypeon-logo.png" alt="" width={26} height={26} style={{ borderRadius: 5, objectFit: 'contain' }} />
+          <span className="nav-v2-logo-text">Hype On Media</span>
         </a>
 
-        <ul className="nav-links" style={{ fontFamily: 'var(--font-mono)', listStyle: 'none' }}>
-          <li><a href="/#channels">Channels</a></li>
-          <li><a href="/#services">Services</a></li>
-          <li><a href="/#guarantee">Guarantee</a></li>
-          <li><a href="/blog">Blog</a></li>
-          <li><a href="/#contact">Contact</a></li>
+        {/* Desktop links */}
+        <ul className="nav-v2-links" aria-label="Site sections">
+          <li><a href="/#services" className="nav-v2-link">Services</a></li>
+          <li><a href="/#proof" className="nav-v2-link">Proof</a></li>
+          <li><a href="/blog" className="nav-v2-link">Blog</a></li>
+          <li><a href="/#contact" className="nav-v2-link">Contact</a></li>
         </ul>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-          <a href="/login" className="nav-login">Log in</a>
-          <a href="/analyze" className="nav-cta">Get Free Audit</a>
+        {/* CTAs */}
+        <div className="nav-v2-actions">
+          <a href="/login" className="nav-v2-login">Log in</a>
+          <a href="/#contact" className="nav-v2-cta">Book a Call →</a>
         </div>
 
         {/* Hamburger */}
         <button
-          className={`hamburger-btn${menuOpen ? ' hamburger-hidden' : ''}`}
+          className={`nav-v2-hamburger${menuOpen ? ' hamburger-hidden' : ''}`}
           onClick={open}
           aria-label="Open menu"
           aria-expanded={menuOpen}
@@ -133,35 +131,23 @@ export default function Nav() {
 
       {/* Mobile slide-in panel */}
       <div
-        className={`nav-mobile${menuOpen ? ' open' : ''}`}
+        className={`nav-v2-mobile${menuOpen ? ' open' : ''}`}
         aria-hidden={!menuOpen}
         ref={overlayRef}
-        style={{ zIndex: 101 }}
       >
         <button
-          style={{
-            position: 'absolute',
-            top: 28,
-            right: 24,
-            background: 'none',
-            border: 'none',
-            color: 'var(--white)',
-            fontSize: 28,
-            cursor: 'pointer',
-            lineHeight: 1,
-          }}
+          className="nav-v2-mobile-close"
           onClick={close}
           aria-label="Close menu"
         >
           &times;
         </button>
-        <a href="/#channels" className="mobile-menu-link" onClick={close}>Channels</a>
-        <a href="/#services" className="mobile-menu-link" onClick={close}>Services</a>
-        <a href="/#guarantee" className="mobile-menu-link" onClick={close}>Guarantee</a>
-        <a href="/blog" className="mobile-menu-link" onClick={close}>Blog</a>
-        <a href="/#contact" className="mobile-menu-link" onClick={close}>Contact</a>
-        <a href="/login" className="mobile-menu-link" onClick={close}>Log in</a>
-        <a href="/analyze" className="nav-mobile-cta" onClick={close}>Get a Free Audit &rarr;</a>
+        <a href="/#services" className="nav-v2-mobile-link" onClick={close}>Services</a>
+        <a href="/#proof" className="nav-v2-mobile-link" onClick={close}>Proof</a>
+        <a href="/blog" className="nav-v2-mobile-link" onClick={close}>Blog</a>
+        <a href="/#contact" className="nav-v2-mobile-link" onClick={close}>Contact</a>
+        <a href="/login" className="nav-v2-mobile-link" onClick={close}>Log in</a>
+        <a href="/#contact" className="nav-v2-mobile-cta" onClick={close}>Book a Call &rarr;</a>
       </div>
     </>
   );

@@ -11,7 +11,7 @@ import { captureAttribution, setSessionId, getSessionId } from '@/lib/attributio
 import { createVisitorSession } from '@/lib/actions/session';
 import PromoInput from './PromoInput';
 import promoStyles from './promoGate.module.css';
-import styles from '@/app/analyze/analyze.module.css';
+import styles from '@/app/(marketing)/analyze/analyze.module.css';
 
 // ── Code-split heavy components (only needed after scan / below fold) ────
 const RadarChart = dynamic(() => import('./RadarChart'), { ssr: false });

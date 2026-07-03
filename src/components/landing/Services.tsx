@@ -1,101 +1,149 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
-import RevealOnScroll from '@/components/ui/RevealOnScroll';
-import ParallaxBgNumber from '@/components/ui/ParallaxBgNumber';
 
 const SERVICES = [
-  { idx: '01', name: 'Channel Strategy & Audit', desc: 'Deep-dive analysis of your content, audience, and revenue opportunities. A clear roadmap, not a pitch deck.', tags: ['Audit', 'Strategy', 'Roadmap'] },
-  { idx: '02', name: 'Format Development', desc: 'We design video formats engineered for your niche — built on a decade of data across 50+ channels.', tags: ['Formats', 'Testing', 'Scripts'] },
-  { idx: '03', name: 'Thumbnail & Packaging', desc: 'CTR is the game. We build systematic thumbnail and title frameworks with rigorous A/B testing.', tags: ['Thumbnails', 'CTR', 'A/B Testing'] },
-  { idx: '04', name: 'Multi-market Expansion', desc: 'One proven format, scaled across languages and markets. 15 languages of production capability.', tags: ['Localization', '15 Languages', 'Global'] },
-  { idx: '05', name: 'Performance Analytics', desc: 'Custom dashboards, RPM optimization, watch-time analysis, and revenue attribution.', tags: ['Analytics', 'RPM', 'Revenue'] },
-  { idx: '06', name: 'Shorts + Long-form', desc: 'Platform-native strategy for both formats. Different algorithms, different playbooks.', tags: ['Shorts', 'Long-form', 'Algorithm'] },
+  {
+    num: '01',
+    name: 'Channel Strategy',
+    desc: 'We map your channel to what your audience is actually searching for. Format development, posting cadence, title systems, and content architecture built around measurable performance.',
+    tags: ['Format Dev', 'Positioning', 'Shorts', 'Long-form'],
+  },
+  {
+    num: '02',
+    name: 'Content Production',
+    desc: 'Scripts, briefs, and production workflows at scale. We build the pipeline that keeps your channel publishing consistently without burning out your team. AI-assisted, human-reviewed.',
+    tags: ['Scripts', 'Briefs', 'AI Pipeline', 'Batch'],
+  },
+  {
+    num: '03',
+    name: 'Thumbnail & SEO',
+    desc: 'Packaging systems that drive clicks. Thumbnail frameworks, title formulas, and metadata optimization built on 22B+ views across 75+ channels.',
+    tags: ['Thumbnails', 'Title Systems', 'CTR', 'A/B Testing'],
+  },
+  {
+    num: '04',
+    name: 'Analytics & Reporting',
+    desc: "Data that drives decisions. Performance dashboards, monthly reports, and signal-vs-noise analysis. Weekly analysis — what works gets scaled, what doesn't gets cut.",
+    tags: ['Dashboards', 'Monthly Reports', 'Revenue Tracking', 'Attribution'],
+  },
+  {
+    num: '05',
+    name: 'Content Localization',
+    desc: "Your content, in new markets. We've scaled content across 15 languages. Spanish alone typically adds 35–60% incremental AdSense revenue to an English-language channel.",
+    tags: ['15 Languages', 'Dubbing', 'Localization', 'SEO'],
+  },
 ];
 
 export default function Services() {
-  const [active, setActive] = useState(-1);
+  const [activeService, setActiveService] = useState(0);
   const [inView, setInView] = useState(false);
   const [userTouched, setUserTouched] = useState(false);
   const ref = useRef<HTMLElement>(null);
 
+  // IntersectionObserver to trigger auto-cycle on first view
   useEffect(() => {
     const obs = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } },
+      ([e]) => {
+        if (e.isIntersecting) {
+          setInView(true);
+          obs.disconnect();
+        }
+      },
       { threshold: 0.2 }
     );
     if (ref.current) obs.observe(ref.current);
     return () => obs.disconnect();
   }, []);
 
-  // Auto-cycle on first view
+  // Auto-cycle through tabs when in view (if user hasn't touched)
   useEffect(() => {
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!inView || userTouched || reducedMotion) return;
 
-    setActive(0);
     let currentIdx = 0;
     const i = setInterval(() => {
-      currentIdx++;
-      if (currentIdx >= SERVICES.length) {
-        clearInterval(i);
-        return;
-      }
-      setActive(currentIdx);
-    }, 1200);
+      currentIdx = (currentIdx + 1) % SERVICES.length;
+      setActiveService(currentIdx);
+    }, 2000);
+
     return () => clearInterval(i);
   }, [inView, userTouched]);
 
-  const toggle = (i: number) => {
+  const handleTabClick = (i: number) => {
     setUserTouched(true);
-    setActive(active === i ? -1 : i);
+    setActiveService(i);
   };
 
-  return (
-    <section className="section" id="services" ref={ref}>
-      <ParallaxBgNumber number="03" />
-      <div className="container">
-        <RevealOnScroll>
-          <p className="eyebrow"><span>03</span> — Services</p>
-          <h2 className="section-title">YouTube performance. Every angle.</h2>
-          <p className="section-subtitle">One focus. Six disciplines. All built from operating at scale.</p>
-        </RevealOnScroll>
+  const active = SERVICES[activeService];
 
-        <div className="services-list" style={{ marginTop: 40 }}>
-          {SERVICES.map((svc, i) => {
-            const isActive = active === i;
-            return (
-              <div
-                key={i}
-                className={`service-item${isActive ? ' active' : ''}`}
-                onClick={() => toggle(i)}
-                role="button"
-                tabIndex={0}
-                aria-expanded={isActive}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(i); } }}
-              >
-                <div className="service-header">
-                  <span className="service-idx">{svc.idx}</span>
-                  <h3 className="service-name">{svc.name}</h3>
-                  <span className="service-arrow" aria-hidden="true">{isActive ? '−' : '+'}</span>
-                </div>
-                <div className="service-body" style={{ maxHeight: isActive ? 300 : 0 }}>
-                  <div className="service-body-inner">
-                    <p className="service-desc">{svc.desc}</p>
-                    <div className="service-tags">
-                      {svc.tags.map(t => <span key={t} className="pill accent">{t}</span>)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+  return (
+    <section className="services-v2" id="services" ref={ref}>
+      {/* Header */}
+      <div className="services-v2__header">
+        <div>
+          <p className="services-v2__eyebrow">What we do</p>
+          <h2 className="services-v2__title">
+            YouTube solutions<br />
+            that scale with you.
+          </h2>
+        </div>
+        <a href="/#contact" className="services-v2__cta-link">
+          Start with a free audit →
+        </a>
+      </div>
+
+      {/* Grid: tabs + panel */}
+      <div className="services-v2__grid">
+        {/* Tabs column */}
+        <div className="services-v2__tabs-col" role="tablist" aria-label="Services">
+          {SERVICES.map((svc, i) => (
+            <div
+              key={svc.num}
+              className={`services-v2__tab${activeService === i ? ' services-v2__tab--active' : ''}`}
+              onClick={() => handleTabClick(i)}
+              role="tab"
+              aria-selected={activeService === i}
+              aria-controls={`services-panel-${i}`}
+              id={`services-tab-${i}`}
+              tabIndex={activeService === i ? 0 : -1}
+              onKeyDown={e => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleTabClick(i);
+                }
+              }}
+            >
+              <div className="services-v2__tab-num">{svc.num}</div>
+              <div className="services-v2__tab-name">{svc.name}</div>
+            </div>
+          ))}
         </div>
 
-        <RevealOnScroll>
-          <a href="/analyze" className="inline-cta">
-            Not sure where to start? Get a free audit <span className="arrow">&rarr;</span>
+        {/* Detail panel */}
+        <div
+          className="services-v2__panel"
+          role="tabpanel"
+          id={`services-panel-${activeService}`}
+          aria-labelledby={`services-tab-${activeService}`}
+        >
+          <div>
+            <span className="services-v2__panel-num-label">
+              {active.num} — {active.name}
+            </span>
+          </div>
+          <div>
+            <h3 className="services-v2__panel-title">{active.name}</h3>
+            <p className="services-v2__panel-desc">{active.desc}</p>
+          </div>
+          <div className="services-v2__panel-tags">
+            {active.tags.map(tag => (
+              <span key={tag} className="services-v2__tag">{tag}</span>
+            ))}
+          </div>
+          <a href="/#contact" className="services-v2__panel-cta">
+            Get started →
           </a>
-        </RevealOnScroll>
+        </div>
       </div>
     </section>
   );
