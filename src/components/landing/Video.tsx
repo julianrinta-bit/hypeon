@@ -1,25 +1,26 @@
 'use client';
 
 /**
- * Video.tsx — Fase 2.2
+ * Video.tsx — Fase 2.2 (updated: native video, self-hosted VSL)
  * Replaces Showreel.tsx (file kept intact).
  * Layout: .section--white, 2-col (headline left + video right).
- * Video: YouTube embed via click-to-load pattern (poster placeholder,
- * click replaces with iframe) — same approach as dc.html §43.
+ * Video: self-hosted MP4 via click-to-play pattern.
+ *   - Poster state: real frame image (/video/hypeon-vsl-poster.jpg) +
+ *     overlay overlay (title, play button, duration badge).
+ *   - Playing state: native <video> with controls, autoPlay, preload="none"
+ *     (preload=none is mandatory — landing receives paid traffic; no bytes
+ *     transferred until the user explicitly clicks play).
  *
  * WCAG contraste:
  *  - Headline: --fg-dark (#111) over white → ~17:1 ✓
  *  - Body:     --fg-dark-mid (#444) over white → ~9.7:1 ✓
  *  - Eyebrow:  --fg-dark-muted (#888) — decorative/label use only ✓
- *
- * TODO: replace YouTube embed ID with final video if different from Showreel's /video/hypeon-vsl.mp4
  */
 
-import { useRef, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 export default function Video() {
   const [playing, setPlaying] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
 
   const handlePlay = useCallback(() => {
     setPlaying(true);
@@ -45,13 +46,16 @@ export default function Video() {
           </div>
 
           {/* Right: video */}
-          <div className="vid-media" ref={containerRef}>
+          <div className="vid-media">
             {playing ? (
-              <iframe
+              <video
                 className="vid-iframe"
-                src="https://www.youtube.com/embed/loSABT0E1Mc?autoplay=1"
-                allow="autoplay; encrypted-media"
-                allowFullScreen
+                src="/video/hypeon-vsl.mp4"
+                poster="/video/hypeon-vsl-poster.jpg"
+                controls
+                autoPlay
+                playsInline
+                preload="none"
                 title="Hype On Media — 4-minute channel audit"
               />
             ) : (
@@ -68,8 +72,7 @@ export default function Video() {
                   }
                 }}
               >
-                {/* Poster gradient placeholder — no external CDN image */}
-                {/* TODO: reemplazar por asset real (thumbnail del video) */}
+                {/* Real poster frame — styles in globals.css .vid-poster__bg */}
                 <div className="vid-poster__bg" aria-hidden="true" />
 
                 {/* Overlay text */}
@@ -93,9 +96,9 @@ export default function Video() {
                   </svg>
                 </div>
 
-                {/* Duration badge */}
+                {/* Duration badge — exact VSL runtime: 3m 35s */}
                 <div className="vid-poster__duration" aria-hidden="true">
-                  <span className="eyebrow">4:00</span>
+                  <span className="eyebrow">3:35</span>
                 </div>
               </div>
             )}

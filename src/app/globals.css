@@ -10524,3 +10524,53 @@ select:focus-visible,
   }
 }
 
+/* ─── PATCH: cp-badge label — neutralise .eyebrow layout side-effects ─────
+   Root cause: .eyebrow (0,1,0) adds display:flex + margin-bottom:24px to the
+   label span inside the pill. In the inline-flex badge, this pushes the label
+   upward (margin box centre shifts), so the green dot appears BELOW the text
+   instead of to its LEFT — creating the "two-dot" visual Julian reported.
+
+   Reference dc.html:
+     single green dot (#c8ff2e, 6 px, pulseDot) LEFT + "Client Portal" RIGHT
+     in one horizontal inline-flex row.
+
+   Specificity: 0,2,0 (.cp-badge + .cp-badge__label).
+     • Beats .eyebrow (0,1,0) → wins on display / margin-bottom.
+     • Equals .section--cream .eyebrow (0,2,0) → later rule in source order
+       wins → our color: var(--accent) overrides the gray override.
+   NEVER modify rules above; this block is purely additive (appended at EOF). */
+.cp-badge .cp-badge__label {
+  display: block;       /* neutralise display:flex from .eyebrow */
+  margin-bottom: 0;     /* neutralise margin-bottom:24px — was misaligning dot */
+  color: var(--accent); /* #c8ff2e — override .section--cream .eyebrow gray   */
+}
+
+/* ── VSL poster — real frame image (additive, 2026-07-03) ────────────────
+   Overrides the gradient placeholder in .vid-poster__bg (line ~7662) with
+   the actual VSL frame. The text-legibility overlay gradient on
+   .vid-poster::after (line ~7669) is PRESERVED — it sits on top of this
+   image and keeps "How we turn a dying…" readable.
+   Specificity: 0,1,0 — same as the base rule; later in source order wins. */
+.vid-poster__bg {
+  background-image: url('/video/hypeon-vsl-poster.jpg');
+  background-size: cover;
+  background-position: center;
+  /* gradient removed: real image replaces the navy placeholder */
+  background-color: #0d1b2a; /* fallback while image loads */
+}
+
+
+/* ── Creator strip — real photo cards (additive, 2026-07-03) ────────────────
+   .hero-v2__creator-photo replaces the gradient placeholder for cards 1-4.
+   background-size: cover + background-position: center top ensures the face
+   is always in frame (portraits are top-heavy).
+   The existing .hero-v2__creator-gradient overlay (dark vignette at bottom)
+   is preserved — it sits on top of the photo and keeps the name/subs legible.
+   Specificity: 0,1,0 — mirrors the existing .hero-v2__creator-placeholder rule. */
+.hero-v2__creator-photo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}

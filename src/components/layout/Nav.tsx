@@ -114,7 +114,7 @@ export default function Nav() {
         {/* CTAs */}
         <div className="nav-v2-actions">
           <a href="/login" className="nav-v2-login">Log in</a>
-          <a href="/#contact" className="nav-v2-cta">Book a Call →</a>
+          <a href="/analyze" className="nav-v2-cta">Book a Call →</a>
         </div>
 
         {/* Hamburger */}
@@ -147,7 +147,7 @@ export default function Nav() {
         <a href="/blog" className="nav-v2-mobile-link" onClick={close}>Blog</a>
         <a href="/#contact" className="nav-v2-mobile-link" onClick={close}>Contact</a>
         <a href="/login" className="nav-v2-mobile-link" onClick={close}>Log in</a>
-        <a href="/#contact" className="nav-v2-mobile-cta" onClick={close}>Book a Call &rarr;</a>
+        <a href="/analyze" className="nav-v2-mobile-cta" onClick={close}>Book a Call &rarr;</a>
       </div>
     </>
   );

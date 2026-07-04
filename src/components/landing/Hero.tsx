@@ -1,15 +1,16 @@
 'use client';
 import ChatWidget from '@/components/landing/ChatWidget';
 
-// Creator strip placeholder data — 7 cards with varied heights matching dc.html pattern
+// Creator strip — 8 cards with varied heights matching dc.html pattern
 const CREATOR_CARDS = [
-  { name: 'Creator One',   subs: '2.4M subscribers', w: '200px', h: '340px' },
-  { name: 'Creator Two',   subs: '1.1M subscribers', w: '200px', h: '280px' },
-  { name: 'Creator Three', subs: '850K subscribers',  w: '200px', h: '320px' },
-  { name: 'Creator Four',  subs: '3.2M subscribers',  w: '200px', h: '360px' },
-  { name: 'Creator Five',  subs: '640K subscribers',  w: '200px', h: '300px' },
-  { name: 'Creator Six',   subs: '1.8M subscribers',  w: '200px', h: '340px' },
-  { name: 'Creator Seven', subs: '920K subscribers',  w: '200px', h: '290px' },
+  { name: 'Travel & Lifestyle',        w: '200px', h: '340px', img: '/images/creators/influencer-v1.jpg' },
+  { name: '2D Animation',              w: '200px', h: '300px', img: '/images/creators/bamboo.jpg' },
+  { name: 'Business & Finance',        w: '200px', h: '290px', img: '/images/creators/business-v2-clean.jpg' },
+  { name: 'Tech Reviews',              w: '200px', h: '280px', img: '/images/creators/asian-creator-v2.jpg' },
+  { name: '3D Animation',              w: '200px', h: '310px', img: '/images/creators/squirrel-v1.jpg' },
+  { name: 'Regional Cooking',          w: '200px', h: '340px', img: '/images/creators/russian-final.jpg' },
+  { name: 'Science Divulgation',       w: '200px', h: '320px', img: '/images/creators/scholastic-v2.jpg' },
+  { name: 'Documentary · Video Essays',w: '200px', h: '360px', img: '/images/creators/johnny-v1.jpg' },
 ];
 
 // Gradient palette for placeholder circles
@@ -72,16 +73,23 @@ export default function Hero() {
               role="img"
               aria-label={c.name}
             >
-              {/* TODO: fotos reales — placeholder con gradiente */}
-              <div
-                className="hero-v2__creator-placeholder"
-                style={{ background: GRADIENTS[i % GRADIENTS.length] }}
-                aria-hidden="true"
-              />
+                  {/* Background: real photo or gradient placeholder */}
+              {c.img ? (
+                <div
+                  className="hero-v2__creator-photo"
+                  style={{ backgroundImage: `url(${c.img})` }}
+                  aria-hidden="true"
+                />
+              ) : (
+                <div
+                  className="hero-v2__creator-placeholder"
+                  style={{ background: GRADIENTS[i % GRADIENTS.length] }}
+                  aria-hidden="true"
+                />
+              )}
               <div className="hero-v2__creator-gradient" aria-hidden="true" />
               <div className="hero-v2__creator-info">
                 <div className="hero-v2__creator-name">{c.name}</div>
-                <div className="hero-v2__creator-subs">{c.subs}</div>
               </div>
             </div>
           ))}
