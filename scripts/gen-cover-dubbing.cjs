@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const fs = require('fs');
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '***REMOVED***');
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 
 const prompt = `Documentary photograph. Shot on Canon EOS R5 with 50mm f/2.0 lens, ISO 800. Kodak Portra 400 tonality — warm midtones, matte film finish, lifted shadows.
 

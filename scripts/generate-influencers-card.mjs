@@ -13,7 +13,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { writeFileSync } from "fs";
 
-const API_KEY = "***REMOVED***";
+const API_KEY = process.env.GOOGLE_AI_API_KEY;
 const DEST = "/Users/julianrinta/projects/hypeon-website/public/images/whatwemake/influencers.jpg";
 
 // PROMPT — SCHEMA AVANZATO

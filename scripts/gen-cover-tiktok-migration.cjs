@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const fs = require('fs');
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '***REMOVED***');
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 
 const prompt = `Cinematic documentary photograph. Shot on Canon EOS R5 with 70mm f/2.8 lens, ISO 200. Kodak Ektar 100 tonality — vivid saturated colors, crisp detail, punchy contrast.
 

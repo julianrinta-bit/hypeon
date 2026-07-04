@@ -1,7 +1,7 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const fs = require('fs');
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || '***REMOVED***');
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
 
 const MODEL_CASCADE = [
   'gemini-3-pro-image-preview',

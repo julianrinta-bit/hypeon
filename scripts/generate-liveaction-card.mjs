@@ -20,7 +20,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { writeFileSync, readFileSync } from "fs";
 
-const API_KEY = "***REMOVED***";
+const API_KEY = process.env.GOOGLE_AI_API_KEY;
 const DEST = "/Users/julianrinta/projects/hypeon-website/public/images/whatwemake/liveaction.jpg";
 
 // ─── Load both reference images as inlineData ───────────────────────────────

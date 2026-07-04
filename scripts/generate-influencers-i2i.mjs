@@ -11,7 +11,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { writeFileSync, readFileSync } from "fs";
 
-const API_KEY = process.env.GOOGLE_AI_API_KEY || "***REMOVED***";
+const API_KEY = process.env.GOOGLE_AI_API_KEY;
 const REFERENCE_PATH = "/tmp/reference-influencers.jpg";
 const DEST = "/Users/julianrinta/projects/hypeon-website/public/images/whatwemake/influencers.jpg";
 

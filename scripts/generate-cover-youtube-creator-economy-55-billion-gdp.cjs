@@ -2,7 +2,7 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 const fs = require('fs');
 const path = require('path');
 
-const API_KEY = process.env.GOOGLE_AI_API_KEY || '***REMOVED***';
+const API_KEY = process.env.GOOGLE_AI_API_KEY;
 
 async function generate() {
   const genAI = new GoogleGenerativeAI(API_KEY);
