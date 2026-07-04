@@ -7351,16 +7351,18 @@ select:focus-visible,
 .sp-yt-badge {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  border: 1px solid var(--border-light);
+  gap: 8px;
+  border: 1px solid #D8D8D0;
   border-radius: var(--radius-pill);
-  padding: 8px 20px;
+  padding: 7px 16px 7px 12px;
   background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.04);
 }
 
 .sp-yt-badge__label {
-  color: var(--fg-dark-muted);
-  font-size: 0.6rem;
+  color: var(--fg-dark-mid);
+  font-size: 0.65rem;
+  letter-spacing: 0.04em;
 }
 
 /* Responsive: 2-col on tablet, 1-col on mobile */
@@ -7442,15 +7444,16 @@ select:focus-visible,
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  border: 1px solid rgba(255, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   border-radius: 100px;
-  padding: 6px 14px;
-  background: rgba(255, 0, 0, 0.08);
+  padding: 6px 14px 6px 10px;
+  background: rgba(255, 255, 255, 0.07);
 }
 
 .sp-platform-yt-label {
-  color: rgba(255, 100, 100, 0.9) !important;
-  font-size: 0.52rem;
+  color: rgba(255, 255, 255, 0.90) !important;
+  font-size: 0.6rem;
+  letter-spacing: 0.04em;
 }
 
 .sp-platform-right {
@@ -10573,4 +10576,26 @@ select:focus-visible,
   background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
+}
+
+/* ─── PATCH: YouTube badge icon/text alignment fix ────────────────────────────
+   Root cause: .eyebrow (0,1,0) forces display:flex + margin-bottom:24px on the
+   label <span>, which breaks vertical centering inside the badge flex row.
+   Fix: neutralise those side-effects on both badge label spans, and ensure the
+   SVG icon renders as a block with no extra descent.
+   Specificity (0,2,0) beats .eyebrow (0,1,0) on both selectors.
+─────────────────────────────────────────────────────────────────────────────── */
+.sp-yt-badge .sp-yt-badge__label,
+.sp-platform-yt-badge .sp-platform-yt-label {
+  display: inline;          /* override .eyebrow display:flex */
+  margin-bottom: 0;         /* override .eyebrow margin-bottom:24px */
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.sp-yt-badge svg,
+.sp-platform-yt-badge svg {
+  display: block;           /* remove inline descender gap */
+  flex-shrink: 0;
+  align-self: center;
 }
