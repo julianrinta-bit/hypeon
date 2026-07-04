@@ -47,8 +47,7 @@ const CATEGORIES: ContentCard[] = [
     headline: 'Animated & live-action kids programming',
     body: 'Educational, entertaining, and designed to keep young audiences coming back.',
     gradient: 'linear-gradient(135deg, #1a2a4a, #2d1a6e)',
-    emoji: '🎨',
-    // TODO: reemplazar por asset real en /public/images/whatwemake/kids.jpg
+    image: '/images/whatwemake/kidsfamily.jpg',
   },
   {
     category: 'Podcasts & Talk Shows',
