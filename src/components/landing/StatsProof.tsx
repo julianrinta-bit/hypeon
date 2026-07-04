@@ -19,7 +19,7 @@ import CountUp from '@/components/ui/CountUp';
 
 const CARDS = [
   {
-    num: 20,
+    num: 22,
     suffix: 'B+',
     prefix: '',
     label: 'Organic Views',

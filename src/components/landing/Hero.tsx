@@ -50,7 +50,7 @@ export default function Hero() {
         {/* Subtext — exact copy from dc.html */}
         <p className="hero-v2__subtext">
           We turn underperforming channels into growth engines — strategy, production,
-          thumbnails, and multi-language expansion built on 20B+ views.
+          thumbnails, and multi-language expansion built on 22B+ views.
         </p>
 
         {/* Chat widget — centered, max-width 640px */}

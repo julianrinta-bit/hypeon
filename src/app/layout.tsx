@@ -29,12 +29,12 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: 'Hype On Media — YouTube. Engineered.',
   description:
-    '20B+ organic views. $4M+/month revenue managed at peak. 50+ channels scaled across 15 languages. We turn underperforming YouTube channels into growth engines.',
+    '22B+ organic views. $4M+/month revenue managed at peak. 50+ channels scaled across 15 languages. We turn underperforming YouTube channels into growth engines.',
   metadataBase: new URL('https://hypeon.media'),
   openGraph: {
     title: 'Hype On Media — YouTube. Engineered.',
     description:
-      '20B+ organic views. $4M+/month revenue managed at peak. 50+ channels scaled.',
+      '22B+ organic views. $4M+/month revenue managed at peak. 50+ channels scaled.',
     type: 'website',
     url: 'https://hypeon.media',
     images: ['/og-image.jpg'],
