@@ -60,18 +60,6 @@ export default function ChatWidget() {
 
   return (
     <div className="chat-widget">
-      {/* Top bar: equalizer + label + dot */}
-      <div className="chat-widget__topbar">
-        <div className="chat-widget__eq" aria-hidden="true">
-          <span className="chat-widget__eq-bar chat-widget__eq-bar--1" />
-          <span className="chat-widget__eq-bar chat-widget__eq-bar--2" />
-          <span className="chat-widget__eq-bar chat-widget__eq-bar--3" />
-          <span className="chat-widget__eq-bar chat-widget__eq-bar--4" />
-        </div>
-        <span className="chat-widget__label">Hype On Advisor</span>
-        <span className="chat-widget__dot" aria-hidden="true" />
-      </div>
-
       {/* Input row */}
       <div className="chat-widget__input-row">
         <div className="chat-widget__input-wrap">
@@ -130,11 +118,6 @@ export default function ChatWidget() {
           </button>
         ))}
       </div>
-
-      {/* Urgency line */}
-      <p className="chat-widget__urgency">
-        3 new audit slots left this month · Response within 48h
-      </p>
     </div>
   );
 }
