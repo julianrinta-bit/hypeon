@@ -20,6 +20,7 @@ interface ContentCard {
   headline: string;
   body: string;
   gradient: string;
+  image?: string;
   emoji?: string;
   video?: string;
 }
@@ -30,7 +31,7 @@ const CATEGORIES: ContentCard[] = [
     headline: 'Short & long-form for creator-led channels',
     body: 'Scripted series, vlogs, reaction content — built to grow audiences, not just fill a calendar.',
     gradient: 'linear-gradient(135deg, #1a0a2e, #3d1a6e)',
-    // TODO: reemplazar por asset real en /public/images/whatwemake/influencers.jpg
+    image: '/images/whatwemake/influencers.jpg',
     video: '/video/productions/bamboo-clip.mp4',
   },
   {
@@ -97,10 +98,18 @@ function ContentCard({ card }: { card: ContentCard }) {
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Background: gradient placeholder */}
+      {/* Background: real image (if available) or gradient placeholder */}
       <div
         className="wmm-card__bg"
-        style={{ background: card.gradient }}
+        style={
+          card.image
+            ? {
+                backgroundImage: `url(${card.image})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center top',
+              }
+            : { background: card.gradient }
+        }
         aria-hidden="true"
       />
       {/* Subtle noise/grid texture overlay */}
@@ -121,8 +130,11 @@ function ContentCard({ card }: { card: ContentCard }) {
         />
       )}
 
-      {/* Gradient overlay */}
-      <div className="wmm-card__overlay" aria-hidden="true" />
+      {/* Gradient overlay — stronger bottom fade when real image is present */}
+      <div
+        className={`wmm-card__overlay${card.image ? ' wmm-card__overlay--photo' : ''}`}
+        aria-hidden="true"
+      />
 
       {/* Card body */}
       <div className="wmm-card__body">

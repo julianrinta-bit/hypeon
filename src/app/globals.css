@@ -7831,17 +7831,13 @@ select:focus-visible,
   scroll-snap-type: none;
 }
 
-/* Individual card */
+/* Individual card — grid item (no carousel, no fixed width) */
 .wmm-card {
   position: relative;
-  width: 320px;
-  min-width: 320px;
   height: 280px;
-  border-radius: var(--radius-card);
+  border-radius: 12px;
   overflow: hidden;
   cursor: pointer;
-  scroll-snap-align: start;
-  flex-shrink: 0;
 }
 
 .wmm-card__bg {
@@ -7895,6 +7891,16 @@ select:focus-visible,
 
 .wmm-card:hover .wmm-card__overlay {
   opacity: 0.35;
+}
+
+/* Photo variant: transparent at top (subject visible), strong fade at bottom (text legible) */
+.wmm-card__overlay--photo {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.08) 0%, rgba(0, 0, 0, 0.55) 55%, rgba(0, 0, 0, 0.88) 100%);
+  opacity: 1;
+}
+
+.wmm-card:hover .wmm-card__overlay--photo {
+  opacity: 0.7;
 }
 
 /* Card content */
