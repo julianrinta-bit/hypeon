@@ -21,7 +21,7 @@
 
 export default function ClientPortal() {
   return (
-    <section className="section section--white cp-section" id="portal">
+    <section className="section section--cream cp-section" id="portal">
       <div className="container">
         <div className="cp-grid">
           {/* Left: copy */}
@@ -64,7 +64,7 @@ export default function ClientPortal() {
             </ul>
 
             <a href="#contact" className="btn-dark cp-cta">
-              Request Early Access <span className="arrow">→</span>
+              Get access with your audit <span className="arrow">→</span>
             </a>
           </div>
 
@@ -75,9 +75,17 @@ export default function ClientPortal() {
             {/* App header bar */}
             <div className="cp-mock__header">
               <div className="cp-mock__logo">
-                <span className="cp-mock__logo-dot" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/email-logo.png"
+                  alt=""
+                  width={16}
+                  height={16}
+                  className="cp-mock__logo-img"
+                  aria-hidden="true"
+                />
                 <span className="eyebrow cp-mock__logo-label">
-                  Hype On · Client Portal
+                  HYPE ON · CLIENT PORTAL
                 </span>
               </div>
               <div className="cp-mock__filters">

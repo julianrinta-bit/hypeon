@@ -6177,6 +6177,13 @@ select:focus-visible,
   85%, 100% { opacity: 0; }
 }
 
+/* phAppear: slide-in only. Used for placeholder cycling so text
+   is always visible between key-swaps (never flashes empty). */
+@keyframes phAppear {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* Blinking text cursor */
 @keyframes cursor {
   0%, 100% { opacity: 1; }
@@ -8241,7 +8248,8 @@ select:focus-visible,
 .cp-section {
   padding-top: clamp(5rem, 9vh, 8rem);
   padding-bottom: clamp(5rem, 9vh, 8rem);
-  border-top: 1px solid var(--border-light);
+  border-top: 1px solid #E5E5DC;
+  background: #F2F2EA;
 }
 
 .cp-grid {
@@ -8387,6 +8395,15 @@ select:focus-visible,
   background: var(--accent);
   display: inline-block;
   animation: pulseDot 1.8s ease-in-out infinite;
+}
+
+/* Logo "h" image in mockup header */
+.cp-mock__logo-img {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
 }
 
 .cp-mock__logo-label {
@@ -8880,7 +8897,10 @@ select:focus-visible,
   text-overflow: ellipsis;
   max-width: 100%;
   z-index: 0;
-  animation: placeholderFade 3.2s ease both;
+  /* phAppear: only animates IN (opacity 0→1, translateY 5→0).
+     Never animates back to opacity 0, so placeholder text is
+     always visible between cycles — no empty-input flash. */
+  animation: phAppear 350ms ease both;
 }
 
 .chat-widget__cursor {
