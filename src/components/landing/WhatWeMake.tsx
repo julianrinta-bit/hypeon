@@ -39,7 +39,7 @@ const CATEGORIES: ContentCard[] = [
     headline: 'Narrative docs & investigative series',
     body: 'From history to science to human interest — documentary formats that hold attention at scale.',
     gradient: 'linear-gradient(135deg, #0d1a0d, #1a3a2a)',
-    // TODO: reemplazar por asset real en /public/images/whatwemake/docs.jpg
+    image: '/images/whatwemake/documentaries.jpg',
     video: '/video/productions/unscripted-clip.mp4',
   },
   {
@@ -52,10 +52,10 @@ const CATEGORIES: ContentCard[] = [
   },
   {
     category: 'Podcasts & Talk Shows',
-    headline: 'Audio-first content adapted for YouTube',
+    headline: 'Podcasts & talk shows',
     body: 'Full production — recording, editing, clips, thumbnails — optimized for discovery on YouTube.',
     gradient: 'linear-gradient(135deg, #1a0a08, #3d1a10)',
-    // TODO: reemplazar por asset real en /public/images/whatwemake/podcasts.jpg
+    image: '/images/whatwemake/podcasts.jpg',
     video: '/video/productions/realidades-clip.mp4',
   },
   {
@@ -63,14 +63,14 @@ const CATEGORIES: ContentCard[] = [
     headline: 'On-location & studio production',
     body: 'Automotive, travel, lifestyle, sport — we handle full production from shoot to publish.',
     gradient: 'linear-gradient(135deg, #0d1525, #1a2a40)',
-    // TODO: reemplazar por asset real en /public/images/whatwemake/live-action.jpg
+    image: '/images/whatwemake/liveaction.jpg',
   },
   {
     category: 'Multi-Language',
     headline: 'Content for global audiences in 15 languages',
     body: 'Dubbing, localization, and market-specific production — built to scale internationally.',
     gradient: 'linear-gradient(135deg, #1a1a0a, #2a2a14)',
-    // TODO: reemplazar por asset real en /public/images/whatwemake/multi-language.jpg
+    image: '/images/whatwemake/multilanguage.jpg',
   },
 ];
 
