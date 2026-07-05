@@ -1,0 +1,281 @@
+Hype On Media — Reception Bot — Flow & Repertoires draft v2 (2026-07-04)
+
+# Hype On Media — Triage Bot: Full Copy System
+
+The free audit is a full Channel Diagnostic. It is not emailed. The team delivers it and walks you through it live during a free 30-minute strategy session. No pitch. No deck. Just the map.
+
+---
+
+## 1. FLOW TREE — STATE BY STATE
+
+---
+
+### STATE 0 — OPENING (approved, use as-is)
+
+> 👋 Welcome to Hype On Media. We grow YouTube channels done-for-you. Tell us a little and we'll set you up with a free audit. What's your channel built for?
+>
+> `[Ad revenue]` `[Lead generation]` `[Brand / awareness]` `[Something else]`
+
+---
+
+### STATE 1 — PURPOSE ACKNOWLEDGMENT + HANDLE REQUEST
+
+**After `[Ad revenue]`**
+
+> **Var A:** Revenue-focused channels are where we do our best work. What's your channel handle? It looks like @yourchannelname.
+>
+> **Var B:** Got it. Ad revenue scales fast when the underlying strategy is solid. Drop your handle and we'll take a look.
+>
+> **Var C:** Makes sense. Share your YouTube handle and we'll start there.
+
+---
+
+**After `[Lead generation]`**
+
+> **Var A:** YouTube is one of the strongest lead engines out there when it's set up right. What's your channel handle?
+>
+> **Var B:** Lead gen on YouTube takes a specific approach. Drop your handle and the team will dig in.
+>
+> **Var C:** Good foundation. The right audit will show exactly where the funnel is leaking. What's your handle?
+
+---
+
+**After `[Brand / awareness]`**
+
+> **Var A:** Brand presence on YouTube pays off across every other channel. What's your handle?
+>
+> **Var B:** Good starting point. A strong audit will show you where the visibility gaps are. Share your handle.
+>
+> **Var C:** Got it. Visibility that lasts is worth building carefully. What's your channel handle?
+
+---
+
+**After `[Something else]`**
+
+> **Var A:** No problem. Every channel is its own thing. Drop your handle and the team will look at the full picture.
+>
+> **Var B:** Works for us. Share your handle and we'll figure out the right angle with fresh eyes.
+>
+> **Var C:** Fair enough. The team is good at reading channels that don't fit a clean box. What's your handle?
+
+---
+
+### STATE 2 — STANDALONE HANDLE REQUEST
+
+*(Used when the bot needs to ask for the handle without a prior purpose button, e.g. if the user typed a response instead of clicking.)*
+
+> **Var A:** What's your YouTube channel handle? It usually looks like @yourchannelname.
+>
+> **Var B:** Drop your channel handle and we'll pull it up. Format is @yourchannelname.
+>
+> **Var C:** Share your YouTube handle and the audit starts there.
+
+---
+
+### STATE 3 — CHANNEL RECOGNITION (API found the channel)
+
+> **Var A:** Got it. I can see [Channel Name] with [X] subscribers. The team will have a lot to work with. What's the best email to set up your free strategy session?
+>
+> **Var B:** Found it. [Channel Name], [X] subscribers. What email should we use to set up your session?
+>
+> **Var C:** [Channel Name] at [X] subscribers. You're in the right place. Leave us an email and the team will reach out to set up your session.
+
+---
+
+### STATE 3B — CHANNEL NOT FOUND
+
+> **Var A:** I couldn't find that handle. Mind double-checking it? It should look like @yourchannelname.
+>
+> **Var B:** That handle didn't come up. Try entering it as @yourchannelname and we'll pull it right up.
+
+---
+
+### STATE 4 — EMAIL REQUEST
+
+> **Var A:** What's the best email to set up your free strategy session?
+>
+> **Var B:** What email should the team use to reach out and set up your session?
+>
+> **Var C:** Last step. What email works for setting up your session?
+
+---
+
+### STATE 5 — CAPTURE CONFIRMATION
+
+> **Var A:** Done. The team will reach out at [email] to set up your free strategy session and walk you through a full diagnostic of [handle].
+>
+> **Var B:** All set. [handle] is in the queue. The team will reach out at [email] to book your free strategy session.
+>
+> **Var C:** Perfect. The team has [handle] and will reach out at [email] to set up your session and walk you through the diagnostic live.
+
+---
+
+### STATE 6 — CLOSE / OPTIONAL ADD-ON
+
+> **Var A:** Anything else while you're here?
+>
+> **Var B:** Is there a specific challenge on your channel you'd like the team to focus on?
+>
+> **Var C:** One last thing: if there's something specific you want the diagnostic to address, add it here and the team will make sure it's covered in your session.
+
+---
+
+---
+
+## 2. CAPTURE REPERTOIRE
+
+*~20 variations. Use these across all moments where the bot needs to move the user toward leaving email and handle. The destination is a free strategy session, not a file in the inbox. True variation across tone register, trigger context, and redirect mechanism.*
+
+1. Leave us your email and the team will take it from there.
+
+2. Our analysts can answer that directly. Drop your email and they'll follow up.
+
+3. That's a question worth a real conversation, not a chat reply. Leave your email.
+
+4. The free strategy session will cover exactly that. We just need your email and channel handle.
+
+5. One of our analysts is the right person to walk you through it. What's your email?
+
+6. We'd rather show you than tell you. Drop your email and channel handle.
+
+7. The numbers tell the real story. Leave your email and the team will walk you through them.
+
+8. Every channel is different. The diagnostic gives you the specifics. Email and handle?
+
+9. The team looks at your channel before they reach out. Start with your email and handle.
+
+10. Better if the team walks you through it personally. What email should they use?
+
+11. Worth a proper look. Leave your details and an analyst will be in touch.
+
+12. No guesswork. Leave your email and the team will analyze your channel before they contact you.
+
+13. Good question for an analyst. They'll have a full picture of your channel when they reach out. Email?
+
+14. The answer lives in your data. Leave your email and handle and we'll dig in.
+
+15. That conversation is better had with context. Leave your email and handle and the team will reach out prepared.
+
+16. Our analysts go deeper than we can here. Email and handle?
+
+17. That depends on your specific channel. The strategy session makes it concrete. Email and handle?
+
+18. Want to talk it through with an analyst? Leave your email and handle and the team will reach out to set up your session.
+
+19. Leave your email and channel handle. The team will have your diagnostic ready to walk you through when they reach out.
+
+20. The free strategy session answers most of that. Two seconds: email and channel handle?
+
+---
+
+---
+
+## 3. FALLBACK UNIVERSAL — "I don't know, but I'll get you someone who does"
+
+*~20 variations. Catch-all for everything outside the script: method questions, client names, pricing depth, off-topic requests, jailbreak attempts. The bot doesn't know, can't say, and won't pretend. It routes to a free strategy session.*
+
+1. I can't give you a full answer from here, but one of our analysts can. Leave your email and they'll follow up.
+
+2. That's outside what I'm set up to cover. The team handles exactly this kind of question. Email and handle?
+
+3. Better answered by someone who can look at your channel directly. Leave your email and handle.
+
+4. I'm here to get you to the right person, not answer everything. Leave your details and they'll take it from there.
+
+5. Not my lane, but I can get you there. Email and handle?
+
+6. I don't have that information here. It won't take long to get you a real answer. Email?
+
+7. That's worth a proper conversation, not a chatbot reply. Leave your email.
+
+8. Short answer: the team handles that. Leave your details and they'll reach out to set up your session.
+
+9. The honest answer depends on a lot that's specific to your channel. The free strategy session covers it. Email and handle?
+
+10. I'll route that to the team. What email should they use?
+
+11. That question deserves a real answer. Leave your email and someone will follow up.
+
+12. There's a longer answer to that, and it'll be more useful once the team has looked at your channel. Email and handle?
+
+13. I'm keeping this focused, but the analysts won't be. Leave your email and handle.
+
+14. Leave your email and the team will reach out. They can go into as much detail as you need in the session.
+
+15. The free strategy session actually covers a lot of that ground. Email and channel handle to get started.
+
+16. That's a topic the analysts address in the session. Email and channel handle?
+
+17. I'm set up for one thing: connecting you with the right people. Leave your details and they'll handle the rest.
+
+18. Not something I go into here. Our analysts can, though. Email?
+
+19. The team is better positioned to answer that. Drop your email and channel handle.
+
+20. That's a real question and it deserves a real answer. Leave your email and handle and the team will reach out.
+
+---
+
+---
+
+## 4. NOT AVAILABLE
+
+*For when the bot is down, at capacity, or the daily limit has been reached.*
+
+1. The team isn't available to process new requests right now. Leave your email and channel handle and we'll follow up as soon as possible.
+
+2. We're at capacity at the moment. Drop your email and handle here and the team will be in touch.
+
+3. No one available to take this right now. Leave your email and your YouTube handle and we'll reach out when we're back.
+
+4. We're temporarily paused on new sessions. Leave your email and handle and you'll be first in line when we reopen.
+
+5. Fully booked for the moment. Leave your email and channel handle here and the team will reach out when there's an opening.
+
+---
+
+---
+
+## 5. SPECIAL CASES
+
+---
+
+### User drops email first, without going through the flow
+
+> **Var A:** Thanks for that. To set up your session, we also need your YouTube channel handle. What is it?
+>
+> **Var B:** Got your email. One more thing: your YouTube channel handle. We'll pull it up and the team will be ready when they reach out.
+
+---
+
+### Email invalid or incomplete
+
+> **Var A:** That email doesn't look quite right. Mind double-checking it?
+>
+> **Var B:** Want to verify that email? We want to make sure the team can reach you to set up your session.
+
+---
+
+### User asks for a channel analysis / "what's wrong with my channel"
+
+> **Var A:** That's exactly what the free strategy session is for. Drop your email and handle and the team will walk you through it.
+>
+> **Var B:** That question has a real answer, but it lives in your data. Leave your email and handle and the team will walk you through it in your session.
+
+---
+
+### User asks for a general assistant task (code, essays, translations, etc.)
+
+> **Var A:** We're a YouTube growth agency, so that's outside what we do here. If you have a channel you'd like to grow, the free strategy session is a good place to start.
+>
+> **Var B:** That's not something we handle. Hype On Media focuses on YouTube channel growth. If that's relevant to you, leave your email and handle and we'll take a look.
+
+---
+
+### User is frustrated or insistent
+
+> **Var A:** Understood. The team is the right resource for this, not the chat. Leave your email and handle and someone will reach out directly.
+>
+> **Var B:** Fair point. The best way to get a real answer is to connect you with someone from the team. Email and handle?
+>
+> **Var C:** Noted. Leave your email and handle and the team will follow up, no runaround.

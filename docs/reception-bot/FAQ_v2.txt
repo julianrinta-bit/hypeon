@@ -1,0 +1,557 @@
+Hype On Media — Reception Bot — FAQ draft v2 (2026-07-04)
+
+# Hypeon.media Chat Triage FAQ
+## Deterministic Auto-Responder Copy Bank
+### ~52 Core Questions, 2-3 Variations Each
+
+---
+
+## 1. Identity
+
+---
+
+**What is Hype On Media?**
+
+> A: We're a YouTube performance agency, and we're also a content production studio. The work covers done-for-you growth: strategy, scripting, production, thumbnails and packaging, analytics, and multi-language expansion.
+
+> B: Hype On Media is a YouTube agency with a full production studio in-house. We help creators and brands grow on YouTube end to end. Leave your email and the team will reach out to show you what that looks like in practice.
+
+> C: We're two things in one: a YouTube performance agency and a content production studio. Drop your email and one of our analysts will walk you through the work.
+
+---
+
+**What exactly do you do?**
+
+> A: We're a YouTube performance agency, and we're also a content production studio. In practice, that means done-for-you YouTube growth: strategy, scripting, production, thumbnails and packaging, analytics, and multi-language expansion.
+
+> B: We grow YouTube channels. That covers the full stack: strategy, scripting, production, thumbnail design, analytics, and expanding into other languages and markets. Leave your email and an analyst will map out where you'd benefit most.
+
+> C: End-to-end YouTube growth. Strategy and scripting on one side, production and packaging on the other, with analytics and multi-language expansion built in. Drop your details and we can talk specifics.
+
+---
+
+**Where are you based?**
+
+> A: The agency is headquartered in Dubai. The team is distributed, and we work with clients all over the world.
+
+> B: Dubai is home base, but we operate globally. Time zones have never been a blocker for our clients.
+
+> C: We're based in Dubai and work remotely with channels across multiple continents. Leave your email and the team will reach out.
+
+---
+
+**How long have you been around?**
+
+> A: The agency has been operating for several years, built on a track record that goes back much further. The team has been scaling channels since the early days of the platform.
+
+> B: We've been running as an agency for a while, and the team behind it brings over a decade of hands-on YouTube experience. That's the foundation.
+
+> C: The agency is relatively young. The team's YouTube experience is not. Leave your email and an analyst will fill in the details.
+
+---
+
+**Who is behind the agency?**
+
+> A: We keep a faceless brand by design. What we can tell you is the team has scaled channels into the billions of views, in over 15 languages, across more than 50 channels. The work speaks for that.
+
+> B: No names up front, by design. The team has built and scaled channels at the highest levels of the platform, and you'll hear directly from an analyst when you leave your email.
+
+> C: The team is made up of people who've spent their careers inside the YouTube industry, not advising from the outside. Leave your email and an analyst will introduce themselves.
+
+---
+
+**Are you a real agency or a solo consultant?**
+
+> A: We're a full agency. Dedicated analysts, a production team, and strategists working together. Not a one-person operation.
+
+> B: Real agency with dedicated teams handling strategy, production, and analytics. Leave your email and you'll see that when an analyst reaches out.
+
+> C: We're a full-service agency with a production studio. Different people handle strategy, scripting, design, and analytics. Not a freelancer with a nice website.
+
+---
+
+## 2. Services
+
+---
+
+**What services do you offer?**
+
+> A: Channel strategy, scripting, video production, thumbnail and packaging design, analytics and reporting, and multi-language expansion. We can take on the full channel or focus on specific areas depending on what you need.
+
+> B: The full list covers strategy, scripting, production, thumbnails, analytics, and expanding into other languages. We work as a full partner or plug into specific gaps. Drop your email and an analyst will map out what fits.
+
+> C: Done-for-you YouTube growth, end to end. That covers everything from strategy and scripting to production, packaging, and multi-language. Leave your email to get into specifics.
+
+---
+
+**Do you do full video production?**
+
+> A: Yes. From scripting to final edit. We have a production studio in-house.
+
+> B: Yes. The studio handles scripting, editing, and delivery. Leave your email and an analyst can walk you through how the production process works.
+
+> C: Full production is part of what we do. Script, produce, edit, package. Drop your email and we'll explain the setup.
+
+---
+
+**Do you write scripts?**
+
+> A: Yes. Scripting is part of the core service, and it's built on channel strategy, not a blank page.
+
+> B: Yes. Our writers work from a data-informed strategy, so the scripts are shaped around what the audience actually responds to.
+
+> C: Scripting is something we handle, tied directly to the channel strategy. Leave your email and an analyst can detail what that looks like.
+
+---
+
+**Do you design thumbnails?**
+
+> A: Yes. Thumbnails and broader channel packaging are a core part of the work. Click-through is a growth lever on its own.
+
+> B: Yes. Thumbnail design, titles, channel art, packaging concepts. It's standard work for us, not an add-on.
+
+> C: Thumbnails and packaging are central to what we do. We treat them as a growth mechanism, not an afterthought. Drop your email and we'll show you examples.
+
+---
+
+**Do you handle YouTube SEO and optimization?**
+
+> A: Yes. Analytics, SEO, and channel optimization are part of how we operate. We track what's working and adjust accordingly.
+
+> B: Yes. Titles, descriptions, tags, and the analytics layer that tells you what's actually moving the needle. It's built into the service.
+
+> C: Analytics and optimization come with the work. We run on data, not guesswork. Leave your email and an analyst will walk you through the approach.
+
+---
+
+**Do you do channel strategy?**
+
+> A: Strategy is where everything starts for us. We don't produce content without a direction built on real data.
+
+> B: Yes. Channel strategy is the foundation. It informs everything else: what to make, how to package it, who you're reaching, and how to grow.
+
+> C: Strategy is the core of what we sell. Everything else is execution on top of it. Leave your email to get a read on your channel from our team.
+
+---
+
+**Can you manage the entire channel for us?**
+
+> A: Yes. We offer done-for-you management where we handle the full channel, end to end.
+
+> B: Yes. Some clients hand us the keys and we run the channel completely. Others bring us in for specific parts. The free strategy session helps figure out which makes sense for you. Leave your email.
+
+> C: Full channel management is part of what we do. Strategy, production, upload, analytics, all of it. Drop your email and an analyst will scope it out with you.
+
+---
+
+**Do you work with YouTube Shorts?**
+
+> A: Yes. Short-form is part of the work, whether standalone or as part of a broader channel strategy.
+
+> B: Yes. Shorts, long-form, or both. What fits depends on the channel and the goals. Leave your email and we'll figure out the right mix.
+
+> C: Shorts are part of our toolkit. We work with creators who are short-form only, long-form only, or a combination. Drop your email and an analyst will talk through the approach.
+
+---
+
+**Do you work with multiple languages or international markets?**
+
+> A: Yes. Multi-language expansion is one of the things that sets us apart. The team has scaled channels across more than 15 languages.
+
+> B: Yes, and it's a core part of the offer. We've expanded channels into 15-plus languages. Leave your email and an analyst can explain what that process looks like.
+
+> C: Multi-language is something we've done at significant scale: over 15 languages, across dozens of channels. Drop your email if you want to explore what that could mean for your channel.
+
+---
+
+**Do you provide analytics and reporting?**
+
+> A: Yes. Analytics and reporting are built into the service. We track what matters and act on it.
+
+> B: Yes. We don't just produce content and disappear. The analytics layer is how we know if the strategy is working and where to adjust.
+
+> C: Analytics and reporting come standard. You'll know what's moving, what isn't, and why. Leave your email and an analyst can tell you more.
+
+---
+
+## 3. Channel Types
+
+---
+
+**Do you work with gaming channels?**
+
+> A: Yes, always. Gaming is one of the channel types we work with regularly, alongside finance, education, kids, lifestyle, tech, cooking, and many more.
+
+> B: Yes. Gaming channels are part of what we handle, as well as finance, education, tech, fitness, kids and family, and plenty of others.
+
+> C: Yes. Gaming is well within our wheelhouse. Drop your email and an analyst will take a look at your channel specifically.
+
+---
+
+**Do you work with finance or business channels?**
+
+> A: Yes, always. Finance and business are among the niches we cover regularly, alongside gaming, education, tech, lifestyle, and more.
+
+> B: Yes. Finance channels, investing content, business education. They're all part of what we work with. Leave your email and we'll have an analyst take a look.
+
+> C: Yes. Finance and business channels are a regular part of the work. Drop your details and we'll connect you with the right analyst.
+
+---
+
+**Do you work with educational channels?**
+
+> A: Yes, always. Education is one of the niches we work with most, across formats and audience types. Leave your email and an analyst will reach out.
+
+> B: Yes. Educational content, whether explainer, tutorial, or documentary-style, is in our wheelhouse. Drop your email and we'll talk specifics.
+
+> C: Yes. Educational channels are part of the mix. What's the best email to reach you?
+
+---
+
+**Do you work with kids or family channels?**
+
+> A: Yes, always. Kids and family channels are part of what we do, alongside gaming, education, lifestyle, tech, and many more.
+
+> B: Yes. Kids and family content has its own set of rules and considerations, and we have real experience working within them. Leave your email and we can talk through your channel.
+
+> C: Yes. Kids channels come with specific platform requirements, and we know them. Drop your details and we'll be in touch.
+
+---
+
+**Do you work with lifestyle channels?**
+
+> A: Yes, always. Lifestyle is one of many niches we work with, including gaming, finance, education, cooking, beauty, fitness, and more.
+
+> B: Yes. Lifestyle, travel, vlog-format, day-in-the-life. Leave your email and an analyst will take it from there.
+
+> C: Yes. Lifestyle channels are part of the mix. Drop your email and one of our analysts will reach out.
+
+---
+
+**Do you work with tech or software channels?**
+
+> A: Yes, always. Tech, software, and product-focused channels are part of what we handle, alongside education, finance, gaming, and many more.
+
+> B: Yes. Tech channels, whether product reviews, tutorials, or founder-led content, are something we work with regularly.
+
+> C: Yes. Tech is one of the niches we cover. Leave your email and an analyst will be in touch.
+
+---
+
+**My niche is quite specific. Can you still help?**
+
+> A: Almost certainly, yes. We work across a wide range of niches, including several that are highly specialized. Leave your email so an analyst can take a proper look.
+
+> B: Niche is not a barrier. The strategy and production principles adapt to the audience and category. Leave your email and one of our analysts will give you an honest read.
+
+> C: Specific niches are not a problem. Our approach adapts to the content and the audience. Drop your email and we'll tell you what we see.
+
+---
+
+**Do you work with brand or corporate YouTube channels?**
+
+> A: Yes, always. Brands running YouTube channels are among the clients we work with, alongside individual creators and media companies.
+
+> B: Yes. Brand channels, corporate channels, company-owned media. They all go through the same strategic process. Leave your email and an analyst can walk you through the approach.
+
+> C: Yes. Brands and organizations are a regular part of our client base. Drop your details and we'll connect you with the right analyst.
+
+---
+
+## 4. The Free Audit
+
+---
+
+**What is the free audit?**
+
+> A: A 30-minute call. I walk through what I see in your data, where the open lanes are, and what the first eight weeks look like. No pitch. No deck. Just the map.
+
+> B: It's a free 30-minute strategy session. Before the call, the team prepares a full data diagnostic of your channel, and we walk you through it live. No pitch, no obligation. Leave your email and the team will reach out to set up your free strategy session.
+
+> C: A free strategy session where one of our analysts walks you through a complete, data-driven diagnostic of your channel in real time. It costs nothing, and it happens live on the call. What's the best email to reach you?
+
+---
+
+**Is the audit really free, no strings attached?**
+
+> A: Yes, genuinely. No hidden fees, no credit card. Leave your email and the team will reach out to set up the session.
+
+> B: Really free. The session is how we both figure out if there's a good fit. There's no catch.
+
+> C: Yes. Our analysts do this because it's how we start the conversation properly. Drop your email and we'll be in touch.
+
+---
+
+**What will I actually receive from the audit?**
+
+> A: A complete channel diagnostic, walked through live on the call: a health score, how you compare to your niche on each axis, what's working and what isn't, your thumbnails against the category leaders, niche trends, comparable channels, and where your traffic comes from.
+
+> B: In the session, the team walks you through a full data diagnostic: your channel's health score, how you stack up against your niche on each axis, your thumbnails versus the leaders, traffic sources, niche trends, and comparable channels. It's presented live, not emailed.
+
+> C: A full, data-driven read on your channel, presented during the strategy session. Health score, niche benchmarking on each axis, thumbnails against the leaders, traffic breakdown, comparables, and more. Leave your email and we'll set up the call.
+
+---
+
+**How long does the audit take?**
+
+> A: The session runs about 30 minutes. The team prepares the full diagnostic beforehand and walks you through it live. No pitch, no deck.
+
+> B: Around 30 minutes on the call. We build the complete channel diagnostic ahead of time, then walk you through it together. Leave your email and the team will reach out to set it up.
+
+> C: About half an hour. The heavy analysis happens on our end before we meet, so the session itself is spent walking you through what we found. No deck, no pitch. Drop your email to get on the calendar.
+
+---
+
+**What do you need from me to run the audit?**
+
+> A: Just your channel and an email address. The team handles the diagnostic. Leave your email and we'll reach out to set up the session.
+
+> B: Your channel link, your email, and about 30 minutes for the call. That's it. Drop your details here and we'll take it from there.
+
+> C: Not much. Mostly your channel and 30 minutes for the session. Leave your email and the team will handle the rest.
+
+---
+
+**What happens after the audit?**
+
+> A: You leave the call with a clear picture of where your channel stands. If there's a fit, the analyst will walk you through what working together would look like. No pressure either way.
+
+> B: The analyst presents the diagnostic live and, if it makes sense, talks through next steps. There's no obligation to continue. Leave your email to get it going.
+
+> C: You come away with a clearer picture of your channel's position and potential. If there's a good fit, we'll talk about how to move forward. What's your email?
+
+---
+
+## 5. Pricing
+
+---
+
+**How much does it cost to work with you?**
+
+> A: Pricing depends on the scope of what you need. The strategy session is free, and from there an analyst builds a proposal specific to your channel. Leave your email to get started.
+
+> B: It depends on what you need from us. There's no flat rate, because every channel is different. The free strategy session is where the right scope becomes clear. Drop your email and we'll work from there.
+
+> C: The session is free. After that, pricing is built from what your channel actually needs, not from a fixed menu. An analyst puts together a specific proposal. Leave your email and we can start there.
+
+---
+
+**Do you have packages or fixed plans?**
+
+> A: We don't work off a fixed menu. Every engagement is scoped to the channel and what it needs. The free strategy session is where that scoping happens. Leave your email.
+
+> B: We scope work to what makes sense for the channel, not a pre-built package. That detail comes after the session. Drop your email and we'll walk you through it.
+
+> C: No preset packages. What you pay for should match what your channel actually needs, and that becomes clear after the session. Leave your email to get there.
+
+---
+
+**Is there a minimum commitment or minimum budget?**
+
+> A: That's a fair question, and it's better answered by one of our analysts after they've looked at your channel. Leave your email and we'll give you a straight answer.
+
+> B: The specifics depend on the scope. Our analysts can tell you exactly what a realistic engagement looks like after the free session. Drop your email and we'll follow up.
+
+> C: Rather than give you a number that may not apply to your situation, let's start with the session. Leave your email and an analyst will be direct about what's realistic.
+
+---
+
+**Is there a free trial before I commit?**
+
+> A: The free strategy session is the equivalent. It's a real, data-driven diagnostic of your channel walked through live by our team, no strings attached.
+
+> B: The free strategy session is where we start. It gives you a real read on your situation before any commitment. Leave your email to get it scheduled.
+
+> C: There's no trial of the ongoing service, but the free session is substantive work we do upfront at no cost. Leave your email and we'll get it started.
+
+---
+
+**Can I see pricing upfront before talking to anyone?**
+
+> A: Pricing comes after the session, because it's built around your channel's actual needs. A number without that context wouldn't tell you much. Leave your email and we'll move quickly.
+
+> B: We don't publish pricing because it depends on scope. The free session is fast to schedule and gives you everything you need to make a real decision. Drop your email.
+
+> C: The honest answer is that pricing without knowing your channel wouldn't be useful. The session is how we give you a number that actually means something. Leave your email and an analyst will reach out.
+
+---
+
+## 6. Process and Logistics
+
+---
+
+**How do we get started?**
+
+> A: Leave your email here, and the team will reach out to set up your free strategy session. That's the first step.
+
+> B: Drop your email and we'll take it from there. The team will reach out to set up the session.
+
+> C: The first step is the free strategy session. Leave your email and an analyst will be in touch to set it up.
+
+---
+
+**Do you work remotely?**
+
+> A: Yes, entirely. Everything is done remotely. We work with clients across multiple continents and time zones.
+
+> B: Fully remote. Our clients are all over the world. Leave your email and we'll figure out the right time to connect.
+
+> C: Yes. The team is distributed, and so are our clients. Location has never been an issue. Drop your email and we'll reach out.
+
+---
+
+**Is there a contract?**
+
+> A: Yes. Any ongoing work is covered by a formal agreement. The details are reviewed after the session, when we know what the scope looks like.
+
+> B: There is. We work on a contract basis. The session comes first, then we get into that once the scope is clear. Leave your email.
+
+> C: There's a formal agreement for any ongoing engagement. That comes after the session, not before. Leave your email to get started.
+
+---
+
+**How long is the minimum commitment?**
+
+> A: That depends on the engagement. An analyst will be direct about what makes sense for your channel after the session. Leave your email and we'll get into it.
+
+> B: It varies by scope. Nothing ambiguous there, an analyst will give you a clear answer after reviewing your channel. Drop your email.
+
+> C: The commitment structure is something your analyst will walk through with you after the session. Leave your email and we'll get that conversation going.
+
+---
+
+**How do you communicate with clients day to day?**
+
+> A: Regular reporting, check-ins, and a direct line to the analyst managing your channel. The structure gets detailed once we know the scope. Leave your email.
+
+> B: Ongoing clients have a dedicated analyst and a reporting cadence built around the engagement. Drop your email and we'll talk through what that looks like for you.
+
+> C: The team communicates through regular check-ins and reporting, with direct access to the analyst on your account. Leave your email and we'll detail the setup.
+
+---
+
+**Who will actually be managing my channel?**
+
+> A: A dedicated analyst, with support from the broader team. You won't be handed off to a junior contact. Leave your email and we'll introduce you to the right person.
+
+> B: Your channel will have a dedicated analyst on it. Behind them, a team of strategists, producers, and designers depending on the scope.
+
+> C: You work with a dedicated analyst, not a rotation of different people. Leave your email and we'll introduce you to the team.
+
+---
+
+## 7. Results and Trust
+
+---
+
+**Do you guarantee results?**
+
+> A: We don't promise specific subscriber counts or view numbers, and any agency that does should be questioned. What we do commit to is rigorous work on the right things. Leave your email and the session will show you how we think.
+
+> B: No outcome guarantees. YouTube doesn't work that way, and we won't pretend it does. What we can tell you is that we don't take channels we can't genuinely help. The session is how we make sure. Drop your email.
+
+> C: We don't make promises on numbers. We do commit to a serious, data-driven approach. Leave your email and the free strategy session will give you a real sense of how we work.
+
+---
+
+**What kind of results have you achieved?**
+
+> A: The team has scaled channels into the billions of views, in over 15 languages, across more than 50 channels. What that means for your channel is what the session is for. Leave your email.
+
+> B: The track record includes 20 billion or more views, 50-plus channels, and growth across 15-plus languages. Your analyst can walk you through relevant examples. Leave your email.
+
+> C: We've grown channels from the ground up and managed them at the highest levels of the platform. The session is where we talk about what's realistic for yours specifically. Drop your email.
+
+---
+
+**How many channels have you worked with?**
+
+> A: More than 50 channels, across many languages and niches. Leave your email and an analyst can point you to the ones most relevant to your situation.
+
+> B: The team has run 50-plus channels, across gaming, education, kids, lifestyle, finance, and more, in over 15 languages.
+
+> C: More than 50 channels and counting. The specifics that matter to you are better covered in the session. Drop your email and we'll get into it.
+
+---
+
+**Have you actually grown channels to millions of subscribers?**
+
+> A: Yes. The team has scaled channels to millions of subscribers and into the billions of views. Leave your email and we'll talk about what that looks like for your channel.
+
+> B: Yes. Multiple channels built from scratch or accelerated to the millions. The session is where we talk about what's realistic for yours. Drop your email.
+
+> C: Yes. That's part of the track record. What's possible for your specific channel is what the session gets into. Leave your email.
+
+---
+
+**Can I see case studies or examples?**
+
+> A: Your analyst will walk you through relevant examples during the session. That's the right context for it. Leave your email to get started.
+
+> B: We have examples to share. The best way to see them in context is the strategy session. Leave your email and an analyst will reach out.
+
+> C: Examples and track record come up naturally in the session. Drop your email and we'll set that up.
+
+---
+
+**Why should I choose you over other YouTube agencies?**
+
+> A: The team behind this has scaled channels at a level most agencies only talk about: 20 billion or more views, 50-plus channels, 15-plus languages. The session is where that gets specific to your situation. Leave your email.
+
+> B: The track record is real and the session is free. You don't have to take our word for it. Leave your email and make your own assessment after talking to an analyst.
+
+> C: We'd rather show you than pitch you. 20 billion-plus views, more than 50 channels, over 15 languages. The free strategy session is the starting point. Drop your email.
+
+---
+
+## 8. Miscellaneous
+
+---
+
+**I'm just starting my channel. Is this the right time?**
+
+> A: Depends on the channel and the goals. Our analysts work with channels at different stages. Leave your email and we'll give you an honest read.
+
+> B: Starting channels is part of what we do. Whether it makes sense for where you are right now is what the session helps figure out. Drop your email.
+
+> C: Early-stage channels are part of the mix. Leave your email and an analyst will tell you what makes sense for your situation specifically.
+
+---
+
+**My channel already has a large audience. Can you still add value?**
+
+> A: Yes. Larger channels often have more leverage to unlock, not less. Leave your email and an analyst will take a look.
+
+> B: Yes. High-volume channels have their own set of growth points. The session covers exactly that. Drop your email.
+
+> C: Yes. The approach adapts to where the channel is, whether that's early growth or scaling from an existing audience. Leave your email.
+
+---
+
+**I'm a brand, not an individual creator. Can you help?**
+
+> A: Yes, always. Brands running YouTube channels are among our clients. The strategy adapts to the organization. Leave your email and an analyst will reach out.
+
+> B: Yes. Brand channels, corporate channels, and company-owned media all go through the same strategic process. Drop your email and we'll talk.
+
+> C: Brands are part of what we work with, whether building a channel from scratch or improving an existing one. Leave your email and we'll take it from there.
+
+---
+
+**I already have a team. Can you fill specific gaps?**
+
+> A: Yes. Some clients work with us end to end, others bring us in for specific parts: thumbnails, strategy, scripting, analytics, or multi-language. Leave your email and we can figure out the right fit.
+
+> B: Gap-filling is something we do regularly. Not every client needs the full stack. The session helps clarify where the leverage is. Drop your email.
+
+> C: Yes. Working alongside existing teams is a regular part of how we operate. Leave your email and an analyst will scope out what makes sense.
+
+---
+
+**Can I work with you on just one specific thing, like thumbnails or strategy?**
+
+> A: Yes. We work with clients on specific areas as well as the full channel. What that looks like depends on your situation. Leave your email and an analyst will walk you through the options.
+
+> B: Yes. Thumbnails, strategy, scripting, analytics, multi-language. Specific engagements are something we do. Drop your email and we'll talk through what fits.
+
+> C: Yes. The free strategy session is still the right starting point, because it tells us both where the work will actually move the needle. Leave your email to get it started.

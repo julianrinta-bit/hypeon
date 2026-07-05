@@ -1,217 +1,246 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { getReply } from '@/lib/chat-responses';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import BotButtons from './BotButtons';
+import EmailInput from './EmailInput';
 
-/* === ChatClient ===
-   Full chat UI for /chat page. Matches HypeOn Chat.dc.html design.
-   - 5 suggestion chips (from .dc.html) that disappear after first message
-   - On mount: if initialQ is set, auto-sends after 400ms
-   - User bubbles: right-aligned, rgba(200,255,46,.1)
-   - Bot bubbles: left-aligned, dark card with avatar "Hype On Advisor"
-   - Typing indicator: 3 animated dots
-   - Textarea: auto-resize ≤120px, Enter=send, Shift+Enter=newline
-   - CTA "Get a Free Channel Audit →" → /#contact when reply.cta=true
-*/
-
-interface Message {
-  id: number;
-  role: 'user' | 'bot';
+interface BotMessage {
   text: string;
   cta?: boolean;
 }
 
-interface Props {
-  initialQ?: string;
+interface BotButton {
+  label: string;
+  value: string;
 }
 
-const CHIPS = [
-  "What's wrong with my channel?",
-  'How can I grow faster?',
-  'How much am I leaving on the table?',
-  'How does multi-language expansion work?',
-  'What does a typical engagement look like?',
-];
+interface ConversationContext {
+  sessionId: string;
+  visitorId?: string;
+  turn: number;
+  purpose?: string;
+  handle?: string;
+  channelId?: string;
+  channelName?: string;
+  subscriberCount?: number;
+}
 
-export default function ChatClient({ initialQ = '' }: Props) {
-  const [messages, setMessages] = useState<Message[]>([]);
+type BotStateId = 'INIT' | 'AWAIT_PURPOSE' | 'AWAIT_HANDLE' | 'AWAIT_EMAIL' | 'DONE' | 'UNAVAILABLE';
+
+interface ChatMessage {
+  role: 'bot' | 'user';
+  text: string;
+  cta?: boolean;
+}
+
+function getOrCreateSessionId(): string {
+  if (typeof window === 'undefined') return crypto.randomUUID();
+  const key = 'hom_chat_session';
+  const existing = sessionStorage.getItem(key);
+  if (existing) return existing;
+  const id = crypto.randomUUID();
+  sessionStorage.setItem(key, id);
+  return id;
+}
+
+function getVisitorId(): string | undefined {
+  if (typeof window === 'undefined') return undefined;
+  try {
+    return localStorage.getItem('hom_vid') ?? undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export default function ChatClient() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [stateId, setStateId] = useState<BotStateId>('INIT');
+  const [context, setContext] = useState<ConversationContext | null>(null);
+  const [buttons, setButtons] = useState<BotButton[] | undefined>();
   const [inputValue, setInputValue] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [showChips, setShowChips] = useState(true);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const sentInitial = useRef(false);
+  const [loading, setLoading] = useState(false);
+  const [botTrap, setBotTrap] = useState('');
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const initSent = useRef(false);
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  const send = useCallback((text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-
-    setMessages(prev => [
-      ...prev,
-      { id: Date.now(), role: 'user', text: trimmed },
-    ]);
-    setInputValue('');
-    setIsTyping(true);
-    setShowChips(false);
-
-    // Reset textarea height
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-    }
-
-    const delay = 1200 + Math.random() * 600;
-    setTimeout(() => {
-      const reply = getReply(trimmed);
-      setIsTyping(false);
-      setMessages(prev => [
-        ...prev,
-        { id: Date.now() + 1, role: 'bot', text: reply.text, cta: reply.cta },
-      ]);
-    }, delay);
-  }, []);
-
-  // Auto-send initialQ after 400ms (from ?q= param)
-  useEffect(() => {
-    if (initialQ && !sentInitial.current) {
-      sentInitial.current = true;
-      const timer = setTimeout(() => send(initialQ), 400);
-      return () => clearTimeout(timer);
-    }
-  }, [initialQ, send]);
-
-  // Scroll on new messages / typing state change
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping, scrollToBottom]);
+  }, [messages, loading, scrollToBottom]);
 
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setInputValue(e.target.value);
-    // Auto-resize
-    const ta = e.target;
-    ta.style.height = 'auto';
-    ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
-  };
+  const sendMessage = useCallback(async (
+    input: string | null,
+    currentStateId: BotStateId,
+    currentContext: ConversationContext,
+  ) => {
+    setLoading(true);
+    setButtons(undefined);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          stateId: currentStateId,
+          input,
+          context: currentContext,
+          botTrap,
+        }),
+      });
+
+      if (!res.ok && res.status !== 429) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      const data = await res.json() as {
+        ok: boolean;
+        stateId: BotStateId;
+        messages: BotMessage[];
+        buttons?: BotButton[];
+        context: ConversationContext;
+      };
+
+      setMessages(prev => [
+        ...prev,
+        ...data.messages.map(m => ({ role: 'bot' as const, text: m.text, cta: m.cta })),
+      ]);
+      setStateId(data.stateId);
+      if (data.context?.sessionId) {
+        setContext(data.context);
+      }
+      if (data.buttons) setButtons(data.buttons);
+    } catch (err) {
+      console.error('[ChatClient] error:', err);
+      setMessages(prev => [
+        ...prev,
+        { role: 'bot', text: 'Something went wrong. Please refresh the page and try again.' },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  }, [botTrap]);
+
+  // Initialize chat on mount — exactly once
+  useEffect(() => {
+    if (initSent.current) return;
+    initSent.current = true;
+
+    const sessionId = getOrCreateSessionId();
+    const visitorId = getVisitorId();
+    const initialContext: ConversationContext = { sessionId, visitorId, turn: 0 };
+    setContext(initialContext);
+    sendMessage(null, 'INIT', initialContext);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleTextSubmit = useCallback(() => {
+    const trimmed = inputValue.trim();
+    if (!trimmed || loading || !context) return;
+
+    setMessages(prev => [...prev, { role: 'user', text: trimmed }]);
+    setInputValue('');
+    sendMessage(trimmed, stateId, context);
+  }, [inputValue, loading, context, stateId, sendMessage]);
+
+  const handleButtonSelect = useCallback((value: string, label: string) => {
+    if (loading || !context) return;
+    setMessages(prev => [...prev, { role: 'user', text: label }]);
+    sendMessage(value, stateId, context);
+  }, [loading, context, stateId, sendMessage]);
+
+  const handleEmailSubmit = useCallback((email: string) => {
+    if (loading || !context) return;
+    setMessages(prev => [...prev, { role: 'user', text: email }]);
+    sendMessage(email, stateId, context);
+  }, [loading, context, stateId, sendMessage]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      send(inputValue);
+      handleTextSubmit();
     }
   };
 
-  const isSendDisabled = inputValue.trim().length === 0 || isTyping;
+  const isDone = stateId === 'DONE';
+  const isUnavailableState = stateId === 'UNAVAILABLE';
+  const showEmailInput = stateId === 'AWAIT_EMAIL' && !loading;
+  const showButtons = buttons && buttons.length > 0 && !loading && !isDone;
+  const showTextInput = !isDone && !isUnavailableState && !showEmailInput && stateId !== 'AWAIT_PURPOSE';
 
   return (
-    <main id="main-content" className="chat-shell-page">
-      {/* Nav */}
-      <div className="chat-page-nav" role="banner">
-        <a href="/" className="chat-page-nav-logo" aria-label="Hype On Media home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/hypeon-logo.png" alt="Hype On" width={22} height={22} style={{ objectFit: 'contain' }} />
-          <span className="chat-page-nav-logo-text">Hype On Media</span>
-          <span className="chat-page-beta" aria-label="Beta">Beta</span>
-        </a>
-        <a href="/" className="chat-page-back">← Back</a>
-      </div>
+    <div className="chat-container">
+      {/* Honeypot — hidden from real users */}
+      <input
+        type="text"
+        name="website"
+        value={botTrap}
+        onChange={(e) => setBotTrap(e.target.value)}
+        tabIndex={-1}
+        aria-hidden="true"
+        style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }}
+        autoComplete="off"
+      />
 
-      {/* Messages */}
-      <div className="chat-messages" id="chat-messages-list" aria-live="polite" aria-label="Chat messages">
-
-        {/* Welcome block */}
-        <div className="chat-welcome">
-          <div className="chat-welcome-eyebrow">
-            <span className="chat-welcome-dot" aria-hidden="true" />
-            <span className="chat-welcome-label">Channel Advisor</span>
+      <div className="chat-messages" role="log" aria-live="polite" aria-label="Chat messages">
+        {messages.map((msg, i) => (
+          <div
+            key={i}
+            className={`chat-bubble ${msg.role === 'bot' ? 'chat-bubble-bot' : 'chat-bubble-user'}${msg.cta ? ' chat-bubble-cta' : ''}`}
+          >
+            {msg.text}
           </div>
-          <h1 className="chat-welcome-h1">
-            What&apos;s holding your<br />YouTube channel back?
-          </h1>
-          <p className="chat-welcome-sub">
-            Tell us about your channel — goals, challenges, or what you&apos;d like to improve. We&apos;ll give you honest, specific advice.
-          </p>
+        ))}
 
-          {/* Suggestion chips */}
-          {showChips && (
-            <div className="chat-chips" role="list" aria-label="Suggested questions">
-              {CHIPS.map((chip) => (
-                <button
-                  key={chip}
-                  className="chat-chip"
-                  role="listitem"
-                  onClick={() => send(chip)}
-                >
-                  {chip}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Message bubbles */}
-        {messages.map((msg) =>
-          msg.role === 'user' ? (
-            <div key={msg.id} className="chat-bubble-user" aria-label="You">
-              <p>{msg.text}</p>
-            </div>
-          ) : (
-            <div key={msg.id} className="chat-bubble-bot" aria-label="Hype On Advisor">
-              <div className="chat-bot-avatar">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/images/hypeon-logo.png" alt="" width={20} height={20} />
-                <span>Hype On Advisor</span>
-              </div>
-              <div className="chat-bot-inner">
-                <p>{msg.text}</p>
-                {msg.cta && (
-                  <a href="/#contact" className="chat-cta-btn">
-                    Get a Free Channel Audit →
-                  </a>
-                )}
-              </div>
-            </div>
-          )
-        )}
-
-        {/* Typing indicator */}
-        {isTyping && (
-          <div className="chat-typing" aria-label="Advisor is typing">
-            <div className="chat-bot-avatar">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/images/hypeon-logo.png" alt="" width={20} height={20} />
-              <span>Hype On Advisor</span>
-            </div>
-            <div className="chat-typing-inner">
-              <span className="chat-typing-dot" aria-hidden="true" />
-              <span className="chat-typing-dot" aria-hidden="true" />
-              <span className="chat-typing-dot" aria-hidden="true" />
-            </div>
+        {loading && (
+          <div className="chat-bubble chat-bubble-bot chat-typing" aria-label="Bot is typing">
+            <span className="chat-dot" />
+            <span className="chat-dot" />
+            <span className="chat-dot" />
           </div>
         )}
 
-        <div ref={messagesEndRef} />
+        <div ref={bottomRef} />
       </div>
 
-      {/* Input */}
-      <div className="chat-input-area">
+      {showButtons && (
+        <BotButtons
+          buttons={buttons}
+          onSelect={handleButtonSelect}
+          disabled={loading}
+        />
+      )}
+
+      {showEmailInput && (
+        <EmailInput onSubmit={handleEmailSubmit} disabled={loading} />
+      )}
+
+      {showTextInput && (
         <div className="chat-input-row">
-          <textarea
-            ref={textareaRef}
-            className="chat-textarea"
-            placeholder="Ask about your channel..."
-            rows={1}
+          <input
+            ref={inputRef}
+            type="text"
+            className="chat-text-input"
+            placeholder={
+              stateId === 'AWAIT_HANDLE'
+                ? 'Your YouTube handle (@yourname)…'
+                : 'Type a message…'
+            }
             value={inputValue}
-            onChange={handleInput}
+            onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            aria-label="Message input"
+            disabled={loading}
+            aria-label="Chat message input"
+            maxLength={500}
           />
           <button
             className="chat-send-btn"
-            onClick={() => send(inputValue)}
-            disabled={isSendDisabled}
+            onClick={handleTextSubmit}
+            disabled={loading || inputValue.trim().length === 0}
+            type="button"
             aria-label="Send message"
           >
             <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
@@ -219,10 +248,7 @@ export default function ChatClient({ initialQ = '' }: Props) {
             </svg>
           </button>
         </div>
-        <p className="chat-disclaimer">
-          Hype On Media · Not financial advice · For educational purposes
-        </p>
-      </div>
-    </main>
+      )}
+    </div>
   );
 }

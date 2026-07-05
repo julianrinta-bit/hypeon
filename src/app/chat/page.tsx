@@ -7,13 +7,6 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-interface Props {
-  searchParams: Promise<{ q?: string }>;
-}
-
-export default async function ChatPage({ searchParams }: Props) {
-  const params = await searchParams;
-  const initialQ = typeof params.q === 'string' ? params.q.trim() : '';
-
-  return <ChatClient initialQ={initialQ} />;
+export default function ChatPage() {
+  return <ChatClient />;
 }
