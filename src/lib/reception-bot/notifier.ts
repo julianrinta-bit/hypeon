@@ -1,4 +1,4 @@
-const LEAD_NOTIFICATION_EMAIL = 'julianrinta@gmail.com';
+const LEAD_NOTIFICATION_EMAIL = 'admin@hypeon.media';
 
 export interface LeadData {
   email: string;
@@ -46,7 +46,7 @@ export async function sendLeadNotification(lead: LeadData): Promise<void> {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        from: 'Hype On Media <onboarding@resend.dev>',
+        from: 'Hype On Media <noreply@hypeon.media>',
         to: [LEAD_NOTIFICATION_EMAIL],
         subject: `New lead: ${lead.email}${lead.channelName ? ` — ${lead.channelName}` : ''}`,
         text: lines,
