@@ -10,7 +10,7 @@ export default function Footer() {
         <div className="footer-v2-left">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/images/hypeon-logo.png" alt="" width={20} height={20} style={{ objectFit: 'contain' }} />
-          <span className="footer-v2-copy">Hype On Media · Outright Publishing LLC · © 2024–2026</span>
+          <span className="footer-v2-copy">Outright Publishing LLC dba Hype On Media · Delaware, USA · © 2024–2026</span>
         </div>
 
         {/* Right: links */}
