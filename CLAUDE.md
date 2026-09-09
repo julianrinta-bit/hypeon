@@ -123,6 +123,30 @@ A full-stack website platform for Hype On Media FZCO (YouTube performance agency
 ### PM2 ecosystem config (pattern)
 ### nginx pattern
 ### Build & deploy flow
+
+**PRODUCTION IS THE ALPHA DROPLET, NOT VERCEL. Pushing to GitHub does not deploy the live site.**
+
+`hypeon.media` resolves to `167.172.246.198` (the Alpha box), served by nginx in front of the PM2
+process `hypeon-website`, from `/opt/hypeon-website`. The deploy is manual:
+
+```bash
+ssh root@167.172.246.198
+cd /opt/hypeon-website && git pull --ff-only origin main && npm run build && pm2 restart hypeon-website --update-env
+```
+
+Chain them with `&&` so PM2 only restarts if the build succeeded.
+
+**Verify by artifact, always:** `curl -s "https://hypeon.media/?cb=$RANDOM" | grep <your change>`.
+A green deployment in `npx vercel ls` proves nothing about what the public sees.
+
+**The trap (found 2026-09-08).** A `.vercel/` link still exists in this repo, so every push to `main`
+creates a Vercel production deployment that reports Ready. It is a real, correct build, and it is not
+the live site. On 2026-09-08 the server was still on `5a088ef` from **2026-07-05**: two months of
+pushes that deployed only to a URL nobody looks at, while hypeon.media served July's code. The
+symptom that gives it away is a live page whose HTML does not contain a change that is verifiably in
+`main` and verifiably in the Vercel build. If you see that, do not go hunting for a cache bug (the
+`s-maxage=31536000` and `x-nextjs-cache: HIT` headers are a red herring): check the DNS first.
+
 ### What NOT to use
 - **Vercel** — Board decision: DigitalOcean. Server is already paid for. Full control over caching, SSL, and coexistence with Orbit.
 - **Docker** — Adds complexity for a single Next.js app. PM2 is sufficient. Docker makes sense at 5+ services, not 2.
@@ -187,6 +211,20 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 <!-- GSD:architecture-end -->
 
 ## Conventions — Learned the Hard Way
+
+### The `.eyebrow` Class Landmine (ocurrió 2 veces: badge Client Portal + badge Team YouTube Certified)
+
+**La clase base `.eyebrow` aplica `margin-bottom: 24px` + `display: flex`.** Cualquier `.eyebrow` (o label que use esa clase) dentro de un contenedor flex desalinea el ícono respecto al texto — el `margin-bottom` empuja el contenido hacia abajo y el `display: flex` interfiere con el flujo inline. Fix aditivo (nunca modificar la clase base):
+
+```css
+.tu-badge .eyebrow {
+  display: inline;
+  margin-bottom: 0;
+  vertical-align: middle;
+}
+```
+
+Nunca asumir que un badge o label dentro de flex se va a alinear solo. Si hay un `.eyebrow` dentro, override obligatorio.
 
 ### CSS Specificity
 
